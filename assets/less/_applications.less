@@ -1,0 +1,177 @@
+#listing-header{
+  border: none;
+}
+
+.space-card{
+  height: auto;
+}
+
+#property-listing, #space-card{
+  margin-top: 40px;
+
+  .space-card{
+    height: auto;
+  }
+
+  &.management-list .space-card{
+    height: auto;
+  }
+
+  .space-card .col-sm-8{
+    padding-top: 0;
+    padding-right: 15px;
+  }
+
+  .item.space-card .info > .row:not(:last-child){
+    margin-bottom: 5px;
+  }
+
+  .item.space-card .info > .row.margin-15{
+    margin-bottom: 15px;
+  }
+
+  h3.price{
+    position: initial;
+    background: initial;
+    color: inherit;
+    padding: 0;
+    color: @black;
+    &::before{
+      content: none;
+    }
+  }
+
+
+  .item{
+    background: #F2E9E2;
+    width: inherit;
+
+    &.no-bkg{
+      background: none;
+    }
+
+    h3{
+      border: none;
+      font-size: 20px;
+
+      a{
+        font-size: 14px;
+        text-transform: none;
+        font-weight: normal;
+        text-decoration: underline;
+        color: @red;
+      }
+
+      small{
+        color: @brown-item;
+        font-style: normal;
+        font-size: 16px;
+        margin-bottom: 5px;
+        display: block;
+        &.sub{
+          color: @brown-text-dark;
+          font-size: 14px;
+        }
+      }
+
+      &.price{
+        text-align: right;
+      }
+    }
+
+    h4{
+      font-size: 14px;
+      font-weight: 300;
+      text-transform: uppercase;
+      color: @brown-text;
+      margin-bottom: 5px;
+    }
+
+    .info{
+      width: auto;
+      float: none;
+      margin: auto;
+      padding: 25px 25px 0 0;
+
+      &.no-padding{
+        padding: 0;
+      }
+
+      & > .row:not(:last-child){
+        margin-bottom: 20px;
+      }
+    }
+
+    .item-desc{
+      height: 60px;
+
+      &.block{
+        height: auto;
+
+        .block-content{
+          height: auto;
+          min-height: 60px;
+          background: @white;
+        }
+      }
+
+      .row.status{
+        margin: 2px;
+        .col-sm-4{
+          padding: 0 2px;
+        }
+      }
+
+      .label-status{
+        cursor: default;
+        font-weight: bold;
+        padding: 4px 4px;
+        min-width: auto;
+        display: block;
+        font-size: 10px;
+      }
+
+    }
+
+    .border-box{
+      border-right: solid 1px @brown-light;
+    }
+
+    .dd-title{
+      color: @brown-item;
+      font-size: 14px;
+
+      strong{
+        line-height: inherit;
+        font-size: 24px;
+      }
+    }
+
+    .image{
+      position: relative;
+      overflow: visible;
+      height: 265px;
+      width: 100%;
+
+      img{
+        transform: initial;
+      }
+
+      .image-wrapper{
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .overlay{
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        img{
+          max-width: 100%;
+        }
+      }
+    }
+
+  }
+
+}

@@ -1,0 +1,452 @@
+{% extends "base.html.twig" %}
+
+{# {% block breadcrumb_items %}
+  <li><a href="{{ path('security_profil') }}">Mon compte</a></li>
+  <li><a href="{{ path('my_applications_list') }}">Mes candidatures</a></span></li>
+  <li><span>Ma candidature pour : {{application.space.name}}</span></li>
+{% endblock %} #}
+
+{% block stylesheets %}
+  {{ parent() }}
+
+  <link rel="stylesheet" href="{{ asset('bundles/app/css/print.css') }}" type="text/css" media="print" />
+
+  <style>
+    @media print {
+      /* Récap candidat (print uniquement) : version resserrée + charte, compatible PDF */
+      :root{
+        --brand-primary:#2D74BA;
+        --brand-accent:#F2BE6A;
+        --text:#1f2937;
+        --muted:#6b7280;
+        --line:#e5e7eb;
+        --card:#f8fafc;
+      }
+
+      /* Ne pas imprimer l'enrobage site / actions */
+      #header, .navbar, nav, header { display: none !important; }
+      .no-print { display: none !important; }
+      .application_buttons, .pagination-wrapper { display: none !important; }
+
+      /* Mise en page print compacte */
+      body { color: var(--text) !important; }
+      .white, .container { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+      .application-header { margin: 0 0 10px 0; padding: 10px 12px; border: 1px solid var(--line); border-left: 4px solid var(--brand-primary); background: var(--card); }
+      .application-space .image { display: none !important; } /* image inutile en PDF */
+
+      /* Impression en rangée (1 colonne), blocs empilés */
+      .row.print-grid { display: block !important; }
+      .print-span-2, .print-col-1, .print-col-2 { grid-column: auto; }
+
+      .box-information { break-inside: avoid; page-break-inside: avoid; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      .box-information.allow-break { break-inside: auto !important; page-break-inside: auto !important; }
+      .box-information .box-content { padding: 10px 10px; }
+      .box-information { margin-bottom: 10px; }
+      .box-information .box-title {
+        margin: 0 0 8px 0;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--brand-primary);
+        color: #0f3f6b;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .box-information table { width: 100%; border-collapse: collapse; }
+      .box-information table tbody tr { border-bottom: 1px solid var(--line); }
+      .box-information table tbody tr:last-child { border-bottom: 0; }
+      .box-information table th,
+      .box-information table td { font-size: 11px; padding: 5px 7px; }
+      .box-information table th { width: 34%; background: #fbfdff; font-weight: 700; color: #0b2239; }
+
+      a[href]:after { content: ""; } /* évite d'ajouter les URLs partout */
+
+      /* Remonter la section "Projet" en haut pour être sur la 1ère page */
+      .print-flow { display: flex !important; flex-direction: column; }
+      .print-flow .row { display: contents !important; } /* neutralise Bootstrap rows en print */
+      .print-order-project { order: 1; }
+      .print-order-contact { order: 2; }
+      .print-order-structure { order: 3; }
+      .print-order-social { order: 4; }
+      .print-order-docs { order: 5; }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+<div class="white"> 
+        <div class="container"> 
+<div class="application-header left">
+ <div class="row">
+    <div class="col-sm-6">
+        <h3>{{ application.name }}</h3>
+        <h6>{{ application.projectHolder.company }}</h6>
+         {% if not application.isDraft %}
+        <p>Candidature envoyée le {{ application.created|date('d/m/Y') }}</p>
+      {% endif %}
+    </div> 
+    <div class="col-sm-6 application-status right">
+      {% include 'Application/partials/_status_label.html.twig' %}
+    </div>
+</div>
+</div>
+
+{% set space = application.space %}
+<div class="application-space space-card item show-app" id="space-card">
+  <div class="item">
+    <div class="row row-flex">
+      <div class="col-xs-12 col-md-4 ">
+        <div class="image">
+          <div class="overlay">
+             {% if application.space.isClosed %}
+                          <div class="clos"><p> Appel à candidature cloturé</p></div>
+                        {% else %}
+                          <div class="encours"><p> Appel à candidature en cours</p></div>
+                        {% endif %}
+          </div>
+          <div class="image-wrapper">
+            <img class="img-responsive" src="{% if space.pics.0 is not null %}{{ vich_uploader_asset(application.space.pics.0, 'file') }}{% endif %}" alt="" />
+          </div>
+          <div class="availability-overlay">
+            <span class="availability-text">Période de disponibilité : {{ space.availability }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-md-8 box-info">
+        <div class="info">
+          <div class="row">
+            <div class="col-sm-7">
+                <p class="ville">{{ space.city }} ({{ space.zipCode|slice(0,2)}})</p>
+                <h5>{{ application.space.name }}</h5>               
+            </div>
+           {#  <div class="col-sm-5 right">
+               <a href="{{ path('space_show', {'id': space.id}) }}"class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Voir l'annonce</a>              
+            </div> #}
+    </div>
+
+    <div class="row">
+            <ul>
+              <li>{{ space.type }}</li>
+              <li>
+                {% if space.priceText %}
+                  {{ space.priceText }}
+                {% else %}
+                  À partir de {{ space.price * 12 }} € / m<sup>2</sup> / an
+                {% endif %}
+              </li>
+              <li>
+                <strong>{{ space.nbSpaces }}</strong> espace(s) de {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup>
+              </li>
+                <li>Bailleur: {{ application.space.owner.company }}</li>
+              </ul>
+             </div>
+     </div> 
+
+     <div class="info-candidature">
+                     <div class="row">
+                       <div class="col-sm-6">
+                            <div class="calendar"></div>
+                            <div class="apply-date">
+                            <p class="apply-date-p">Date limite de candidature</p>
+                            <p class="apply-date-b">
+                  {{ space.limitAvailability | localizeddate("long", "none") }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
+                  </p>
+                      </div>
+      </div>
+
+              <div class="col-sm-6 right">
+                  <a href="{{ path('space_show', { 'id': space.id }) }}" class="btn btn-line-19 btn-grey"><span>Voir fiche projet</span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+        
+
+<div class="print-flow">
+<div class="row print-sections">
+  <div class="col-sm-12 print-order-contact">
+    <div class="box-information">    
+      <div class="box-content">
+         <h4 class="box-title">
+        Contact
+      </h4>
+        <table>
+          <tbody>
+            <tr><th>Candidat</th><td>{{ application.projectHolder.fullName }}</td></tr>
+            {% if application.projectHolder.birthday %}
+              <tr><th>Date de naissance</th><td>{{ application.projectHolder.birthday|date('d/m/Y') }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.phone %}
+              <tr><th>Téléphone</th><td>{{ application.projectHolder.phone }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.email %}
+              <tr><th>Email</th><td>{{ application.projectHolder.email }}</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<div class="col-sm-12 print-order-structure">
+    <div class="box-information">    
+      <div class="box-content">
+          <h4 class="box-title">
+        Structure
+      </h4>
+        <table>
+          <tbody>
+            {% if application.projectHolder.company %}
+              <tr><th>Nom de la structure</th><td>{{ application.projectHolder.company }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.companyStatus %}
+              <tr><th>Statut</th><td>{{ application.projectHolder.companyStatus }}</td></tr>
+            {% endif %}
+            <tr>
+              <th>Date de création</th>
+              <td>
+                {% if application.projectHolder.companyCreationDate %}
+                    {{ application.projectHolder.companyCreationDate|date("d/m/Y") }}
+                {% endif %}
+              </td>
+            </tr>
+            {% if application.projectHolder.companyCreationDate %}
+              {# ligne conservée ci-dessus #}
+            {% endif %}
+            {% if application.projectHolder.siret %}
+              <tr><th>SIRET</th><td>{{ application.projectHolder.siret }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.city %}
+              <tr><th>Ville</th><td>{{ application.projectHolder.city }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.zipcode %}
+              <tr><th>Code postal</th><td>{{ application.projectHolder.zipcode }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.address %}
+              <tr><th>Adresse</th><td>{{ application.projectHolder.address }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.addressSuite %}
+              <tr><th>Adresse (suite)</th><td>{{ application.projectHolder.addressSuite }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.companyPhone %}
+              <tr><th>Téléphone fixe</th><td>{{ application.projectHolder.companyPhone }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.companyMobile %}
+              <tr><th>Téléphone mobile</th><td>{{ application.projectHolder.companyMobile }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.companyDescription %}
+              <tr><th>Présentation</th><td>{{ application.projectHolder.companyDescription|nl2br }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.companyEffective %}
+              <tr><th>Nombre de personnes dans la structure</th><td>{{ application.projectHolder.companyEffective }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.companyStructures %}
+              <tr><th>Structure(s) d'accompagnement</th><td>{{ application.projectHolder.companyStructures|nl2br }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.companySite %}
+              <tr><th>Site web</th><td>{% set _site = application.projectHolder.companySite|safe_href %}{% if _site %}<a href="{{ _site }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companySite|length > 30 ? application.projectHolder.companySite|slice(0, 30) ~ '...' : application.projectHolder.companySite }}</a>{% else %}{{ application.projectHolder.companySite }}{% endif %}</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row print-sections">
+  <div class="col-sm-12 print-order-project">
+    <div class="box-information allow-break">
+      <div class="box-content">
+      <h4 class="box-title">
+        Projet pour cet espace
+      </h4>
+        <table>
+          <tbody>
+            <tr><th>Nom du projet</th><td>{{ application.name }}</td></tr>
+            {% if application.projectHolder.useType %}
+              <tr><th>Type d'usage</th><td>{{ application.projectHolder.useType }}</td></tr>
+            {% endif %}
+            {% if application.category %}
+              <tr><th>Type de projet</th><td>{{ application.category }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.preferredDepartmentsLabels|length %}
+              <tr><th>Départements souhaités</th><td>{{ application.projectHolder.preferredDepartmentsLabels|join(', ') }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.companyStatus %}
+              <tr><th>Statut juridique (profil)</th><td>{{ application.projectHolder.companyStatus }}</td></tr>
+            {% endif %}
+            {% if application.companyStatus %}
+              <tr><th>Statut juridique (candidature)</th><td>{{ application.companyStatus }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.wishedSize %}
+              <tr><th>Surface souhaitée (profil)</th><td>{{ application.projectHolder.wishedSize }} m<sup>2</sup></td></tr>
+            {% endif %}
+            {% if application.wishedSize %}
+              <tr><th>Surface souhaitée (candidature)</th><td>{{ application.wishedSize }} m<sup>2</sup></td></tr>
+            {% endif %}
+            {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
+            {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
+            <tr>
+              <th>Durée d'occupation</th>
+              <td>
+                {% if _lengthValue %}
+                  {{ _lengthValue }}{% if _lengthType %} {{ _lengthType }}{% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+            </tr>
+            {% if application.projectHolder.monthlyBudgetMax %}
+              <tr><th>Budget mensuel total maximum</th><td>{{ application.projectHolder.monthlyBudgetMax }} €</td></tr>
+            {% endif %}
+            {% if application.startOccupation %}
+              <tr><th>Date d'entrée souhaitée</th><td>{{ application.startOccupation|date('d/m/Y') }}</td></tr>
+            {% endif %}
+            {% if application.description %}
+              <tr><th>Présentation du projet</th><td>{{ application.description|nl2br }}</td></tr>
+            {% endif %}
+            {% if application.localUsageDescription %}
+              <tr><th>Quel sera l'usage du local ?</th><td>{{ application.localUsageDescription|nl2br }}</td></tr>
+            {% endif %}
+            <tr><th>Ouvert(e) à un projet collectif</th><td>{{ application.openToGlobalProject ? 'Oui' : 'Non' }}</td></tr>
+            {% if application.contribution %}
+              <tr><th>Quelles idées avez-vous pour participer au projet collectif ?</th><td>{{ application.contribution|nl2br }}</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+{% set hasAnySocial = application.projectHolder.facebookUrl or application.projectHolder.twitterUrl or application.projectHolder.instagramUrl or application.projectHolder.linkedinUrl or application.projectHolder.googleUrl or application.projectHolder.otherUrl %}
+{% if hasAnySocial %}
+<div class="col-sm-6 print-order-social">
+    <div class="box-information">     
+      <div class="box-content">
+         <h4 class="box-title">
+        Réseaux sociaux
+      </h4>
+        <table>
+          <tbody>
+            {% if application.projectHolder.facebookUrl %}<tr><th><i class="fa-brands fa-facebook fa-lg"></i></th><td>{{ application.projectHolder.facebookUrl }}</td></tr>{% endif %}
+            {% if application.projectHolder.twitterUrl %}<tr><th><i class="fa-brands fa-x-twitter fa-lg"></i></th><td>{{ application.projectHolder.twitterUrl }}</td></tr>{% endif %}
+            {% if application.projectHolder.instagramUrl %}<tr><th><i class="fa-brands fa-instagram fa-lg"></i></th><td>{{ application.projectHolder.instagramUrl }}</td></tr>{% endif %}
+            {% if application.projectHolder.linkedinUrl %}<tr><th><i class="fa-brands fa-linkedin fa-lg"></i></th><td>{{ application.projectHolder.linkedinUrl }}</td></tr>{% endif %}
+            {% if application.projectHolder.googleUrl %}<tr><th><i class="fa-brands fa-bluesky fa-lg"></i></th><td>{{ application.projectHolder.googleUrl }}</td></tr>{% endif %}
+            {% if application.projectHolder.otherUrl %}<tr><th><i class="fa fa-link fa-lg" title="Autre URL"></i></th><td>{{ application.projectHolder.otherUrl }}</td></tr>{% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endif %}
+  
+
+  <div class="col-sm-12 print-order-docs">
+    <div class="box-information">
+      <div class="box-content">
+      <h4 class="box-title">
+        Documents disponibles
+      </h4>
+        <div class="files">
+
+  
+            <div class="file-infos">
+              <div style="display:inline-block; width:80%">Pièce d'identité</div>
+              <div style="display:inline-block" class="pull-right actions" >
+                {% if application.projectHolder.hasDocuments('id') %}
+                {% set file =  application.projectHolder.getDocumentsType('id')[0] %}
+                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                {% endif %}
+              </div>
+            </div>
+          
+            <div class="file-infos">
+              <div style="display:inline-block; width:80%">Document justifiant la création de la structure</div>
+              <div style="display:inline-block" class="pull-right actions" >
+                {% if application.projectHolder.hasDocuments('kbis') %}
+                {% set file =  application.projectHolder.getDocumentsType('kbis')[0] %}
+                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                {% endif %}
+              </div>
+            </div>
+         
+
+          {% for doc in application.projectHolder.getDocumentsType('') %}
+              <div class="file-infos">
+                <div style="display:inline-block; width:80%">{{doc.fileName | slice(14, 100)}}</div>
+                <div style="display:inline-block" class="pull-right actions" >
+                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                </div>
+              </div>
+          {% endfor %}
+
+          {% for doc in application.files %}
+              <div class="file-infos">
+                <div style="display:inline-block; width:80%">{{doc.fileName | slice(14, 100)}}</div>
+                <div style="display:inline-block" class="pull-right actions" >
+                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                </div>
+              </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="row application_buttons">
+  <div class="save-recap center">
+    {% if application.isDraft and not application.space.isClosed %}
+      <a href="{{ path('space_apply', {'space': application.space.id}) }}" class="btn btn-line-form-end">
+        <i class="fa fa-pencil fa-lg"></i>
+        Continuer ma candidature
+      </a>
+    {% endif %}
+    <a href="javascript:print();" class="btn btn-line-form-end">
+      <i class="fa-solid fa-print fa-lg"></i>
+      Imprimer ma candidature
+    </a>
+  </div>
+</div>
+
+
+<div class="pagination-wrapper">
+    <ul class="pagination">
+
+        <li>
+            {% if prevApplication %}
+                <a href="{{ path('my_application_show', { 'id': prevApplication.id }) }}" aria-label="Prev" title="Candidature précédente" data-toggle="tooltip">
+                    <span aria-hidden="true"></span>
+                </a>
+            {% else %}
+                <span aria-label="Previous">
+                    <span aria-hidden="true"></span>
+                </span>
+            {% endif %}
+        </li>
+
+        <li>
+            {% if nextApplication %}
+            <a href="{{ path('my_application_show', { 'id': nextApplication.id }) }}" aria-label="Next"  title="Candidature suivante" data-toggle="tooltip">
+                <span aria-hidden="true"></span>
+            </a>
+            {% else %}
+                <span aria-label="Next">
+                    <span aria-hidden="true"></span>
+                </span>
+            {% endif %}
+        </li>
+
+    </ul>
+</div>
+
+</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends '@SonataAdmin/CRUD/base_show_field.html.twig' %}
+
+{% block field %}
+    {% set status_classes = {
+        'draft': 'default',
+        'unread': 'warning',
+        'awaiting': 'info',
+        'accepted': 'success',
+        'rejected': 'danger'
+    } %}
+    
+    {% set status = object.status %}
+    {% set status_label = object.statusLabel %}
+    {% set badge_class = status_classes[status] ?? 'default' %}
+    
+    <span class="label label-{{ badge_class }}" style="font-size: 14px; padding: 6px 12px;">
+        {{ status_label }}
+    </span>
+{% endblock %}

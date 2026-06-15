@@ -1,0 +1,389 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ space.name }} | Plateau Urbain{% endblock %}
+
+{% block meta_description %}
+  {% if space.city is defined and space.city %}
+    Appel à candidatures – {{ space.name }} ({{ space.city }}).
+  {% else %}
+    Appel à candidatures – {{ space.name }}.
+  {% endif %}
+{% endblock %}
+
+{% block og_image %}
+  {% if space.pics is defined and space.pics|length %}
+    {{ app.request.schemeAndHttpHost ~ vich_uploader_asset(space.pics|first, 'file') }}
+  {% else %}
+    {{ parent() }}
+  {% endif %}
+{% endblock %}
+
+{# {% block breadcrumb_items %}
+  <li><a href="{{ path('search_index') }}">Recherche</a></li>
+  <li><span>Fiche espace</span></li>
+{% endblock %}
+ #}
+{% block body %}
+
+{# {% if application is defined and application is not null and not application.isDraft %}
+  <div class="row pu-home-content info ">
+    <div class="col-xs-12 col-md-8 col-lg-8">
+    {% if application.space.isClosed %}
+      <p class="left">Ce projet est désormais clôturé.</p>
+    {% endif %}
+      <p class="left">
+        Vous avez envoyé votre dossier de candidature pour cet espace le {{ application.created|date('d/m/Y') }}
+      </p>
+    </div>
+    <div class="col-xs-12 col-md-4 col-lg-4  btn-right">
+    
+        <a href="{{ path('my_application_show', { 'id': application.id }) }}" class="btn btn-line">
+          <span>Voir votre candidature</span>
+        </a>
+  
+  </div>
+</div>
+{% endif %} #}
+  <div class="white"> 
+        <div class="container"> 
+<div class="col-sm-12 ">
+ <div class="titre-page-hr">
+    <h1>{{ space.name }}</h1>
+    <div class="img-aac"><img src="{{ asset('images/groupe_1051.png') }}" alt="Plateau Urbain" /></div>
+ </div>
+</div>
+<div class="row">
+  <!-- BEGIN MAIN CONTENT -->
+  <div class="col-sm-12">
+    <h1 class="property-title">
+    {#  {{ space.name }} {% if space.size is not empty %}à partir de {{ space.minSize }}m<sup>2</sup>{% endif %}
+       <small>{{ space.city }} ({{ space.zipCode|slice(0,2)}})</small> #}
+    </h1>
+  </div>
+</div>
+
+<div class="row">
+  
+    <div class="sidebar col-xs-12 col-md-4 sticky">
+       <h6><a href="{{ path('search_index') }}" class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Tous les appels à candidatures</a></h6>
+    <div class="content ">
+      <h6>en bref</h6>
+      <p class="pu-label">Commune&nbsp;: {{ space.city }} ({{ space.zipCode|slice(0,2)}})</p>
+      <p class="pu-label">Type de locaux&nbsp;: {{ space.type }}</p>
+       <p class="pu-label">Bailleur&nbsp;: {% if space.owner %}
+        {% if space.owner.website %}
+          <a href="{{ space.owner.website }}" target="_blank">{{ space.owner.company }}</a>
+        {% else %}
+          {{ space.owner.company }}
+        {% endif %}
+      {% else %}
+          Sans bailleur
+      {% endif %}
+      </p>
+
+    <div class="pu-price-zone ">
+    <p class="pu-label">Prix&nbsp;: </sup>
+            {% if space.priceText %}
+                {{ space.priceText }}
+            {% else %}
+                À partir de {{ (space.price * 12)|number_format(2, ',', ' ')|replace({',00': ''}) }} € / m<sup>2</sup> / an
+                <br />Soit {{ space.price|number_format(2, ',', ' ')|replace({',00': ''}) }} € / m<sup>2</sup> / mois
+            {% endif %}
+            </p>
+    
+      {#   <dl class="dl-horizontal">
+  
+          <dd>
+            <span class="pu-title"><strong>{{ space.parcels | length }}</strong> espaces</span>
+            De {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup>
+            <a href="#parcels">Voir la répartition des espaces</a>
+          </dd>
+        </dl> #} 
+            <p class="pu-label">Disponibilité&nbsp;: {{ space.availability }}</p>
+            {% if space.nbSpaces or space.minSpace or space.maxSpace %}
+            <p class="pu-label">
+              Surfaces&nbsp;:
+              {% if space.nbSpaces %}{{ space.nbSpaces }} espace(s){% endif %}
+              {% if space.minSpace or space.maxSpace %}
+                de {{ space.minSpace|default('?') }} m<sup>2</sup> à {{ space.maxSpace|default('?') }} m<sup>2</sup>
+              {% endif %}
+            </p>
+            {% endif %}
+     
+    </div>
+</div>
+  
+
+    <div class="pu-apply-zone">
+      <p class="center">Date limite de candidature</p>
+      <h5 class="center apply-date-show">
+        {{ space.limitAvailability|localizeddate('long', 'none') }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
+      </h5>
+      <p class="center">
+        {% if not space.isEnabled() %}
+          <a href="{{ path('space_manager_edit', { 'id': space.id }) }}" class="btn btn-line-19">
+            {{ "Modifier l'espace"}}
+          </a>
+        {% elseif space.isClosed() %}
+        {% elseif application is defined and application is not null and not application.isDraft %}
+          <a href="{{ path('my_application_show', { 'id': application.id }) }}" class="btn btn-line-19">
+            <span>{{ 'Voir votre candidature !'}}</span>
+          </a>
+        {% elseif not is_granted('ROLE_OWNER') or not app.user.isProprio() %}
+          {% if not app.user %}
+            <div class="auth-buttons">
+              <a href="{{ path('app_login', {'next': path('space_apply', {'space': space.id})}) }}" class="btn btn-line-19">
+                <span>Se connecter</span>
+              </a>
+              <a href="{{ path('security_profil') }}" class="btn btn-line-19">
+                <span>Créer un compte</span>
+              </a>
+            </div>
+            <p class="center" style="margin-top:8px">Vous devez avoir un compte pour candidater.</p>
+          {% else %}
+            {% if not app.user.isProfileComplete() %}
+              <a href="{{ path('security_profil', {'next': path('space_apply', {'space': space.id})}) }}" class="btn btn-line-19">
+                <span>Veuillez compléter votre profil</span>
+              </a>
+              <p class="center" style="margin-top:8px">Votre profil doit être complet pour candidater.</p>
+            {% else %}
+              <a href="{{ path('space_apply', { 'space': space.id }) }}" class="btn btn-line-19">
+                <span>{{ 'Je candidate'}}</span>
+              </a>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      </p>
+      {% if application is defined and application is not null and not application.isDraft %}
+ 
+    {% if application.space.isClosed %}
+      <p class="center">Ce projet est désormais clôturé.</p>
+    {% endif %}
+      <p class="center">
+        Vous avez envoyé votre dossier de candidature pour cet espace le {{ application.created|date('d/m/Y') }}
+      </p>
+ 
+  
+
+{% endif %}
+    </div>
+  </div>
+
+
+<div class="main show col-xs-12 col-md-8">
+    <div id="property-detail-wrapper" class="style1">
+     {#  {% if space.isClosed %}
+        <img src="{{ asset('/bundles/app/images/closed.png') }}" alt="closed" class="closed" />
+      {% endif %} #}
+
+      <div id="property-detail-large" class="owl-carousel ">
+        {% for p in space.pics %}
+          <div class="item">
+            <img src="{{ vich_uploader_asset(p, 'file') }}" alt="{{ space.name }}" />
+          </div>
+        {% endfor %}
+      </div>
+
+       <div id="property-detail-thumbs" class="owl-carousel">
+        {% for p in space.pics %}
+          <div class="item">
+            <img src="{{ vich_uploader_asset(p, 'file') }}" alt="{{ space.name }}" />
+          </div>
+        {% endfor %}
+      </div> 
+    </div>
+
+
+
+
+
+    <h4 >
+      {{ 'Descriptif du projet' }}
+    </h4>
+    <div class="pu-col-container content-block">
+      <p>{{ space.description | raw }}</p>
+    </div>
+
+
+
+    <h4>
+      {{ 'Activités recherchées' }}
+    </h4>
+    <div class="pu-col-container content-block">
+      <p>{{ space.activityDescription | raw }}</p>
+    </div>
+
+    {% if space.visits | length %}
+    <h4>
+      Dates et horaires des visites prévues
+    </h4>
+    <div class="pu-col-container content-block">
+      <p>À la clôture de l’AAC vous recevrez un mail pour vous inscrire à l’une de nos visites (la visite du site est obligatoire).</p>
+      <ul class="property-amenities-list">
+        {% for v in space.visits %}
+          <li><i class="fa fa-calendar" aria-hidden="true" style="margin-right:8px;"></i> {{ v.visitDate|date('d/m/Y') }} de {{ v.startTime|date('H:i') }} à {{ v.endTime|date('H:i') }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+ 
+  <h4>
+      {{ 'Documents ressources' }}
+    </h4>
+    <div class="pu-col-container content-block ressources">
+     
+     
+          <div class="col-xs-12 col-md-4 grey">
+            <div class="fd ressources-fd"><div class="pdf-appel"></div></div>
+            <div class="lien-pdf red">
+                <p>
+                    {% set file = space.getDocs('document_aac') %}
+                    {% if file | length %}
+                        <a class="red" href="{{ asset(vich_uploader_asset(file[0], 'file')) }}" target="_blank">
+                    {% else %}
+                        <a class="red" href="#">
+                    {% endif %}
+                        Télécharger l'appel à candidatures
+                    </a>
+                </p>
+            </div>
+          </div>
+          {% set filePlan = space.getDocs('document_plan') %}
+          <div class="col-xs-12 col-md-4 grey">
+           <div class="fd ressources-fd"><img src="{{ asset('bundles/app/images/groupe-repartion-espace.png') }}" alt="Répartition des espaces" /></div>
+           <div class="lien-pdf red">
+               <p>
+                   {% if filePlan | length %}
+                   <a class="red" href="{{ asset(vich_uploader_asset(filePlan[0], 'file')) }}" target="_blank">
+                       Répartition des espaces
+                   </a>
+                   {% else %}
+                   <span class="text-muted">Répartition des espaces non disponible</span>
+                   {% endif %}
+               </p>
+           </div>
+        </div>
+          {% set fileFaq = space.getDocs('document_faq') %}
+          <div class="col-xs-12 col-md-4 grey">
+           <div class="fd ressources-fd"><img src="{{ asset('bundles/app/images/groupe-faq.png') }}" alt="F.A.Q" /></div>
+           <div class="lien-pdf red">
+               <p>
+                   {% if fileFaq | length %}
+                   <a class="red" href="{{ asset(vich_uploader_asset(fileFaq[0], 'file')) }}" target="_blank">
+                       F.A.Q
+                   </a>
+                   {% else %}
+                   <span class="text-muted">F.A.Q non disponible</span>
+                   {% endif %}
+               </p>
+           </div>
+        </div>
+    
+     </div>
+    </div>
+
+
+    {% if space.hasTagType(constant('App\\Entity\\SpaceAttribute::STATUS_INCLUDED')) %}
+      <h4>
+        {{ 'Prestations et services' }}
+      </h4>
+      <div class="pu-col-container content-block">
+        <ul class="property-amenities-list">
+          {% for t in space.tags %}
+            {% if t.isIncluded %}
+              <li class="enabled">{{ t.attribute }}</li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if space.hasTagType(constant('App\\Entity\\SpaceAttribute::STATUS_EXPECTED')) %}
+      <h4>
+        {{ 'À prévoir' }}
+      </h4>
+      <div class="pu-col-container content-block">
+        <ul class="property-amenities-list">
+          {% for t in space.tags %}
+            {% if t.isExpected %}
+              <li class="disabled">{{ t.attribute }}</li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if space.parcels | length > 0 %}
+      <h4 id="parcels">
+        {{ 'Répartition des espaces' }}
+      </h4>
+      <div class="pu-col-container content-block">
+        <div class="pu-table-wrapper">
+          <table class="pu-parcels-table">
+            <thead>
+              <tr>
+                <th>{{ 'Étage' | upper }}</th>
+                <th>{{ 'Type de locaux' | upper }}</th>
+                <th>{{ 'Surface' | upper }}</th>
+                <th>{{ 'Disponibilité' | upper }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in space.parcels %}
+                <tr {% if loop.index is even %}class="even"{% endif %}>
+                  <td>{{ p.floor }}</td>
+                  <td>{{ p.type }}</td>
+                  <td>{{ p.surface }} m<sup>2</sup></td>
+                  <td>{% if p.disponibility is not null %}{{ p.disponibility | date('d/m/Y') }}{% else %}Immédiat{% endif %}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if space.usageRestriction %}
+      <h4>
+        {{ 'Mentions / restrictions d\'usage' }}
+      </h4>
+      <div class="pu-col-container content-block desc-mention">
+        <p>{{ space.usageRestriction | nl2br }}</p>
+      </div>
+    {% endif %}
+</div>
+</div>
+</div>
+<div class="content plusinfos">
+    <div class="container">
+        <div class="row pu-home-content info">
+
+            <div class="col-xs-12 col-md-8 col-lg-8">
+                <h4>Vous souhaitez obtenir plus d'informations</h4>
+            </div>
+            <div class="col-xs-12 col-md-4 col-lg-4  btn-right">
+                <a href='https://www.plateau-urbain.com/contactez-nous/' target="_blank" class='btn btn-line'><span>Contactez-nous</span></a>
+            </div>
+
+    </div>
+</div>
+</div>
+</div>
+</div>
+{% endblock body %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        .auth-buttons .btn {
+            width: 100%;
+            max-width: 200px;
+        }
+    </style>
+{% endblock %}

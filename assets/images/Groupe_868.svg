@@ -1,0 +1,25 @@
+<svg id="Groupe_868" data-name="Groupe 868" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="86.968" height="81.049" viewBox="0 0 86.968 81.049">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_1116" data-name="Rectangle 1116" width="86.968" height="81.049" fill="none" stroke="#707070" stroke-width="3"/>
+    </clipPath>
+  </defs>
+  <g id="Groupe_867" data-name="Groupe 867" transform="translate(0 0)" clip-path="url(#clip-path)">
+    <path id="Tracé_1299" data-name="Tracé 1299" d="M33.237,34.14l2.7,13.5a1.847,1.847,0,0,0,3.118.945L41.844,45.8l5.228,5.23A3.7,3.7,0,1,0,52.3,45.8l-5.228-5.228,2.786-2.786a1.849,1.849,0,0,0-.945-3.12l-13.5-2.7A1.849,1.849,0,0,0,33.237,34.14Z" transform="translate(28.172 27.091)" fill="none" stroke="#2d2a28" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Tracé_1300" data-name="Tracé 1300" d="M60.14,66.854H2.849A1.848,1.848,0,0,1,1,65.006V2.849A1.848,1.848,0,0,1,2.849,1H82.423a1.849,1.849,0,0,1,1.849,1.849V65.006a1.849,1.849,0,0,1-1.849,1.849H75.406" transform="translate(0.849 0.848)" fill="none" stroke="#2d2a28" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <line id="Ligne_243" data-name="Ligne 243" x2="80.38" transform="translate(2.655 14.095)" fill="none" stroke="#2d2a28" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Tracé_1301" data-name="Tracé 1301" d="M12.207,7.131A1.889,1.889,0,1,1,14.1,5.242a1.89,1.89,0,0,1-1.889,1.889" transform="translate(8.755 2.845)" fill="#2d2a28"/>
+    <path id="Tracé_1302" data-name="Tracé 1302" d="M9.119,7.131a1.889,1.889,0,1,1,1.889-1.889A1.89,1.89,0,0,1,9.119,7.131" transform="translate(6.135 2.845)" fill="#2d2a28"/>
+    <path id="Tracé_1303" data-name="Tracé 1303" d="M6.1,7.131A1.889,1.889,0,1,1,7.986,5.242,1.89,1.89,0,0,1,6.1,7.131" transform="translate(3.571 2.845)" fill="#2d2a28"/>
+    <rect id="Rectangle_1115" data-name="Rectangle 1115" width="17.763" height="22.704" transform="translate(15.254 28.495)" fill="none" stroke="#2d2a28" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <line id="Ligne_244" data-name="Ligne 244" x2="26.501" transform="translate(43.484 28.495)" fill="none" stroke="#2d2a28" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <line id="Ligne_245" data-name="Ligne 245" x2="26.501" transform="translate(43.484 39.847)" fill="none" stroke="#2d2a28" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <line id="Ligne_246" data-name="Ligne 246" x2="26.501" transform="translate(43.484 51.199)" fill="none" stroke="#2d2a28" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Tracé_1304" data-name="Tracé 1304" d="M13.374,20.548V18.634a.739.739,0,0,1,.739-.739h1.913a.739.739,0,0,1,.739.739v1.913a.739.739,0,0,1-.739.739H14.113a.739.739,0,0,1-.739-.739" transform="translate(11.348 15.184)" fill="#2d2a28"/>
+    <path id="Tracé_1305" data-name="Tracé 1305" d="M13.374,23.283V21.369a.739.739,0,0,1,.739-.739h1.913a.739.739,0,0,1,.739.739v1.913a.739.739,0,0,1-.739.739H14.113a.739.739,0,0,1-.739-.739" transform="translate(11.348 17.505)" fill="#2d2a28"/>
+    <path id="Tracé_1306" data-name="Tracé 1306" d="M13.374,26.018V24.1a.739.739,0,0,1,.739-.739h1.913a.739.739,0,0,1,.739.739v1.913a.739.739,0,0,1-.739.739H14.113a.739.739,0,0,1-.739-.739" transform="translate(11.348 19.826)" fill="#2d2a28"/>
+    <path id="Tracé_1307" data-name="Tracé 1307" d="M10.657,20.548V18.634A.739.739,0,0,1,11.4,17.9H13.31a.739.739,0,0,1,.739.739v1.913a.739.739,0,0,1-.739.739H11.4a.739.739,0,0,1-.739-.739" transform="translate(9.043 15.184)" fill="#2d2a28"/>
+    <path id="Tracé_1308" data-name="Tracé 1308" d="M10.657,23.27V21.356a.739.739,0,0,1,.739-.739H13.31a.739.739,0,0,1,.739.739V23.27a.739.739,0,0,1-.739.739H11.4a.739.739,0,0,1-.739-.739" transform="translate(9.043 17.494)" fill="#2d2a28"/>
+    <path id="Tracé_1309" data-name="Tracé 1309" d="M10.657,25.992V24.078a.739.739,0,0,1,.739-.739H13.31a.739.739,0,0,1,.739.739v1.913a.739.739,0,0,1-.739.739H11.4a.739.739,0,0,1-.739-.739" transform="translate(9.043 19.804)" fill="#2d2a28"/>
+  </g>
+</svg>

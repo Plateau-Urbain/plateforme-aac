@@ -1,0 +1,5 @@
+{% if is_granted('LIST', admin.class) or is_granted('ROLE_ADMIN') %}
+    <a class="btn btn-info" href="{{ admin.generateUrl('statistics') }}" title="Statistiques globales des candidatures">
+        <i class="fa fa-bar-chart"></i> Statistiques
+    </a>
+{% endif %}

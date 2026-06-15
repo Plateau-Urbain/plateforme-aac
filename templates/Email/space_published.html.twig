@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Votre espace a été publié !</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #bc1b38;">Votre espace a été publié !</h2>
+        
+        <p>Bonjour {{ space.owner.firstname }},</p>
+        
+        <p>Nous avons le plaisir de vous informer que votre espace <strong>{{ space.name }}</strong> a été publié avec succès sur la plateforme Plateau Urbain.</p>
+        
+        <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="margin-top: 0;">Détails de votre espace :</h3>
+            <ul>
+                <li><strong>Nom :</strong> {{ space.name }}</li>
+                <li><strong>Localisation :</strong> {{ space.city }} ({{ space.zipCode }})</li>
+                <li><strong>Type :</strong> {{ space.type }}</li>
+                <li><strong>Prix :</strong> {{ space.price }} € / m² / mois</li>
+                <li><strong>Date limite de candidature :</strong> {{ space.limitAvailability|date('d/m/Y') }}</li>
+            </ul>
+        </div>
+        
+        <p>Votre appel à candidatures est maintenant visible par tous les candidats inscrits sur la plateforme. Vous devriez commencer à recevoir des candidatures dans les prochains jours.</p>
+        
+        <p>Vous pouvez suivre les candidatures reçues en vous connectant à votre espace de gestion :</p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ url('space_manager_candidates', {'id': space.id}) }}" style="background-color: #bc1b38; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block;">Voir les candidatures</a>
+        </div>
+        
+        <p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter.</p>
+        
+        <p>Cordialement,<br>
+        L'équipe Plateau Urbain</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<div class="row-flex">
+<div class="connexion-page  col-xs-12 col-md-6">
+<div class="colorBox-content registration">
+  <img class="icon" src="{{ asset('/bundles/app/images/lock_icon.png') }}" />
+        <div class="alert alert-info" role="alert">
+            <p>Veuillez saisir votre adresse email afin de réinitialiser votre mot de passe.</p>
+            <p>Un email vous sera envoyé. Regardez dans le dossier de spam si vous ne recevez rien.</p>
+        </div>
+        <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
+            <input type="hidden" name="_token" value="{{ csrf_token('resetting_request') }}">
+            <div class="form-group">
+                <label for="username">Adresse email</label>
+                <input type="email" id="username" class="form-control" name="username" required="required" autocomplete="username" />
+            </div>
+            <div>
+                <input type="submit" class="btn btn-line-login" value="Envoyer le lien de réinitialisation" />
+            </div>
+        </form>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-6 sans-marge">
+       <img src="" id="image" alt="" />
+    </div>
+</div>
+<script type="text/javascript">
+    (function randomImg(){
+        var tabImg = ["village-reille.jpg", "asnieres.jpg", "opale.jpg", "opale-1.jpg"];
+        var imgEl = document.getElementById('image');
+        if (imgEl) {
+            imgEl.src = '/bundles/app/images/' + tabImg[Math.floor(Math.random() * tabImg.length)];
+        }
+    })();
+</script>

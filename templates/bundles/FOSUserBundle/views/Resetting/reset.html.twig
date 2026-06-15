@@ -1,0 +1,24 @@
+{% extends "bundles/FOSUserBundle/views/layout.html.twig" %}
+
+{% block fos_user_content %}
+<div class="row-flex">
+        <div class="login-page  col-xs-12 col-md-6"> 
+           <div class="colorBox-content registration">
+             <img class="icon" src="{{ asset('/bundles/app/images/lock_icon.png') }}" />
+            <h4>Réinitialisation</h4>
+<p>
+{% include "bundles/FOSUserBundle/views/Resetting/reset_content.html.twig" %}
+</p>
+</div>
+    </div>
+    <div class="col-xs-12 col-md-6 sans-marge">
+        <img src="" id="image" />
+    </div>
+</div>
+<script type="text/javascript">
+    (function randomImg(){
+        var tabImg = ["village-reille.jpg", "asnieres.jpg", "opale.jpg", "opale-1.jpg"];
+        document.getElementById('image').src = '/bundles/app/images/' + tabImg[Math.floor(Math.random() * tabImg.length)];
+    })();
+</script>
+{% endblock fos_user_content %}

@@ -1,0 +1,26 @@
+{% block image_admin_type_widget %}
+    {% apply spaceless %}
+        {% set subject =  form.parent.vars.data %}
+        {% if subject.id %}
+            <a href="{{ asset(vich_uploader_asset(subject, name)) }}" target="_blank">
+                <img src="{{ asset(vich_uploader_asset(subject, name)) }}" width="200" />
+            </a><br/>
+        {% endif %}
+        {% set type = type|default('file') %}
+        <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+        <p>Les images ne doivent pas dépasser les 5MB et respecter le format 765 * 570 px</p>
+    {% endapply %}
+{% endblock %}
+
+{% block doc_admin_type_widget %}
+    {% apply spaceless %}
+        {% set subject =  form.parent.vars.data %}
+        {% if subject.id %}
+            <a href="{{ asset(vich_uploader_asset(subject, name)) }}" target="_blank">
+              {{ subject.filename }}
+            </a><br/>
+        {% endif %}
+        {% set type = type|default('file') %}
+        <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    {% endapply %}
+{% endblock %}

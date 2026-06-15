@@ -1,0 +1,27 @@
+{% if application.isAccepted %}
+  <div class="btn btn-line-19 btn-accepted">
+    <i class="fa fa-check"></i>
+    Acceptée
+  </div>
+{% endif %}
+
+{% if application.isRejected %}
+<div class="btn btn-line-19 btn-rejected">
+  <i class="fa fa-times"></i>
+  Refusée
+</div>
+{% endif %}
+
+{% if application.isDraft %}
+<div class="btn btn-line-19 btn-draft">
+  <i class="fa fa-pencil"></i>
+  A compléter
+</div>
+{% endif %}
+
+{% if application.isAwaiting or application.isUnread %}
+<div class="btn btn-line-19 btn-awaiting">
+  <i class="fa fa-hourglass-half"></i>
+  Envoyée
+</div>
+{% endif %}

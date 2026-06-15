@@ -1,0 +1,45 @@
+{# Version "figée" de la section Mes documents (apply) - rendu "récap" #}
+{# Dans apply, les docs sont section 4 ; dans profil, ils sont section 4 (documents) #}
+{% set nextUrl = path('space_apply', { 'space': space.id }) %}
+{% set profileRole = 'candidat' %}
+
+<div class="pu-profile-recap">
+    <p class="pu-profile-recap__hint">
+        <i class="fa fa-info-circle"></i>
+        Ces documents proviennent de votre profil. Pour les modifier :
+        <a href="{{ path('security_profil_role', { 'role': profileRole, 'next': nextUrl, 'return_anchor': 'four' }) ~ '#four' }}">Mon profil</a>
+    </p>
+
+    <div class="pu-profile-recap__grid">
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Pièce d'identité</span>
+            <span class="pu-profile-recap__value">
+                {% if app.user and app.user.hasDocuments('id') %}
+                    {% set file = app.user.getDocumentsType('id')[0] %}
+                    <i class="fa fa-check"></i> {{ file.originalname }}
+                    <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" style="margin-left:8px;">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                {% else %}
+                    <i class="fa fa-times"></i> Manquant
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Justificatif d'activité</span>
+            <span class="pu-profile-recap__value">
+                {% if app.user and app.user.hasDocuments('kbis') %}
+                    {% set file = app.user.getDocumentsType('kbis')[0] %}
+                    <i class="fa fa-check"></i> {{ file.originalname }}
+                    <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" style="margin-left:8px;">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                {% else %}
+                    <i class="fa fa-times"></i> Manquant
+                {% endif %}
+            </span>
+        </div>
+    </div>
+</div>
+

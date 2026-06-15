@@ -1,0 +1,8 @@
+{% if is_granted('ROLE_ALLOWED_TO_SWITCH') and object.enabled %}
+<a href="{{ path('homepage', {'_switch_user': object.email}) }}"
+   class="btn btn-sm btn-default"
+   title="Se connecter en tant que {{ object.email }}"
+   onclick="return confirm('Se connecter en tant que {{ object.email }} ?')">
+    <i class="fas fa-user-secret"></i>
+</a>
+{% endif %}

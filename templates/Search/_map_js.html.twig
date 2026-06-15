@@ -1,0 +1,208 @@
+<script type="text/javascript" src="{{ asset('bundles/app/js/raphael.js') }}"></script>
+<script type="text/javascript" src="{{ asset('bundles/app/js/jquery.mapael.js') }}"></script>
+<script type="text/javascript" src="{{ asset('bundles/app/js/map.js') }}"></script>
+
+<script type="text/javascript">
+    var coords = {
+        '95': {'x': 220, 'y': 100, 'name': 'Val d\'Oise'},
+        '78': {'x': 140, 'y': 190, 'name': 'Yvelines'},
+        '92': {'x': 235, 'y': 205, 'name': 'Hauts-de-Seine'},
+        '93': {'x': 300, 'y': 165, 'name': 'Seine-Saint-Denis'},
+        '75': {'x': 260, 'y': 185, 'name': 'Paris'},
+        '94': {'x': 290, 'y': 220, 'name': 'Val de Marne'},
+        '77': {'x': 420, 'y': 240, 'name': 'Seine-et-Marne'},
+        '91': {'x': 240, 'y': 270, 'name': 'Essonne'},
+    };
+
+    function loadSearch(code) {
+        $('#appbundle_search_space_zipCode').val(code);
+        search();
+        return false;
+    }
+
+    function initSort() {
+        $('#sort_by').change(function(){
+            $('#appbundle_search_space_orderBy').val($('#sort_by').val());
+            search();
+        });
+        $('#asc').click(function(){
+            $('#appbundle_search_space_sort').val('asc');
+            search();
+        });
+        $('#desc').click(function(){
+            $('#appbundle_search_space_sort').val('desc');
+            search();
+        });
+
+        $('.pagination a').click(function() {
+            var target = $(this).attr('href');
+            search(target);
+            return false;
+        });
+
+        $("select").chosen();
+    }
+
+    initSort();
+
+    function search(target) {
+        $.ajax({
+            type: "POST",
+            url: target ? target : '{{ path('search_action') }}',
+            data: $( "#searchForm" ).serialize(),
+            success: function(result) {
+                hideTooltip();
+
+                $('#js-results').html($(result).find("#js-results"));
+                $('.js-partners').hide();
+
+                initSort();
+
+                $('html, body').animate({
+                    scrollTop: $("#js-results").offset().top
+                }, 1000);
+            },
+        });
+
+
+        return false;
+    }
+
+    function hideTooltip() {
+        $('#pu_tool_tip').hide();
+        return ;
+    }
+
+    $(document).ready(function() {
+        $(".js-map").mapael({
+            map : {
+                name : "idf"
+
+                , zoom : {
+                    enabled : true,
+                    maxLevel : 10
+                },
+                afterInit : function($self, paper, areas, plots, options) {
+
+                    // Show te link between the two plots on mouseover event on the red one
+                    {% for code, qt in departements %}
+                    $(areas['d{{ code }}'].mapElem.node)
+                            .on('mouseenter', function() {
+
+                                var offset = $(plots['d{{ code }}'].mapElem.node).offset();
+                                var width  = $(plots['d{{ code }}'].mapElem.node).get(0).getBoundingClientRect().width;
+                                var toolTip = $('#pu_tool_tip');
+
+                                /* SHOW TOOLTIP */
+                                toolTip.show();
+                                toolTip.css('top', (offset.top - 185) + 'px').css('left', (offset.left - 162 + (width / 2)) + 'px');
+                                toolTip.html("<span class='zone_title'>"+ coords['{{ code }}'].name +"</span><br />{{ qt }} espace{% if qt > 1 %}s{% endif %} disponible{% if qt > 1 %}s{% endif %}<br /><a href='#' onclick=\"loadSearch('{{ code }}')\" class='btn btn-fullcolor'>Voir les espaces</a><span class='close' onclick='hideTooltip();'><i class='fa fa-times'></i></span>");
+
+                                /* CLICK IN TOOLTIP */
+                                $(toolTip).find('a').click(function() {
+                                    var newData = {
+                                        'areas': {},
+                                        'plots' : {}
+                                    };
+
+                                    {% for code2, qt2 in departements %}
+                                    newData.areas['d{{ code2 }}'] = {
+                                        attrs: {
+                                            fill: "#C18D3F"
+                                        }
+                                    };
+
+                                    newData.plots['d{{ code2 }}'] = {
+                                        attrs: {
+                                            fill: "#B6761A"
+                                        }
+                                    };
+                                    {% endfor %}
+
+                                    newData.areas['d{{ code }}'] = {
+                                        attrs: {
+                                            fill: "#BC1B38"
+                                        }
+                                    };
+
+                                    newData.plots['d{{ code }}'] = {
+                                        attrs: {
+                                            fill: "#BC1B38"
+                                        }
+                                    };
+
+                                    $(".js-map").trigger('update', [newData]);
+                                });
+
+                            });
+                    {% endfor %}
+                }
+
+                // Set default plots and areas style
+                , defaultPlot : {
+                    attrs : {
+                        fill: "transparent"
+                        , opacity : 0.6
+                    }
+                    , attrsHover : {
+                        opacity : 1,
+                        fill: "#BC1B38"
+                    }
+                    , text : {
+                        position : "inner",
+                        attrs : {
+                            "font-size" : 11
+                            , fill : "#fff"
+                        },
+                        attrsHover : {
+                            "font-size" : 11
+                            , fill : "#fff"
+                        }
+                    }
+                }
+                , defaultArea: {
+                    attrs : {
+                        fill : "#f2eee9"
+                        , stroke: "#fdfdfd"
+                    }
+                    , attrsHover : {
+                        fill: "#cea262"
+                    }
+                }
+            },
+
+            // Customize some areas of the map
+            areas: {
+                {% for code, qt in departements %}
+                "d{{ code }}" : {
+                    attrs : {
+                        fill : {% if zipCode is defined and zipCode == code %}"#BC1B38"{% else %}"#cea262"{% endif %}
+                    }
+                    , attrsHover : {
+                        fill: "#BC1B38"
+                    }
+                },
+                {% endfor %}
+            },
+
+            // Add some plots on the map
+            plots : {
+                {% for code, qt in departements %}
+                'd{{ code }}' : {
+                    type: "circle",
+                    size: 20,
+                    x: coords['{{ code }}'].x,
+                    y: coords['{{ code }}'].y,
+                    attrs : {
+                        opacity : 0.6,
+                        'stroke-width': 3,
+                    },
+                    text : {
+                        content : "{{ qt }}",
+                    }
+                },
+                {% endfor %}
+            }
+        });
+    });
+</script>

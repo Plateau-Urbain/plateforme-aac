@@ -1,0 +1,120 @@
+
+
+
+
+@font-face {
+  font-family: 'ginkabold';
+  src: url('../fonts/ginka/Ginka-Bold.woff2') format('woff2'),
+  url('../fonts/ginka/Ginka-Bold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+
+
+
+@font-face {
+  font-family: 'ginkabold_italic';
+  src: url('../fonts/ginka/Ginka-Bold_Italic.woff2') format('woff2'),
+  url('../fonts/ginka/Ginka-Bold_Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+
+
+
+@font-face {
+  font-family: 'ginkabook_italic';
+  src: url('../fonts/ginka/Ginka-Book_Italic.woff2') format('woff2'),
+  url('../fonts/ginka/Ginka-Book_Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+
+
+
+@font-face {
+  font-family: 'ginkabook';
+  src: url('../fonts/ginka/Ginka-Book.woff2') format('woff2'),
+  url('../fonts/ginka/Ginka-Book.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+
+
+
+@font-face {
+  font-family: 'ginkaitalic';
+  src: url('../fonts/ginka/Ginka-Italic.woff2') format('woff2'),
+  url('../fonts/ginka/Ginka-Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+
+
+
+@font-face {
+  font-family: 'ginkalight';
+  src: url('../fonts/ginka/Ginka-Light.woff2') format('woff2'),
+  url('../fonts/ginka/Ginka-Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+
+
+
+@font-face {
+  font-family: 'ginkalight_italic';
+  src: url('../fonts/ginka/ginka-lightitalic-webfont.woff2') format('woff2'),
+  url('../fonts/ginka/ginka-lightitalic-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+
+
+
+@font-face {
+  font-family: 'ginkamedium';
+  src: url('../fonts/ginka/Ginka-Medium.woff2') format('woff2'),
+  url('../fonts/ginka/Ginka-Medium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+
+
+
+@font-face {
+  font-family: 'ginkamedium_italic';
+  src: url('../fonts/ginka/Ginka-Medium_Italic.woff2') format('woff2'),
+  url('../fonts/ginka/Ginka-Medium_Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+
+
+
+@font-face {
+  font-family: 'ginkaregular';
+  src: url('../fonts/ginka/Ginka-Regular.woff2') format('woff2'),
+  url('../fonts/ginka/Ginka-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}

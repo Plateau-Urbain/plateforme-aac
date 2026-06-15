@@ -1,0 +1,26 @@
+{% extends '@SonataAdmin/CRUD/base_show_field.html.twig' %}
+
+{% block field %}
+    {% if value is empty %}
+        <em class="text-muted">Aucun document</em>
+    {% else %}
+        <div class="list-group">
+            {% for file in value %}
+                <div class="list-group-item">
+                    <i class="fa fa-file-o"></i>
+                    {% if file.fileName %}
+                        <a href="{{ asset('uploads/application_files/' ~ file.fileName) }}" target="_blank" class="btn btn-xs btn-primary pull-right">
+                            <i class="fa fa-download"></i> Télécharger
+                        </a>
+                        <strong>{{ file.fileName }}</strong>
+                        {% if file.spaceDocument %}
+                            <br><small class="text-muted">Type: {{ file.spaceDocument.name }}</small>
+                        {% endif %}
+                    {% else %}
+                        <em class="text-muted">Nom de fichier non disponible</em>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

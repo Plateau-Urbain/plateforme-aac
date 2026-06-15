@@ -1,0 +1,342 @@
+<style>
+/* Styles pour reproduire exactement le design de l'image */
+.visits-section {
+  margin-bottom: 30px;
+}
+
+.visits-header {
+  color: #000; /* Titre en noir */
+  padding: 15px 20px;
+  font-weight: bold;
+  font-size: 21px; /* Même taille que les TH */
+}
+
+.visits-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+}
+
+.visits-table th {
+  background: #F2BE6A; /* Couleur dorée comme dans l'image */
+  border-bottom: 2px solid #14151B;
+  font-family: "ginkamedium", sans-serif;
+  font-weight: normal;
+  font-size: 21px;
+  color: #000;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.visits-table td {
+  padding: 15px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+  background: white;
+}
+
+.visits-table tr:last-child td {
+  border-bottom: none;
+}
+
+.no-visits-cell {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 30px 15px;
+}
+
+.delete-btn {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.delete-btn:hover {
+  background-color: #b91c1c;
+}
+
+/* Section d'ajout */
+.add-visit-section {
+  margin-top: 20px;
+}
+
+.add-visit-header {
+  color: #000; /* Titre en noir */
+  padding: 15px 20px;
+  font-weight: bold;
+  font-size: 21px; /* Même taille que les TH */
+  display: flex;
+  align-items: center;
+}
+
+.add-visit-header .icon {
+  background-color: #000; /* Icône en noir */
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.add-visit-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.add-visit-table th {
+  background: #F2BE6A; /* Couleur dorée comme dans l'image */
+  border-bottom: 2px solid #14151B;
+  font-family: "ginkamedium", sans-serif;
+  font-weight: normal;
+  font-size: 21px;
+  color: #000;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.add-visit-table td {
+  padding: 15px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  margin-bottom: 0; /* Suppression du margin-bottom */
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.add-btn {
+  background-color: transparent; /* Transparent */
+  color: #000; /* Texte en noir */
+  border: 2px solid #000; /* Bordure noire */
+  padding: 12px 30px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+  background-color: #000; /* Fond noir au survol */
+  color: white; /* Texte blanc au survol */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .visits-table,
+  .add-visit-table {
+    display: block;
+    width: 100%;
+  }
+  
+  .visits-table thead,
+  .add-visit-table thead {
+    display: none; /* Masquer les en-têtes sur mobile */
+  }
+  
+  .visits-table tbody,
+  .add-visit-table tbody {
+    display: block;
+    width: 100%;
+  }
+  
+  .visits-table tr,
+  .add-visit-table tr {
+    display: block;
+    margin-bottom: 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .visits-table td,
+  .add-visit-table td {
+    display: block;
+    padding: 10px 15px;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    position: relative;
+    padding-left: 50%;
+  }
+  
+  .visits-table td:last-child,
+  .add-visit-table td:last-child {
+    border-bottom: none;
+  }
+  
+  .visits-table td:before,
+  .add-visit-table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+    color: #374151;
+  }
+  
+  .visits-table td[data-label="Date"]:before { content: "Date :"; }
+  .visits-table td[data-label="Heure de début"]:before { content: "Début :"; }
+  .visits-table td[data-label="Heure de fin"]:before { content: "Fin :"; }
+  .visits-table td[data-label="Actions"]:before { content: "Actions :"; }
+  
+  .add-visit-table td[data-label="Date de visite"]:before { content: "Date :"; }
+  .add-visit-table td[data-label="Heure de début"]:before { content: "Début :"; }
+  .add-visit-table td[data-label="Heure de fin"]:before { content: "Fin :"; }
+  .add-visit-table td[data-label="Action"]:before { content: "Action :"; }
+  
+  .form-field input,
+  .form-field select {
+    font-size: 16px; /* Éviter le zoom sur iOS */
+  }
+  
+  .add-btn {
+    padding: 15px 30px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .visits-header,
+  .add-visit-header {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+  
+  .visits-table td,
+  .add-visit-table td {
+    padding-left: 40%;
+  }
+  
+  .visits-table td:before,
+  .add-visit-table td:before {
+    width: 35%;
+    font-size: 12px;
+  }
+}
+</style>
+
+<div class="visits-section">
+  <!-- En-tête principal -->
+  <div class="visits-header">
+    Visites organisées
+  </div>
+  
+  <!-- Tableau des visites existantes -->
+  <table class="visits-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Heure de début</th>
+        <th>Heure de fin</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for visit in visits %}
+          {% if visit.id is not empty %}
+              <tr>
+                  <td data-label="Date">{{ visit.visitDate|date('d/m/Y') }}</td>
+                  <td data-label="Heure de début">{{ visit.startTime|date('H:i') }}</td>
+                  <td data-label="Heure de fin">{{ visit.endTime|date('H:i') }}</td>
+                  <td data-label="Actions">
+                      <a href="{{ path('space_manager_removevisit', { 'id': visit.id, 'token': csrf_token('remove_visit') }) }}" 
+                         class="delete-btn js-btn-space" 
+                         role="button" 
+                         data-link-method="post"
+                         title="Supprimer cette visite">
+                          <i class="fa fa-times"></i>
+                      </a>
+                  </td>
+              </tr>
+          {% endif %}
+      {% else %}
+          <tr>
+              <td colspan="4" class="no-visits-cell">
+                  Pas de visites
+              </td>
+          </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="add-visit-section">
+  <!-- En-tête d'ajout -->
+  <div class="add-visit-header">
+    <div class="icon">+</div>
+    Ajouter une visite
+  </div>
+  
+  <!-- Tableau du formulaire d'ajout -->
+  <table class="add-visit-table">
+    <thead>
+      <tr>
+        <th>Date de visite</th>
+        <th>Heure de début</th>
+        <th>Heure de fin</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="Date de visite">
+          <div class="form-field">
+            {{ form_widget(form.visitDate, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.visitDate) }}
+          </div>
+        </td>
+        <td data-label="Heure de début">
+          <div class="form-field">
+            {{ form_widget(form.startTime, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.startTime) }}
+          </div>
+        </td>
+        <td data-label="Heure de fin">
+          <div class="form-field">
+            {{ form_widget(form.endTime, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.endTime) }}
+          </div>
+        </td>
+        <td data-label="Action">
+          <button type="submit" name="add_visit" value="1" class="add-btn no-ajax">
+            Ajouter
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  {{ form_errors(form) }}
+</div>

@@ -1,0 +1,74 @@
+{% use 'Form/bootstrap_3_layout.html.twig' %}
+
+{# Date widget #}
+{% block date_widget -%}
+    {% if widget == 'single_text' %}
+        <div class="date">
+            {{ block('form_widget_simple') }}
+           {#  <span class="input-group-addon">
+                <i class="fa fa-calendar fa-lg"></i>
+            </span> #}
+        </div>
+    {% else -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline input-group')|trim}) -%}
+        {% if datetime is not defined or not datetime -%}
+            <div {{ block('widget_container_attributes') -}}>
+        {%- endif %}
+        {{- date_pattern|replace({
+            '{{ year }}': form_widget(form.year),
+            '{{ month }}': form_widget(form.month),
+            '{{ day }}': form_widget(form.day),
+        })|raw -}}
+        {% if datetime is not defined or not datetime -%}
+            </div>
+        {%- endif -%}
+    {% endif %}
+{%- endblock date_widget %}
+
+{% block form_label %}
+    {{- parent() -}}
+    {% if help|default(false) %}
+        <span data-toggle="tooltip" data-placement="right" title="{{ help }}" data-class="danger">
+        <i class="fa fa-info-circle danger"></i>
+    </span>
+    {% endif %}
+{% endblock %}
+
+{% block _appbundle_application_size_calculator_row %}
+    <div class="form-group {{ not valid ? 'has-error' : '' }}" data-size-calculator="{{ form.parent.vars.data.space.price }}">
+        {{ form_label(form) }}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class=" box-calculator clearfix">
+                    
+                        {{ form_widget(form) }}
+                    </div>
+                    {# <div class="col-sm-4">
+                      <span class="calculator">
+                        <strong>Environ <span class="price" data-model="monthPrice">-</span> &euro; / mois</strong>
+                        <br>
+                        Soit <span data-model="yearPrice">-</span> &euro; / an</span>
+                    </div> #}
+               
+          </div>
+            <div class="col-sm-12">
+                {{ form_errors(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block _filter_sort_order_widget %}
+    <div class="sort">
+        <ul>
+        {% for childForm in form %}
+            <li>
+                <label for="{{ childForm.vars.id }}" class="{{ childForm.vars.checked ? 'checked' : '' }}">
+                    <i data-toggle="tooltip" data-placement="top" title="{{ childForm.vars.label }}" class="fa {{ childForm.vars.value == 'asc' ? 'fa-chevron-up' : 'fa-chevron-down' }}"></i>
+                    <input type="radio" id="{{ childForm.vars.id }}" {{ childForm.vars.checked ? 'checked' : '' }} value="{{ childForm.vars.value }}" name="{{ childForm.vars.full_name }}" style="display: none;" />
+                </label>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

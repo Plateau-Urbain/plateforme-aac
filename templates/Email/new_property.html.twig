@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Nouvelle propriété en attente de validation</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #bc1b38;">Nouvelle propriété en attente de validation</h2>
+    
+    <p>Bonjour,</p>
+    
+    <p>Une nouvelle propriété a été soumise sur le site Plateau Urbain par <strong>{{ space.owner.company }}</strong>.</p>
+    
+    <p style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ff9800; border-radius: 4px;">
+        <strong>⚠️ Action requise :</strong> Cette propriété est en attente de validation. Vous devez l'examiner et l'approuver pour qu'elle soit publiée sur la plateforme.
+    </p>
+    
+    <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3 style="margin-top: 0;">Aperçu de la propriété :</h3>
+        <ul>
+            <li><strong>Nom :</strong> {{ space.name }}</li>
+            <li><strong>Localisation :</strong> {{ space.city }} ({{ space.zipCode }})</li>
+            <li><strong>Type :</strong> {{ space.type }}</li>
+            <li><strong>Prix :</strong> {% if space.priceText %}{{ space.priceText }}{% else %}{{ space.price }} € / m² / mois{% endif %}</li>
+            <li><strong>Propriétaire :</strong> {{ space.owner.company }} ({{ space.owner.email }})</li>
+            <li><strong>Description :</strong> {{ space.description | raw | slice(0, 200) }}{% if space.description|length > 200 %}...{% endif %}</li>
+        </ul>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <p>Pour examiner et approuver cette propriété, connectez-vous à votre interface d'administration.</p>
+    </div>
+    
+    <p style="font-size: 12px; color: #666; margin-top: 30px;">
+        Une fois approuvée, le propriétaire sera automatiquement notifié par email et l'espace sera publié sur la plateforme.
+    </p>
+</body>
+</html>

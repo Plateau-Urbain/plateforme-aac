@@ -1,0 +1,1560 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Garantit que la modale d'alerte reste au-dessus de tout overlay local */
+        #depublished-warning-modal {
+            z-index: 20000 !important;
+        }
+        #depublished-warning-modal .modal-dialog {
+            z-index: 20001 !important;
+            position: relative;
+        }
+        #depublished-warning-modal .modal-content {
+            z-index: 20002 !important;
+            position: relative;
+        }
+        .modal-backdrop {
+            z-index: 19990 !important;
+        }
+
+        .pu-dept-combobox {
+            position: relative;
+            margin-top: 8px;
+        }
+        .pu-dept-inputwrap {
+            position: relative;
+        }
+        .pu-dept-results {
+            position: absolute;
+            z-index: 9999;
+            left: 0;
+            right: 0;
+            top: 100%;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-top: none;
+            max-height: 240px;
+            overflow: auto;
+            display: none;
+        }
+        .pu-dept-result {
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #333;
+        }
+        .pu-dept-result:hover {
+            background: #f5f5f5;
+        }
+        .pu-dept-tags {
+            margin-top: 10px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .pu-dept-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border: 1px solid #e3e3e3;
+            background: rgba(255,255,255,1);
+            border-radius: 999px;
+            color: #000;
+            font-size: 15px;
+        }
+        .pu-dept-tag-remove {
+            margin-left: 10px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            padding: 0;
+            color: #74777c;
+            font-size: 14px;
+            line-height: 1;
+        }
+        .pu-dept-tag-remove:hover {
+            transform: scale(1.15);
+        }
+
+        /* Récap profil (section 1) en lecture seule */
+        .pu-profile-recap {
+            margin-top: 6px;
+        }
+        .pu-profile-recap__hint {
+            margin: 30px 0 30px 0;
+            padding:10px;
+            color: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 6px;
+        }
+        .pu-profile-recap__hint a {
+            color: #fff;
+            text-decoration: underline;
+            font-weight: 700;
+
+        }
+        .pu-profile-recap__grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px 18px;
+        }
+        @media (min-width: 768px) {
+            .pu-profile-recap__grid { grid-template-columns: 1fr 1fr; }
+        }
+        .pu-profile-recap__item {
+            display: flex;
+           
+            gap: 12px;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.18);
+        }
+        .pu-profile-recap__label {
+            font-weight: 800;
+            color: rgba(0,0,0,1);
+        }
+        .pu-profile-recap__value {
+            text-align: left;
+         
+            color: rgba(0,0,0,1);
+            word-break: break-word;
+        }
+
+        /* Sections 1 à 4 : issues du profil → fond "ambre" comme sur la page profil */
+        #one .form-contener.vert,
+        #two .form-contener.vert,
+        #three .form-contener.vert,
+        #four .form-contener.vert {
+            background-color: #f2be6a !important;
+        }
+        #one .form-contener.vert,
+        #two .form-contener.vert,
+        #three .form-contener.vert,
+        #four .form-contener.vert {
+            border-color: #f2be6a !important;
+        }
+        #one .form-contener.vert .pu-profile-recap__hint,
+        #two .form-contener.vert .pu-profile-recap__hint,
+        #three .form-contener.vert .pu-profile-recap__hint,
+        #four .form-contener.vert .pu-profile-recap__hint {
+            color: #856404;
+        }
+        #one .form-contener.vert .pu-profile-recap__hint a,
+        #two .form-contener.vert .pu-profile-recap__hint a,
+        #three .form-contener.vert .pu-profile-recap__hint a,
+        #four .form-contener.vert .pu-profile-recap__hint a {
+            color: #856404;
+        }
+        #one .form-contener.vert .pu-profile-recap__item,
+        #two .form-contener.vert .pu-profile-recap__item,
+        #three .form-contener.vert .pu-profile-recap__item,
+        #four .form-contener.vert .pu-profile-recap__item {
+            border-bottom-color: rgba(133, 100, 4, 0.22);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="white">
+        <div class="container">
+<div class="bkg-img"></div>
+
+<div class="row top-profil">
+    <!-- BEGIN MAIN CONTENT -->
+    <div class=" col-sm-12 ">
+
+        <div class="titre-page">
+            <h1>
+                {{ 'Déposer ma candidature' }}
+            </h1>
+        </div>
+        
+        
+        <!-- Pop-up d'avertissement -->
+        <div id="depublished-warning-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="depublished-warning-title" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="depublished-warning-title">
+                            <i class="fa fa-exclamation-triangle text-warning"></i>
+                            Espace temporairement dépublié
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Cet espace a été temporairement suspendu par le propriétaire pour modification.</p>
+                        <ul>
+                            <li><strong>Vous pouvez continuer à remplir votre candidature</strong> et l'enregistrer en brouillon</li>
+                            <li><strong>Vous ne pourrez pas soumettre définitivement</strong> votre candidature tant que l'espace n'est pas republié</li>
+                            <li><strong>Une fois l'espace republié</strong>, vous pourrez compléter et soumettre votre candidature depuis "Mes candidatures"</li>
+                            <li><strong>Vous serez notifié</strong> quand l'espace sera de nouveau disponible</li>
+                        </ul>
+                        <div class="alert alert-warning">
+                            <strong>Important :</strong> Le bouton "Soumettre" est désactivé. Utilisez le bouton "Enregistrer en brouillon" pour sauvegarder votre travail.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-line-19 btn-grey" data-dismiss="modal">
+                            J'ai compris
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if app.user %}
+        <h6>
+            <i class="fa-solid fa-chevron-right"></i>
+            Les sections 1 à 4 sont issues de votre profil et peuvent être modifiées uniquement depuis celle-ci <i class="fa-solid fa-chevron-right"></i> <a href="{{ path('security_profil') }}" class="mailto">profil</a>
+        </h6>
+        {% endif %}
+        {% if not app.user %}
+        <h6>
+            <i class="fa-solid fa-chevron-right"></i> Si vous possédez déjà un compte, connectez-vous pour récupérer les informations de <a href="{{ path('security_profil') }}" class="mailto">votre profil</a>.
+        </h6>
+        {% endif %}
+
+        {# Consommer les flashes du profil (retour via next) pour éviter qu'ils n'apparaissent plus tard à tort #}
+        {% for message in app.flashes('success_msg') %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('error_msg') %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="pu-col-container content-block">
+            <div class="row">
+                {{ form_start(form, {'attr' : {'class' : 'col-md-12 form-apply', 'role': 'form', 'aria-label': 'Formulaire de candidature', 'novalidate': 'novalidate'} } ) }}
+                {{ form_errors(form, {'attr': {'role': 'alert', 'aria-live': 'polite'}}) }}
+                
+                {# Affichage des erreurs de validation côté serveur #}
+                {# form_errors(form) (ci-dessus) couvre déjà les erreurs racine. #}
+                {# Ce bloc complète avec les erreurs des champs documents et des champs imbriqués #}
+                {# qui ne sont pas rendus inline (champs non affichés dans le template). #}
+                {% if not form.vars.valid and form.vars.submitted %}
+                    {# Capturer le contenu avant de rendre le conteneur pour éviter une barre vide #}
+                    {% set errorBlockContent %}
+                        {# Erreurs des champs documents requis de l'espace #}
+                        {% for document in space.documents %}
+                            {% set fieldName = 'document_' ~ document.id %}
+                            {% if form[fieldName] is defined %}
+                                {% for error in form[fieldName].vars.errors %}
+                                    <div>{{ error.message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {# Erreurs des champs du formulaire (enfants, petits-enfants, arrière-petits-enfants) #}
+                        {# Les champs rendus inline avec leur erreur sont exclus pour éviter le doublon #}
+                        {% for child in form %}
+                            {% if child.vars.name not in ['contribution', 'companyStatus'] and child.vars.errors is defined and child.vars.errors|length > 0 %}
+                                {% for error in child.vars.errors %}
+                                    <div>{{ error.message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                            {% for grandChild in child %}
+                                {% if grandChild.vars.errors is defined and grandChild.vars.errors|length > 0 %}
+                                    {% for error in grandChild.vars.errors %}
+                                        <div>{{ error.message }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                                {% for greatGrandChild in grandChild %}
+                                    {% if greatGrandChild.vars.errors is defined and greatGrandChild.vars.errors|length > 0 %}
+                                        {% for error in greatGrandChild.vars.errors %}
+                                            <div>{{ error.message }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endset %}
+                    {% if errorBlockContent|trim is not empty %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ errorBlockContent|raw }}
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                <div id="js-form-space" role="group" aria-label="Étapes du formulaire">
+
+                    <div class="row">
+                        <div class=" col-xs-1 bkg ">
+                            <ul role="tablist">
+                                <li role="tab" aria-controls="one" aria-selected="true">
+                                    <a class="indicator active" href="#one" aria-label="Étape 1: Mes informations"></a>
+                                </li>
+                                <li role="tab" aria-controls="two" aria-selected="false">
+                                    <a class="indicator" href="#two" aria-label="Étape 2: Ma structure"></a>
+                                </li>
+                                <li role="tab" aria-controls="three" aria-selected="false">
+                                    <a class="indicator" href="#three" aria-label="Étape 3: Réseaux sociaux"></a>
+                                </li>
+                                <li role="tab" aria-controls="four" aria-selected="false">
+                                    <a class="indicator" href="#four" aria-label="Étape 4: Mes documents"></a>
+                                </li>
+                                <li role="tab" aria-controls="five" aria-selected="false">
+                                    <a class="indicator" href="#five" aria-label="Étape 5: Mes souhaits"></a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="main col-xs-10">
+                            <div id="one" class="section" role="tabpanel" aria-labelledby="section-info-title">
+                                <span class="section-title form-one"></span>
+                                <div class="form-contener vert">
+                                    <h3 id="section-info-title">Mes informations</h3>
+
+                                    {# Réversible : passer à true pour revenir à la section éditable d'origine #}
+                                    {% set APPLY_PROFILE_SECTION_EDITABLE = false %}
+                                    {% if APPLY_PROFILE_SECTION_EDITABLE %}
+                                        {% include 'Space/Partials/_apply_profile_section_editable.html.twig' with { form: form, app: app } %}
+                                    {% else %}
+                                        {% include 'Space/Partials/_apply_profile_section_readonly.html.twig' with { form: form, app: app, space: space } %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div id="two" class="section">
+                                <span class="section-title form-two"></span>
+                                <div class="form-contener vert">
+                                    <h3>Ma structure</h3>
+                                    {# Réversible : passer à true pour revenir à la section éditable d'origine #}
+                                    {% set APPLY_COMPANY_SECTION_EDITABLE = false %}
+                                    {% if APPLY_COMPANY_SECTION_EDITABLE %}
+                                        {% include 'Space/Partials/_apply_company_section_editable.html.twig' with { form: form, app: app } %}
+                                    {% else %}
+                                        {% include 'Space/Partials/_apply_company_section_readonly.html.twig' with { form: form, app: app, space: space } %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div id="three" class="section">
+                                <span class="section-title form-three"></span>
+                                <div class="form-contener vert">
+                                    <h3>Réseaux sociaux</h3>
+                                    {# Réversible : passer à true pour revenir à la section éditable d'origine #}
+                                    {% set APPLY_SOCIAL_SECTION_EDITABLE = false %}
+                                    {% if APPLY_SOCIAL_SECTION_EDITABLE %}
+                                        {% include 'Space/Partials/_apply_social_section_editable.html.twig' with { form: form, app: app } %}
+                                    {% else %}
+                                        {% include 'Space/Partials/_apply_social_section_readonly.html.twig' with { form: form, app: app, space: space } %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div id="four" class="section">
+                                <span class="section-title form-four"></span>
+                                <div class="form-contener vert">
+                                    <h3>Mes documents</h3>
+                                    {# Réversible : passer à true pour revenir à la section éditable d'origine #}
+                                    {% set APPLY_DOCUMENTS_SECTION_EDITABLE = false %}
+                                    {% if APPLY_DOCUMENTS_SECTION_EDITABLE %}
+                                        {% include 'Space/Partials/_apply_documents_section_editable.html.twig' with { form: form, app: app, space: space } %}
+                                    {% else %}
+                                        {% include 'Space/Partials/_apply_documents_section_readonly.html.twig' with { form: form, app: app, space: space } %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div id="five" class="section">
+                                <span class="section-title form-five"></span>
+                                <div class="form-contener vert">
+                                        <h3>Mon projet pour ce lieu</h3>
+                                        <div class="row">
+                                            <div class="col-sm-6 form-group{% if not form.name.vars.valid %} has-error{% endif %}">
+                                                {{ form_label(form.name, null, {'label_attr': {'class': 'required'}}) }}
+                                                {{ form_widget(form.name, {
+                                                    'attr': {
+                                                        'required': 'required',
+                                                        'aria-required': 'true',
+                                                        'aria-invalid': form_errors(form.name) ? 'true' : 'false',
+                                                        'aria-describedby': 'name-error'
+                                                    }
+                                                }) }}
+                                                {{ form_errors(form.name, {
+                                                    'attr': {
+                                                        'id': 'name-error',
+                                                        'role': 'alert',
+                                                        'aria-live': 'polite'
+                                                    }
+                                                }) }}
+                                            </div>
+                                            <div class="col-sm-6 form-group{% if not form.category.vars.valid %} has-error{% endif %}">
+                                                {{ form_row(form.category, {
+                                                    'label_attr': {'class': 'required'},
+                                                    'placeholder': 'Sélectionner un type d\'usage',
+                                                    'attr': {
+                                                        'class': 'form-control',
+                                                        'required': 'required',
+                                                        'data-error-message': 'Veuillez sélectionner un type d\'usage'
+                                                    }
+                                                }) }}
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-6 form-group{% if not form.wishedSize.vars.valid %} has-error{% endif %}">
+                                                {{ form_row(form.wishedSize) }}
+                                            </div>
+                                            <div class="col-sm-6 form-group{% if form.companyStatus is defined and not form.companyStatus.vars.valid %} has-error{% endif %}">
+                                                {% if form.companyStatus is defined %}
+                                                    {{ form_label(form.companyStatus, null, {'label_attr': {'class': 'required'}}) }}
+                                                    {{ form_widget(form.companyStatus, {
+                                                        'attr': {
+                                                            'class': 'form-control input-box',
+                                                            'required': 'required',
+                                                            'aria-required': 'true',
+                                                            'data-error-message': 'Veuillez sélectionner un statut juridique'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.companyStatus) }}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        {% if space.isRollingAAC() %}
+                                            <div class="row">
+                                                <div class="col-sm-6 form-group{% if not form.startOccupation.vars.valid %} has-error{% endif %}">
+                                                    {{ form_label(form.startOccupation, null, {'label_attr': {'class': 'inline-label required'}}) }}
+                                                    {{ form_widget(form.startOccupation, {
+                                                        'attr': {
+                                                            'required': 'required',
+                                                            'aria-required': 'true',
+                                                            'aria-invalid': form_errors(form.startOccupation) ? 'true' : 'false',
+                                                            'aria-describedby': 'startOccupation-error',
+                                                            'data-error-message': 'Veuillez indiquer une date d\'entrée souhaitée'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.startOccupation, {
+                                                        'attr': {
+                                                            'id': 'startOccupation-error',
+                                                            'role': 'alert',
+                                                            'aria-live': 'polite'
+                                                        }
+                                                    }) }}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="row">
+                                            <div class="col-sm-12 form-group first{% if not form.description.vars.valid %} has-error{% endif %}">
+                                                {{ form_label(form.description, null, {'label_attr': {'class': 'required'}}) }}
+                                                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Présentez votre projet (emojis non autorisés)'}}) }}
+                                                {{ form_errors(form.description) }}
+                                            </div>
+                                            <div class="col-sm-12 form-group{% if form.localUsageDescription is defined and not form.localUsageDescription.vars.valid %} has-error{% endif %}">
+                                                {{ form_row(form.localUsageDescription, {'attr': {'placeholder': 'Décrivez l’usage prévu du local (emojis non autorisés)'}}) }}
+                                            </div>
+                                            <div class="col-sm-12 form-group{% if not form.openToGlobalProject.vars.valid %} has-error{% endif %}">
+                                                {{ form_row(form.openToGlobalProject, { 'attr': { 'data-checkbox-toggle': '#toggle_' ~ form.contribution.vars.id } }) }}
+                                            </div>
+                                            <div class="col-sm-12 form-group{% if not form.contribution.vars.valid %} has-error{% endif %}" id="toggle_{{ form.contribution.vars.id }}">
+                                                {{ form_label(form.contribution, null, {'label_attr': {'class': 'required'}}) }}
+                                                {{ form_widget(form.contribution) }}
+                                                {{ form_errors(form.contribution) }}
+                                            </div>
+
+                                            <div class=" files">
+                                                <div class="col-sm-12 form-group">
+                                                    {% if space.getDocuments() | length > 0 %}
+                                                   <span class="img-docs"></span> <h6 class="docs">{{space.getDocuments() | length}} fichier{% if space.getDocuments() | length > 1%}s{% endif %} à joindre à votre candidature <span class="red">*</span></h6>
+                                                    {% endif %}
+                                                </div>
+
+                                                {% for document in space.documents %}
+                                                <div class="col-sm-8 offset-4 form-group arrow">
+                                                   <i class="fa fa-arrow-right fa-lg"></i>&nbsp;<label>{{document.name}}</label>
+                                                   
+                                                   {# Avertissement avant le champ du premier document obligatoire #}
+                                                   {% if loop.first %}
+                                                       <dl class="dl-horizontal info-block" style="margin-top: 10px; margin-bottom: 10px;">
+                                                           <dd>
+                                                               <i class="fa fa-info-circle"></i> <strong>Formats autorisés :</strong> JPG, GIF, PNG, PDF ou DOC.<br/>
+                                                               <i class="fa fa-exclamation-triangle text-warning"></i> <strong>Taille maximale :</strong> 10 Mo par fichier. Les fichiers plus volumineux seront rejetés.
+                                                           </dd>
+                                                       </dl>
+                                                   {% endif %}
+                                                   
+                                                    {% if form["document_#{document.id}"] is not defined %}
+                                                        <div class="file-infos clearfix" >
+                                                            <div class="actions overflow">
+                                                                {% set file = application.getFilesType(document.id).0 %}
+                                                                <div style="display:inline-block; width:90%; text-overflow:ellipsis;overflow:hidden">{{ file.filename }}</div>
+                                                                <div style="width: 10%" class="clearfix pull-right">
+                                                                    <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
+                                                                    {% if file.id %}<a href="{{ path('space_removefile', { 'id': file.id, 'service': path('space_apply', { 'space': space.id }), '_token': csrf_token('remove_file_' ~ file.id) }) }}"><i class="fa fa-trash"></i></a>{% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="file-infos clearfix" >
+                                                            <div class="actions overflow">
+                                                                <label class="small">
+                                                                    {{ form_widget(attribute(form, "document_#{document.id}")) }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        {{ form_errors(form["document_#{document.id}"]) }}
+                                                    {% endif %}
+                                                </div>
+                                                {% endfor %}
+
+                                                {# Conteneur pour les erreurs de fichiers #}
+                                                <div id="file-validation-errors" class="col-sm-8" style="display: none; margin:0 15px;"></div>
+
+                                                <div class="col-sm-12 ">
+                                                    <label class="control-label">Joindre des fichiers supplémentaires à cette candidature</label>
+                                                    {% if form.vars.data.getFilesType(null) | length > 0 %}
+                                                    <dl class="dl-horizontal  info-block">
+                                                        <dd>Les documents suivants seront seulement attachés à la candidature de cet espace. Les fichiers qui peuvent être joints dans toutes vos candidatures doivent être téléchargés dans la section "Documents".</dd>
+                                                    </dl>
+                                                    {% endif %}
+                                                </div>
+
+                                                {% if form.vars.data.getFilesType(null) | length > 0 %}
+                                                    <div class="files col-sm-6">
+
+                                                        {% for file in form.vars.data.getFilesType(null) %}
+                                                        <div class="file-infos">
+
+                                                            <div class="actions overflow">
+                                                                <span>{{file.fileName | slice(14, 100)}}</span>
+                                                                <div style="width: 10%" class="clearfix pull-right">
+                                                                    <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
+                                                                    {% if file.id %}<a href="{{ path('space_removefile', { 'id': file.id, 'service': path('space_apply', { 'space': space.id }), '_token': csrf_token('remove_file_' ~ file.id) }) }}"><i class="fa fa-trash"></i></a>{% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+
+                                                <div class="add-file col-xs-12 col-sm-8 offset-4{% if not form.newDocument.vars.valid %} has-error{% endif %}">
+                                                    {% if form.vars.data.getFilesType(null) | length > 0 %}
+                                                    <h4>
+                                                        <i class="icon small icon-inline add-red"></i>
+                                                        Ajouter un fichier
+                                                    </h4>
+                                                    {% endif %}
+
+                                                    <dl class="dl-horizontal info-block">
+                                                        <dd>
+                                                            <i class="fa fa-info-circle"></i> <strong>Formats autorisés :</strong> JPG, GIF, PNG, PDF ou DOC.<br/>
+                                                            <i class="fa fa-exclamation-triangle text-warning"></i> <strong>Taille maximale :</strong> 10 Mo par fichier. Les fichiers plus volumineux seront rejetés.
+                                                        </dd>
+                                                    </dl>
+
+                                                    {{ form_widget(form.newDocument, {'attr': {'class': 'form-control'}}) }}
+                                                    {{ form_errors(form.newDocument) }}
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+</div>
+                            <div class="col-sm-12">
+                                <div class="save center">
+                                    {% if form.save is defined %}
+                                        {{ form_widget(form.save, {'attr': {'class': 'btn btn-default-color submit_form no-ajax', 'style': 'margin-right: 15px;', 'formnovalidate': 'formnovalidate'}}) }}
+                                    {% endif %}
+                                    {{ form_widget(form.submit, {'attr': {'class': 'btn btn-fullcolor submit_form no-ajax'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+</div>
+
+            {% if form.intent is defined %}
+                {{ form_widget(form.intent) }}
+            {% endif %}
+            {# Rendre uniquement les champs cachés restants (ex: _token), pas les champs visibles oubliés #}
+            {% for child in form %}
+                {% if not child.rendered and child.vars.name starts with('_') %}
+                    {{ form_row(child) }}
+                {% endif %}
+            {% endfor %}
+            {{ form_end(form, {'render_rest': false}) }}
+
+    </div>
+</div>
+</div>
+</div>
+{% endblock body %}
+
+
+{% block javascript %}
+    <script>
+        // Fonction pour réinitialiser les handlers après mise à jour du formulaire
+        function initializeFormHandlers() {
+            // Réinitialiser les handlers de validation en temps réel
+            // (les handlers sont déjà attachés via les événements délégués ou seront réattachés)
+        }
+        
+        $(document).ready(function() {
+            const EMOJI_REGEX = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u;
+            const PHONE_REGEX = /^(\+33\s?[1-9](\s?\d{2}){4}|0[1-9](\s?\d{2}){4})$/;
+
+            // Assurer la navigation vers "Mon profil" même si des handlers globaux interceptent les clics
+            $(document).on('click', '.pu-profile-recap__hint a', function(e) {
+                const href = this.getAttribute('href');
+                if (!href) return;
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = href;
+            });
+
+            // Suppression document profil depuis la page candidature : POST pour rester sur le formulaire après redirect
+            $(document).on('click', '.js-profile-remove-doc', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var $link = $(this);
+                if (!confirm($link.data('confirm'))) return false;
+                var $form = $('<form>').attr({ method: 'POST', action: $link.data('url') });
+                $form.append($('<input>').attr({ type: 'hidden', name: 'token', value: $link.data('token') }));
+                if ($link.data('service')) {
+                    $form.append($('<input>').attr({ type: 'hidden', name: 'service', value: $link.data('service') }));
+                }
+                if ($link.data('anchor')) {
+                    $form.append($('<input>').attr({ type: 'hidden', name: 'anchor', value: $link.data('anchor') }));
+                }
+                $('body').append($form);
+                $form.submit();
+                return false;
+            });
+
+            let modalAlreadyShown = false;
+            let spaceCheckInterval = null;
+            
+            // Fonction pour afficher le pop-up d'avertissement
+            function showDepublishedModal() {
+                if (modalAlreadyShown) return;
+                modalAlreadyShown = true;
+                $('#depublished-warning-modal').modal({
+                    backdrop: false,
+                    keyboard: true
+                });
+            }
+            
+            // Afficher le pop-up d'avertissement si l'espace est dépublié
+            {% if not space.isEnabled() and not space.isClosed() %}
+            setTimeout(function() {
+                showDepublishedModal();
+            }, 3000);
+            {% endif %}
+            
+            // Vérification périodique de l'état de l'espace
+            function checkSpaceStatus() {
+                if (modalAlreadyShown || $('form').data('submitting')) return;
+                
+                $.ajax({
+                    url: '{{ path('space_check_status', {'id': space.id}) }}',
+                    type: 'GET',
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function(data) {
+                        const submitButton = $('input[name="appbundle_application[submit]"], button[name="appbundle_application[submit]"]');
+                        
+                        if (!data.available && !data.closed) {
+                            // Espace suspendu (dépublié) - désactiver le bouton submit et afficher le modal
+                            if (submitButton.length) {
+                                submitButton.prop('disabled', true);
+                                submitButton.attr('title', 'L\'espace doit être republié pour soumettre la candidature');
+                                submitButton.addClass('disabled');
+                            }
+                            
+                            if (!modalAlreadyShown) {
+                                showDepublishedModal();
+                            }
+                        } else if (data.available) {
+                            // Espace disponible - réactiver le bouton submit
+                            if (submitButton.length) {
+                                submitButton.prop('disabled', false);
+                                submitButton.removeAttr('title');
+                                submitButton.removeClass('disabled');
+                            }
+                            
+                            // Masquer le modal s'il est ouvert
+                            $('#depublished-warning-modal').modal('hide');
+                        }
+                    },
+                    error: function() {
+                    }
+                });
+            }
+            
+            // Démarrer la vérification périodique
+            setTimeout(function() {
+                spaceCheckInterval = setInterval(checkSpaceStatus, 15000);
+            }, 5000);
+            
+            // Désactiver le bouton Soumettre si l'espace est dépublié
+            {% if not space.isEnabled() and not space.isClosed() %}
+            const submitButton = $('input[name="appbundle_application[submit]"], button[name="appbundle_application[submit]"]');
+            if (submitButton.length) {
+                submitButton.prop('disabled', true);
+                submitButton.attr('title', 'L\'espace doit être publié pour soumettre la candidature');
+                submitButton.addClass('disabled');
+            }
+            {% endif %}
+            
+            // Masquer les conteneurs Chosen pour le champ category
+            function hideChosenForCategory() {
+                const $native = $('#appbundle_application_category');
+                const $chosen = $('#appbundle_application_category_chosen, #appbundle_application_category_chzn, #appbundle_application_category + .chzn-container, #appbundle_application_category + .chosen-container');
+                if ($chosen.length) {
+                    $chosen.hide();
+                }
+                if ($native.length) {
+                    $native.show();
+                }
+            }
+            hideChosenForCategory();
+            
+            // Fonction de validation pour les champs - avec messages d'erreur en temps réel
+            function validateField($field) {
+                const formGroup = $field.closest('.form-group');
+                const value = $field.val();
+                const isRequired = $field.prop('required') || $field.attr('required') === 'required' || $field.closest('.required').length > 0;
+                const isValueEmpty = (val) => {
+                    if (val === null || val === undefined) return true;
+                    if (Array.isArray(val)) return val.length === 0;
+                    if (typeof val === 'string') return val.trim() === '';
+                    return String(val).trim() === '';
+                };
+                
+                // Supprimer uniquement les messages d'erreur injectés par le JS
+                // (ne pas effacer les erreurs serveur Symfony rendues par form_errors()).
+                formGroup.find('.js-help-block').remove();
+                
+                // Vérifier si le champ est obligatoire et vide
+                if (isRequired && isValueEmpty(value)) {
+                    // Afficher le message d'erreur immédiatement
+                    let errorMessage = 'Ce champ est requis';
+                    
+                    // Messages spécifiques selon le type de champ
+                    if ($field.attr('id') === 'appbundle_application_name') {
+                        errorMessage = 'Veuillez saisir le nom de votre projet';
+                    } else if ($field.attr('id') === 'appbundle_application_description') {
+                        errorMessage = 'Veuillez décrire votre projet';
+                    } else if ($field.attr('id') === 'appbundle_application_startOccupation') {
+                        errorMessage = 'Veuillez indiquer une date d\'entrée souhaitée';
+                    } else if ($field.attr('id') === 'appbundle_application_projectHolder_userInfo_firstname') {
+                        errorMessage = 'Veuillez saisir votre prénom';
+                    } else if ($field.attr('id') === 'appbundle_application_projectHolder_userInfo_lastname') {
+                        errorMessage = 'Veuillez saisir votre nom';
+                    } else if ($field.attr('id') === 'appbundle_application_projectHolder_userInfo_phone') {
+                        errorMessage = 'Veuillez saisir votre numéro de téléphone';
+                    } else if ($field.attr('id') === 'appbundle_application_projectHolder_userInfo_email') {
+                        errorMessage = 'Veuillez saisir votre adresse email';
+                    } else if ($field.attr('id') === 'appbundle_application_projectHolder_companyInfo_zipcode') {
+                        errorMessage = 'Veuillez saisir le code postal';
+                    } else if ($field.attr('id') === 'appbundle_application_lengthOccupation') {
+                        errorMessage = 'Veuillez indiquer la durée d\'occupation';
+                    } else if ($field.attr('id') === 'appbundle_application_lengthTypeOccupation') {
+                        errorMessage = 'Veuillez sélectionner l\'unité de temps';
+                    } else if ($field.attr('name') && $field.attr('name').includes('civility')) {
+                        errorMessage = 'Veuillez sélectionner votre civilité';
+                    }
+                    
+                    formGroup.append(`<span class="help-block js-help-block" role="alert">${errorMessage}</span>`);
+                    formGroup.addClass('has-error');
+                    $field.attr('aria-invalid', 'true');
+                } else if (isRequired && !isValueEmpty(value)) {
+                    // Champ valide - supprimer les attributs d'erreur
+                    formGroup.removeClass('has-error');
+                    $field.attr('aria-invalid', 'false');
+                }
+                
+                updateStepIndicators();
+                return isRequired && isValueEmpty(value);
+            }
+            
+            // Mettre à jour les indicateurs d'étape - sans styles d'erreur
+            function updateStepIndicators() {
+                // Ne plus ajouter de classes d'erreur aux indicateurs
+                // La validation fonctionne toujours mais sans styles visuels
+            }
+            
+            // Validation en temps réel lors de la saisie pour les champs texte (emojis interdits)
+            $('#appbundle_application_description, #appbundle_application_localUsageDescription, #{{ form.contribution.vars.id }}').on('input', function() {
+                const $field = $(this);
+                const formGroup = $field.closest('.form-group');
+                const value = $field.val();
+                
+                // Supprimer les anciens messages d'erreur
+                formGroup.find('.js-help-block').remove();
+                formGroup.removeClass('has-error');
+                
+                if (!value || value.trim() === '') {
+                    // Champ vide - pas d'erreur pendant la saisie
+                    $field.attr('aria-invalid', 'false');
+                } else {
+                    // Vérifier les caractères spéciaux (emojis uniquement)
+                    const hasEmojis = EMOJI_REGEX.test(value);
+                    
+                    if (hasEmojis) {
+                        formGroup.append('<span class="help-block js-help-block" role="alert">Le texte ne doit pas contenir d\'emojis</span>');
+                        formGroup.addClass('has-error');
+                        $field.attr('aria-invalid', 'true');
+                    } else {
+                        // Texte valide
+                        $field.attr('aria-invalid', 'false');
+                    }
+                }
+            });
+            
+            // Validation spéciale pour le champ SIRET
+            $('input[name*="siret"], #appbundle_application_projectHolder_companyInfo_siret').on('blur change', function() {
+                const $field = $(this);
+                const formGroup = $field.closest('.form-group');
+                const value = $field.val().trim();
+                
+                // Supprimer les anciens messages d'erreur
+                formGroup.find('.js-help-block').remove();
+                
+                if (value !== '') {
+                    // Vérifier le format SIRET avec ou sans espaces
+                    if (!/^(\d{3}\s?){4}\d{2}$/.test(value)) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le SIRET doit contenir exactement 14 chiffres. Format accepté : 123 456 789 01234</span>');
+                    } else {
+                        formGroup.removeClass('has-error');
+                    }
+                } else {
+                    formGroup.removeClass('has-error');
+                }
+            });
+            
+            // Validation en temps réel
+            $('.form-apply input, .form-apply select, .form-apply textarea').on('blur change', function() {
+                const $field = $(this);
+                
+                // Validation spécifique : Surface souhaitée (entier positif)
+                if ($field.is('#appbundle_application_wishedSize')) {
+                    const formGroup = $field.closest('.form-group');
+                    const el = $field.get(0);
+                    const raw = String($field.val() || '').trim();
+                    // Supprimer les anciens messages d'erreur
+                    formGroup.find('.js-help-block').remove();
+                    formGroup.removeClass('has-error');
+
+                    // Si input type=number et saisie invalide (ex: lettres), le navigateur renvoie souvent value=""
+                    // On utilise donc validity.badInput pour distinguer "vide" vs "saisie non numérique".
+                    if (el && el.validity && el.validity.badInput) {
+                        formGroup.append('<span class="help-block js-help-block" role="alert">Veuillez entrer un entier positif (ex : 12).</span>');
+                        formGroup.addClass('has-error');
+                        $field.attr('aria-invalid', 'true');
+                    } else if (raw === '') {
+                        formGroup.append('<span class="help-block js-help-block" role="alert">Ce champ est requis</span>');
+                        formGroup.addClass('has-error');
+                        $field.attr('aria-invalid', 'true');
+                    } else {
+                        const isInt = /^[0-9]+$/.test(raw);
+                        const n = isInt ? parseInt(raw, 10) : NaN;
+                        if (!isInt || !Number.isFinite(n) || n < 1) {
+                            formGroup.append('<span class="help-block js-help-block" role="alert">Veuillez entrer un entier positif (ex : 12).</span>');
+                            formGroup.addClass('has-error');
+                            $field.attr('aria-invalid', 'true');
+                        } else {
+                            $field.attr('aria-invalid', 'false');
+                        }
+                    }
+                    return;
+                }
+
+                if ($field.is('#appbundle_application_description') || $field.is('#appbundle_application_localUsageDescription') || $field.is('#{{ form.contribution.vars.id }}')) {
+                    // Validation spéciale pour les champs texte - détection des emojis
+                    const formGroup = $field.closest('.form-group');
+                    const value = $field.val();
+                    
+                    // Supprimer les anciens messages d'erreur
+                    formGroup.find('.js-help-block').remove();
+                    formGroup.removeClass('has-error');
+                    
+                    if (!value || value.trim() === '') {
+                        // Champ vide - ne pas afficher d'erreur ici (la contrainte required est gérée ailleurs)
+                        $field.attr('aria-invalid', 'false');
+                    } else {
+                        // Vérifier les caractères spéciaux (emojis uniquement)
+                        const hasEmojis = EMOJI_REGEX.test(value);
+                        
+                        if (hasEmojis) {
+                            formGroup.append('<span class="help-block js-help-block" role="alert">Le texte ne doit pas contenir d\'emojis</span>');
+                            formGroup.addClass('has-error');
+                            $field.attr('aria-invalid', 'true');
+                        } else {
+                            // Texte valide
+                            $field.attr('aria-invalid', 'false');
+                        }
+                    }
+                } else if ($field.is('#appbundle_application_category')) {
+                    const formGroup = $field.closest('.form-group');
+                    const value = $field.val();
+                    
+                        if (!value || value === '' || value === '0' || $field.find('option:selected').text().includes('Sélectionner')) {
+                        // Pas de classe has-error, juste le message d'erreur
+                        if (formGroup.find('.js-help-block').length === 0) {
+                                formGroup.append('<span class="help-block js-help-block" role="alert">Veuillez sélectionner un type d\'usage</span>');
+                        }
+                        formGroup.addClass('has-error');
+                        $field.attr('aria-invalid', 'true');
+                    } else {
+                        // Pas de classe is-valid, juste supprimer le message d'erreur
+                        formGroup.find('.js-help-block').remove();
+                        formGroup.removeClass('has-error');
+                        $field.attr('aria-invalid', 'false');
+                    }
+                } else if ($field.attr('name') && $field.attr('name').includes('civility')) {
+                    // Validation spéciale pour les champs de civilité (radio buttons)
+                    const formGroup = $field.closest('.form-group');
+                    const checkedRadio = formGroup.find('input[name="' + $field.attr('name') + '"]:checked');
+                    
+                    if (checkedRadio.length === 0) {
+                        if (formGroup.find('.js-help-block').length === 0) {
+                            formGroup.append('<span class="help-block js-help-block" role="alert">Veuillez sélectionner votre civilité</span>');
+                        }
+                        formGroup.addClass('has-error');
+                    } else {
+                        formGroup.find('.js-help-block').remove();
+                        formGroup.removeClass('has-error');
+                    }
+                } else if ($field.attr('name') && $field.attr('name').includes('siret')) {
+                    // Validation spéciale pour le champ SIRET
+                    const formGroup = $field.closest('.form-group');
+                    const value = $field.val().trim();
+                    
+                    // Supprimer les anciens messages d'erreur
+                    formGroup.find('.js-help-block').remove();
+                    formGroup.removeClass('has-error');
+                    
+                    if (value !== '') {
+                        // Vérifier le format SIRET avec ou sans espaces
+                        if (!/^(\d{3}\s?){4}\d{2}$/.test(value)) {
+                            formGroup.addClass('has-error');
+                            formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le SIRET doit contenir exactement 14 chiffres. Format accepté : 123 456 789 01234</span>');
+                        }
+                    }
+                } else {
+                    validateField($field);
+                }
+                
+                updateStepIndicators();
+            });
+            
+            // Bouton "Enregistrer en brouillon" : laisser Symfony gérer la soumission
+            // (validation_groups=[] côté serveur). On évite l'AJAX ici, car un submit multipart
+            // est plus fiable pour les fichiers.
+            $('#appbundle_application_save').on('click', function() {
+                const $form = $('.form-apply');
+                // Nettoyer un éventuel marqueur caché "submit" injecté après un essai précédent.
+                $form.find('input[type="hidden"][name="appbundle_application[submit]"]').remove();
+                // Intention explicite: brouillon
+                $('#appbundle_application_intent').val('save');
+                if (spaceCheckInterval) {
+                    clearInterval(spaceCheckInterval);
+                }
+                $form.data('submitting', true);
+                return true;
+            });
+            
+            // ===== Handler pour le bouton Submit avec validation =====
+            $('#appbundle_application_submit').on('click', function(e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                
+                // Vérifier d'abord l'état de l'espace
+                const submitButton = $(this);
+                if (submitButton.prop('disabled') || submitButton.hasClass('disabled')) {
+                    alert('Cet espace est temporairement suspendu pour modification. Vous ne pouvez pas soumettre votre candidature pour le moment. Vous pouvez enregistrer votre travail en brouillon et revenir plus tard.');
+                    return false;
+                }
+                
+                let hasErrors = false;
+                let firstErrorSection = null;
+                let firstErrorElement = null;
+                
+                // Validation des champs requis
+                const requiredFields = [
+                    '#appbundle_application_category',
+                    '#appbundle_application_companyStatus',
+                    '#appbundle_application_name',
+                    '#appbundle_application_wishedSize',
+                    '#appbundle_application_description',
+                    '#appbundle_application_projectHolder_userInfo_firstname',
+                    '#appbundle_application_projectHolder_userInfo_lastname',
+                    '#appbundle_application_projectHolder_userInfo_phone',
+                    '#appbundle_application_projectHolder_userInfo_email',
+                    '#appbundle_application_projectHolder_companyInfo_companyMobile'
+                ];
+
+                {% if space.isRollingAAC() %}
+                requiredFields.push('#appbundle_application_startOccupation');
+                {% endif %}
+                
+                requiredFields.forEach(function(fieldId) {
+                    const $field = $(fieldId);
+                    if ($field.length) {
+                        const value = $field.val();
+                        const formGroup = $field.closest('.form-group');
+                        
+                        if (!value || value.trim() === '') {
+                            hasErrors = true;
+                            // Pas de classe has-error, juste le message d'erreur
+                            
+                            if (formGroup.find('.js-help-block').length === 0) {
+                                let errorMessage = 'Ce champ est requis';
+                                if (fieldId === '#appbundle_application_category') {
+                                    errorMessage = 'Veuillez sélectionner un type d\'usage';
+                                } else if (fieldId === '#appbundle_application_companyStatus') {
+                                    errorMessage = 'Veuillez sélectionner un statut juridique';
+                                } else if (fieldId === '#appbundle_application_wishedSize') {
+                                    errorMessage = 'Veuillez renseigner une surface souhaitée';
+                                } else if (fieldId === '#appbundle_application_description') {
+                                    errorMessage = 'Veuillez décrire votre projet';
+                                } else if (fieldId === '#appbundle_application_projectHolder_userInfo_phone') {
+                                    errorMessage = 'Veuillez saisir votre numéro de téléphone';
+                                } else if (fieldId === '#appbundle_application_projectHolder_companyInfo_companyMobile') {
+                                    errorMessage = 'Veuillez saisir votre numéro de téléphone mobile';
+                                }
+                                formGroup.addClass('has-error');
+                                formGroup.append(`<span class="help-block js-help-block" role="alert">${errorMessage}</span>`);
+                            }
+                        } else if (fieldId === '#appbundle_application_description') {
+                            // Vérification spéciale pour le champ description
+                            const hasEmojis = EMOJI_REGEX.test(value);
+                            
+                            if (hasEmojis) {
+                                hasErrors = true;
+                                if (formGroup.find('.js-help-block').length === 0) {
+                                    formGroup.append('<span class="help-block js-help-block" role="alert">Le texte ne doit pas contenir d\'emojis</span>');
+                                }
+                                
+                                if (!firstErrorSection) {
+                                    firstErrorSection = $field.closest('.section');
+                                    firstErrorElement = $field;
+                                }
+                            }
+                        } else if (fieldId === '#appbundle_application_projectHolder_userInfo_phone' || fieldId === '#appbundle_application_projectHolder_companyInfo_companyMobile') {
+                            // Validation du format téléphone
+                            if (!PHONE_REGEX.test(value)) {
+                                hasErrors = true;
+                                if (formGroup.find('.js-help-block').length === 0) {
+                                    formGroup.append('<span class="help-block js-help-block" role="alert">Le format du téléphone n\'est pas valide. Utilisez le format français (01 23 45 67 89) ou international (+33 1 23 45 67 89).</span>');
+                                }
+                                
+                                if (!firstErrorSection) {
+                                    firstErrorSection = $field.closest('.section');
+                                    firstErrorElement = $field;
+                                }
+                            }
+                        } else if (fieldId === '#appbundle_application_wishedSize') {
+                            // Validation entier positif
+                            const v = String(value).trim();
+                            const isInt = /^[0-9]+$/.test(v);
+                            const n = isInt ? parseInt(v, 10) : NaN;
+                            if (!isInt || !Number.isFinite(n) || n < 1) {
+                                hasErrors = true;
+                                if (formGroup.find('.js-help-block').length === 0) {
+                                    formGroup.append('<span class="help-block js-help-block" role="alert">Veuillez entrer un entier positif (ex : 12).</span>');
+                                }
+                                formGroup.addClass('has-error');
+                                if (!firstErrorSection) {
+                                    firstErrorSection = $field.closest('.section');
+                                    firstErrorElement = $field;
+                                }
+                            }
+                        }
+                        
+                        if (!value || value.trim() === '') {
+                            if (!firstErrorSection) {
+                                firstErrorSection = $field.closest('.section');
+                                firstErrorElement = $field;
+                            }
+                        }
+                    }
+                });
+
+                // Validation du champ "contribution" (idées pour le projet collectif)
+                // Requis uniquement si "openToGlobalProject" est coché
+                const $openToGlobal = $('#{{ form.openToGlobalProject.vars.id }}');
+                const $contribution = $('#{{ form.contribution.vars.id }}');
+                if ($openToGlobal.length && $contribution.length && $openToGlobal.is(':checked')) {
+                    const contributionValue = $contribution.val();
+                    if (!contributionValue || contributionValue.trim() === '') {
+                        hasErrors = true;
+                        const $toggleDiv = $('#toggle_{{ form.contribution.vars.id }}');
+                        $toggleDiv.show();
+                        const contribGroup = $contribution.closest('.form-group');
+                        contribGroup.addClass('has-error');
+                        if (contribGroup.find('.js-help-block').length === 0) {
+                            contribGroup.append('<span class="help-block js-help-block" role="alert">Veuillez décrire vos idées pour le projet collectif</span>');
+                        }
+                        if (!firstErrorSection) {
+                            firstErrorSection = contribGroup.closest('.section');
+                            firstErrorElement = $contribution;
+                        }
+                    }
+                }
+                
+                // Nettoyer les erreurs précédentes
+                $('#file-validation-errors').hide().empty();
+                $('.file-error-inline').remove();
+                
+                // Limites de taille des fichiers (10 Mo = 10 * 1024 * 1024 octets)
+                const maxFileSize = 10 * 1024 * 1024; // 10 Mo
+                const maxFileSizeMB = 10;
+                
+                // Formats autorisés : JPG, GIF, PNG, PDF ou DOC
+                const allowedMimeTypes = [
+                    'image/jpeg',
+                    'image/jpg',
+                    'image/gif',
+                    'image/png',
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // DOCX
+                ];
+                
+                const allowedExtensions = ['jpg', 'jpeg', 'gif', 'png', 'pdf', 'doc', 'docx'];
+                
+                function getFileExtension(fileName) {
+                    return fileName.split('.').pop().toLowerCase();
+                }
+                
+                function isValidFileFormat(file) {
+                    // Vérifier le type MIME
+                    const isValidMime = allowedMimeTypes.includes(file.type);
+                    
+                    // Vérifier l'extension (fallback si le type MIME n'est pas fiable)
+                    const extension = getFileExtension(file.name);
+                    const isValidExt = allowedExtensions.includes(extension);
+                    
+                    return isValidMime || isValidExt;
+                }
+                
+                // Validation des fichiers obligatoires et de leur taille/format
+                {% for document in space.documents %}
+                const documentField_{{ document.id }} = $('input[name="appbundle_application[document_{{ document.id }}][file]"]');
+                if (documentField_{{ document.id }}.length) {
+                    const fileInput = documentField_{{ document.id }}[0];
+                    const fileValue = documentField_{{ document.id }}.val();
+                    
+                    // Vérifier si le fichier est obligatoire et manquant
+                    if (!fileValue || fileValue === '') {
+                        hasErrors = true;
+                        
+                        // Afficher l'erreur sous la section des fichiers (style harmonisé)
+                        $('#file-validation-errors').show();
+                        $('#file-validation-errors').append('<div class="file-error-item" data-document="{{ document.name }}" role="alert"><i class="fa fa-exclamation-triangle"></i> Le document "{{ document.name }}" est obligatoire</div>');
+                        
+                        if (!firstErrorSection) {
+                            firstErrorSection = $('.files').closest('.section');
+                            firstErrorElement = documentField_{{ document.id }};
+                        }
+                    }
+                    // Vérifier le format et la taille du fichier si un fichier est sélectionné
+                    else if (fileInput.files && fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        
+                        // Vérifier le format
+                        if (!isValidFileFormat(file)) {
+                            hasErrors = true;
+                            const extension = getFileExtension(file.name);
+                            
+                            $('#file-validation-errors').show();
+                            $('#file-validation-errors').append('<div class="file-error-item" data-document="{{ document.name }}" role="alert"><i class="fa fa-exclamation-triangle"></i> Le fichier "{{ document.name }}" a un format non autorisé (.' + extension + '). Formats acceptés : JPG, GIF, PNG, PDF ou DOC</div>');
+                            
+                            if (!firstErrorSection) {
+                                firstErrorSection = $('.files').closest('.section');
+                                firstErrorElement = documentField_{{ document.id }};
+                            }
+                        }
+                        // Vérifier la taille
+                        else if (file.size > maxFileSize) {
+                            hasErrors = true;
+                            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                            
+                            // Afficher l'erreur de taille (style harmonisé)
+                            $('#file-validation-errors').show();
+                            $('#file-validation-errors').append('<div class="file-error-item" data-document="{{ document.name }}" role="alert"><i class="fa fa-exclamation-triangle"></i> Le fichier "{{ document.name }}" est trop volumineux (' + fileSizeMB + ' Mo). Taille maximale : ' + maxFileSizeMB + ' Mo</div>');
+                            
+                            if (!firstErrorSection) {
+                                firstErrorSection = $('.files').closest('.section');
+                                firstErrorElement = documentField_{{ document.id }};
+                            }
+                        }
+                    }
+                }
+                {% endfor %}
+                
+                // Validation du format et de la taille des fichiers supplémentaires (newDocument)
+                // Note: L'erreur inline est déjà affichée par validateFileSize() lors du change
+                const newDocumentField = $('input[name="appbundle_application[newDocument][file]"]');
+                if (newDocumentField.length && newDocumentField[0].files && newDocumentField[0].files.length > 0) {
+                    const file = newDocumentField[0].files[0];
+                    
+                    // Vérifier le format
+                    if (!isValidFileFormat(file)) {
+                        hasErrors = true;
+                        const extension = getFileExtension(file.name);
+                        
+                        if (!firstErrorSection) {
+                            firstErrorSection = $('.add-file').closest('.section');
+                            firstErrorElement = newDocumentField;
+                        }
+                    }
+                    // Vérifier la taille
+                    else if (file.size > maxFileSize) {
+                        hasErrors = true;
+                        
+                        if (!firstErrorSection) {
+                            firstErrorSection = $('.add-file').closest('.section');
+                            firstErrorElement = newDocumentField;
+                        }
+                    }
+                }
+                
+                if (hasErrors) {
+                    if (firstErrorSection && firstErrorElement) {
+                        const sectionId = firstErrorSection.attr('id');
+                        const tabLink = $(`a[href="#${sectionId}"]`);
+                        
+                        if (tabLink.length) {
+                            // Afficher toutes les sections au lieu de les cacher
+                            $('.section').show();
+                            $('.indicator').removeClass('active');
+                            tabLink.addClass('active');
+                            
+                            setTimeout(function() {
+                                const target = firstErrorElement.closest('.form-group');
+                                const offset = (target.length ? target : firstErrorElement).offset().top - 100;
+                                $('html, body').animate({
+                                    scrollTop: offset
+                                }, 500);
+                                
+                                if (firstErrorElement.is(':input')) {
+                                    firstErrorElement.focus();
+                                }
+                            }, 100);
+                        }
+                    }
+                    
+                    return false;
+                }
+                
+                if (spaceCheckInterval) {
+                    clearInterval(spaceCheckInterval);
+                }
+
+                const $form = $('.form-apply');
+                $form.data('submitting', true);
+                $('#appbundle_application_intent').val('submit');
+
+                // Important: un submit JS natif n'inclut pas automatiquement le bouton cliqué.
+                // On force donc l'intention "soumettre" pour que Symfony détecte submit->isClicked().
+                $form.find('input[type="hidden"][name="appbundle_application[submit]"]').remove();
+                $form.append('<input type="hidden" name="appbundle_application[submit]" value="Soumettre ma candidature">');
+
+                // Laisser le submit HTML (multipart) faire son travail si la validation front est OK
+                $form.get(0).submit();
+                return false;
+            });
+            
+            // Initialisation - sans classes de validation visuelle
+            // Ne plus ajouter de classes has-error aux indicateurs
+            // $('.has-error').each(function() {
+            //     const section = $(this).closest('.section');
+            //     $(`a[href="#${section.attr('id')}"]`).addClass('has-error');
+            // });
+            
+            // Ne plus ajouter de classes de validation aux form-group
+            // $('.form-group').removeClass('is-valid has-error');
+            
+            // Nettoyage initial :
+            // - On évite d'afficher des erreurs avant interaction utilisateur
+            // - MAIS on ne doit jamais effacer les erreurs serveur après un POST invalide
+            const wasSubmitted = {{ form.vars.submitted ? 'true' : 'false' }};
+            if (!wasSubmitted) {
+                $('.form-group').removeClass('has-error');
+                $('.js-help-block').remove();
+            }
+            
+            // Erreur(s) serveur après soumission : scroll automatique vers le premier champ en erreur
+            // (même logique que profil.html.twig, adaptée au formulaire multi-étapes)
+            if (wasSubmitted) {
+                (function() {
+                    // Rendre visibles les divs conditionnels (toggle) si l'un de leurs champs est en erreur
+                    // (ex: le champ "contribution" masqué par défaut derrière la case "openToGlobalProject")
+                    $('[id^="toggle_"]').each(function() {
+                        if ($(this).find('.has-error').length) {
+                            $(this).show();
+                        }
+                    });
+
+                    // Premier form-group en erreur contenant un message Symfony (.help-block)
+                    var $firstError = $('.form-group.has-error').filter(function() {
+                        return $(this).find('.help-block:not(.text-muted)').length > 0;
+                    }).first();
+
+                    // Fallback : premier form-group.has-error sans message visible
+                    if (!$firstError.length) {
+                        $firstError = $('.form-group.has-error').first();
+                    }
+
+                    if ($firstError.length) {
+                        // Identifier la section parente et activer l'indicateur correspondant
+                        var $section = $firstError.closest('.section');
+                        if ($section.length) {
+                            var sectionId = $section.attr('id');
+                            $('.section').show();
+                            $('.indicator').removeClass('active');
+                            $('a[href="#' + sectionId + '"]').addClass('active');
+                        }
+
+                        setTimeout(function() {
+                            $('html, body').animate({
+                                scrollTop: $firstError.offset().top - 120
+                            }, 500);
+                            var $input = $firstError.find('input:not([type="hidden"]), textarea, select').filter(':visible').first();
+                            if ($input.length) {
+                                $input.focus();
+                            }
+                        }, 200);
+                    }
+                })();
+            }
+            
+            // Validation initiale - NE PAS afficher les erreurs au chargement
+            // Les erreurs ne s'afficheront que lors de l'interaction utilisateur
+            $('.form-apply input, .form-apply select, .form-apply textarea').each(function() {
+                const $field = $(this);
+                const value = $field.val();
+                const isRequired = $field.prop('required') || $field.attr('required') === 'required' || $field.closest('.required').length > 0;
+                
+                // Ne plus valider automatiquement au chargement
+                // La validation se fera seulement lors de l'interaction utilisateur (blur, change, input)
+                // Cela évite d'afficher des erreurs avant que l'utilisateur ait commencé à remplir le formulaire
+            });
+            
+            // Validation en temps réel pour les champs de fichiers
+            const maxFileSize = 10 * 1024 * 1024; // 10 Mo
+            const maxFileSizeMB = 10;
+            
+            // Formats autorisés : JPG, GIF, PNG, PDF ou DOC
+            const allowedMimeTypes = [
+                'image/jpeg',
+                'image/jpg',
+                'image/gif',
+                'image/png',
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // DOCX
+            ];
+            
+            const allowedExtensions = ['jpg', 'jpeg', 'gif', 'png', 'pdf', 'doc', 'docx'];
+            
+            function getFileExtension(fileName) {
+                return fileName.split('.').pop().toLowerCase();
+            }
+            
+            function isValidFileFormat(file) {
+                // Vérifier le type MIME
+                const isValidMime = allowedMimeTypes.includes(file.type);
+                
+                // Vérifier l'extension (fallback si le type MIME n'est pas fiable)
+                const extension = getFileExtension(file.name);
+                const isValidExt = allowedExtensions.includes(extension);
+                
+                return isValidMime || isValidExt;
+            }
+            
+            function validateFileSize(fileInput, documentName) {
+                if (fileInput.files && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const $field = $(fileInput);
+                    const formGroup = $field.closest('.file-infos, .form-group');
+                    
+                    // Supprimer les erreurs précédentes pour ce champ
+                    formGroup.find('.file-error-inline').remove();
+                    $('#file-validation-errors').find('.file-error-item').each(function() {
+                        if ($(this).data('document') === documentName) {
+                            $(this).remove();
+                        }
+                    });
+                    
+                    let hasError = false;
+                    
+                    // Vérifier le format du fichier
+                    if (!isValidFileFormat(file)) {
+                        hasError = true;
+                        const extension = getFileExtension(file.name);
+                        const errorMsgInline = '<div class="file-error-inline" role="alert"><i class="fa fa-exclamation-triangle"></i> Format non autorisé (.' + extension + '). Formats acceptés : JPG, GIF, PNG, PDF ou DOC</div>';
+                        formGroup.append(errorMsgInline);
+                        
+                        $('#file-validation-errors').show();
+                        $('#file-validation-errors').append('<div class="file-error-item" data-document="' + documentName + '" role="alert"><i class="fa fa-exclamation-triangle"></i> Le fichier "' + documentName + '" a un format non autorisé. Formats acceptés : JPG, GIF, PNG, PDF ou DOC</div>');
+                        
+                        $field.val('');
+                    }
+                    // Vérifier la taille du fichier
+                    else if (file.size > maxFileSize) {
+                        hasError = true;
+                        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                        
+                        // Message d'erreur inline sous le champ
+                        const errorMsgInline = '<div class="file-error-inline" role="alert"><i class="fa fa-exclamation-triangle"></i> Fichier trop volumineux (' + fileSizeMB + ' Mo). Max : ' + maxFileSizeMB + ' Mo</div>';
+                        formGroup.append(errorMsgInline);
+                        
+                        // Message dans le conteneur global
+                        $('#file-validation-errors').show();
+                        $('#file-validation-errors').append('<div class="file-error-item" data-document="' + documentName + '" role="alert"><i class="fa fa-exclamation-triangle"></i> Le fichier "' + documentName + '" est trop volumineux (' + fileSizeMB + ' Mo). Taille maximale : ' + maxFileSizeMB + ' Mo</div>');
+                        
+                        // Vider le champ pour forcer l'utilisateur à choisir un autre fichier
+                        $field.val('');
+                    } else {
+                        // Fichier valide, nettoyer les erreurs globales si plus aucune erreur
+                        if ($('#file-validation-errors .file-error-item').length === 0) {
+                            $('#file-validation-errors').hide().empty();
+                        }
+                    }
+                }
+            }
+            
+            {% for document in space.documents %}
+            $('input[name="appbundle_application[document_{{ document.id }}][file]"]').on('change', function() {
+                validateFileSize(this, '{{ document.name }}');
+            });
+            {% endfor %}
+            
+            // Validation pour les fichiers supplémentaires (erreur inline uniquement)
+            $('input[name="appbundle_application[newDocument][file]"]').on('change', function() {
+                if (this.files && this.files.length > 0) {
+                    const file = this.files[0];
+                    const $field = $(this);
+                    const formGroup = $field.closest('.form-group, .add-file');
+                    
+                    // Supprimer les erreurs précédentes
+                    formGroup.find('.file-error-inline').remove();
+                    
+                    // Vérifier le format du fichier
+                    if (!isValidFileFormat(file)) {
+                        const extension = getFileExtension(file.name);
+                        const errorMsgInline = '<div class="file-error-inline" role="alert"><i class="fa fa-exclamation-triangle"></i> Format non autorisé (.' + extension + '). Formats acceptés : JPG, GIF, PNG, PDF ou DOC</div>';
+                        formGroup.append(errorMsgInline);
+                        
+                        // Vider le champ
+                        $field.val('');
+                    }
+                    // Vérifier la taille du fichier
+                    else if (file.size > maxFileSize) {
+                        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                        
+                        // Message d'erreur inline sous le champ uniquement
+                        const errorMsgInline = '<div class="file-error-inline" role="alert" style="margin-left:-13px;"><i class="fa fa-exclamation-triangle"></i> Fichier trop volumineux (' + fileSizeMB + ' Mo). Max : ' + maxFileSizeMB + ' Mo</div>';
+                        formGroup.append(errorMsgInline);
+                        
+                        // Vider le champ
+                        $field.val('');
+                    }
+                }
+            });
+        });
+    </script>
+    
+    <style>
+        /* Styles de validation pour le formulaire d'application */
+        .form-group.has-error .help-block {
+            color: white;
+            font-size: 0.9em;
+            margin-top: 5px;
+            padding: 5px 8px;
+            background-color: #dc3545;;
+            border-radius: 3px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .form-group.has-error .form-control {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
+        /* Animation pour les messages d'erreur */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* ========== STYLES HARMONISÉS POUR LES ERREURS DE FICHIERS ========== */
+        
+        /* Conteneur global des erreurs de fichiers */
+        #file-validation-errors {
+            margin: 15px 0;
+            padding: 0;
+        }
+        
+        /* Style uniforme pour tous les messages d'erreur de fichiers */
+        .file-error-item,
+        .file-error-inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            color: white;
+            background-color: #e9473c;
+            text-align: center;
+            position: relative;
+            padding: 5px 0;
+            border-radius: 3px;
+        }
+        
+        .file-error-item:last-child,
+        .file-error-inline:last-child {
+            margin-bottom: 0;
+        }
+        
+        .file-error-item i,
+        .file-error-inline i {
+            color: #dc3545;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+        
+        /* Message d'erreur inline (sous le champ) - style plus compact */
+        .file-error-inline {
+            margin-top: 10px;
+            padding: 10px 12px;
+            font-size: 0.9em;
+        }
+        
+        /* Hover effect */
+        .file-error-item:hover,
+        .file-error-inline:hover {
+            background: linear-gradient(135deg, #ffe0e0 0%, #ffd0d0 100%);
+            box-shadow: 0 3px 6px rgba(220, 53, 69, 0.15);
+        }
+        
+        /* Style pour le bouton Enregistrer en brouillon */
+        #appbundle_application_save {
+            border-color: #555 !important;
+            color: #555 !important;
+            opacity: 1 !important;
+        }
+        #appbundle_application_save:hover {
+            border-color: #df4a43 !important;
+            color: #df4a43 !important;
+            background-color: transparent !important;
+        }
+    </style>
+{% endblock %}

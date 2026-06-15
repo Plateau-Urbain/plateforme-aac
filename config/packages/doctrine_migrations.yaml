@@ -1,0 +1,28 @@
+doctrine_migrations:
+    migrations_paths:
+        # Namespace => dossier physique
+        'DoctrineMigrations': '%kernel.project_dir%/migrations'
+
+    # Schéma de nommage des fichiers : Version20250605120000.php
+    # (horodatage UTC, lisible dans ls et dans git log)
+    storage:
+        table_storage:
+            table_name: 'doctrine_migration_versions'
+            version_column_name: 'version'
+            version_column_length: 191
+            executed_at_column_name: 'executed_at'
+            execution_time_column_name: 'execution_time'
+
+    # Inclut les commentaires SQL dans le fichier de migration généré
+    enable_profiler: false
+
+    # Toujours vérifier que la base est cohérente avant de migrer
+    check_database_platform: true
+
+    # Ne pas exécuter les migrations dans une transaction globale
+    # (utile pour ALTER TABLE sur grosses tables ; chaque migration garde sa propre transaction)
+    all_or_nothing: false
+
+    # Comparer les colonnes sans tenir compte de la longueur par défaut
+    # pour éviter les faux-positifs sur VARCHAR(255) vs VARCHAR
+    organize_migrations: none

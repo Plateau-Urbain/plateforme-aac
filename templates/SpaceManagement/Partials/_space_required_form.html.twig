@@ -1,0 +1,141 @@
+{% if space.getDocs('document_aac') | length == 0 and form.doc_aac.vars.errors | length %}
+    <div class="space-doc-error">
+        {% for error in form.doc_aac.vars.errors %}{{ error.message }}{% endfor %}
+    </div>
+{% endif %}
+{% if space.getDocs('document_plan') | length == 0 and form.doc_plan.vars.errors | length %}
+    <div class="space-doc-error">
+        {% for error in form.doc_plan.vars.errors %}{{ error.message }}{% endfor %}
+    </div>
+{% endif %}
+{% if space.getDocs('document_faq') | length == 0 and form.doc_faq.vars.errors | length %}
+    <div class="space-doc-error">
+        {% for error in form.doc_faq.vars.errors %}{{ error.message }}{% endfor %}
+    </div>
+{% endif %}
+
+<p>Vous pouvez téléverser ici les documents ressources nécessaires au lieu</p>
+<p class="text-muted small">
+    <i class="fa fa-info-circle"></i>
+    Formats acceptés : <strong>PDF, DOC, DOCX</strong>. Taille maximale : <strong>10 Mo</strong> par document.
+</p>
+
+<div class="row">
+  <div class="col-sm-4">
+    <h5>Appel à candidature</h5>
+    {% if space.getDocs('document_aac') | length %}
+        {% set fileaac =  space.getDocs('document_aac')[0] %}
+        {% if fileaac.id %}
+        <a target="_blank" href="{{ asset(vich_uploader_asset(fileaac, 'file')) }}"><i class="fa fa-eye"></i></a>
+        <a href="{{ path('space_manager_removepicture', { 'id': fileaac.id, 'token': csrf_token('remove_image') }) }}"><i class="fa fa-trash"></i></a>
+        {% else %}
+        <span class="text-muted">Document en cours d'enregistrement</span>
+        {% endif %}
+    {% else %}
+        <div class="js-doc-upload" data-max-size="10485760" data-label="Appel à candidature">
+            {{ form_widget(form.doc_aac, {'attr': {'class': 'form-control overflow'}}) }}
+        </div>
+    {% endif %}
+  </div>
+
+  <div class="col-sm-4">
+    <h5>Répartition des espaces</h5>
+    {% if space.getDocs('document_plan') | length %}
+        {% set fileplan =  space.getDocs('document_plan')[0] %}
+        {% if fileplan.id %}
+        <a target="_blank" href="{{ asset(vich_uploader_asset(fileplan, 'file')) }}"><i class="fa fa-eye"></i></a>
+        <a href="{{ path('space_manager_removepicture', { 'id': fileplan.id, 'token': csrf_token('remove_image') }) }}"><i class="fa fa-trash"></i></a>
+        {% else %}
+        <span class="text-muted">Document en cours d'enregistrement</span>
+        {% endif %}
+    {% else %}
+        <div class="js-doc-upload" data-max-size="10485760" data-label="Répartition des espaces">
+            {{ form_widget(form.doc_plan, {'attr': {'class': 'form-control overflow'}}) }}
+        </div>
+    {% endif %}
+  </div>
+
+  <div class="col-sm-4">
+    <h5>F.A.Q</h5>
+    {% if space.getDocs('document_faq') | length %}
+        {% set filefaq =  space.getDocs('document_faq')[0] %}
+        {% if filefaq.id %}
+        <a target="_blank" href="{{ asset(vich_uploader_asset(filefaq, 'file')) }}"><i class="fa fa-eye"></i></a>
+        <a href="{{ path('space_manager_removepicture', { 'id': filefaq.id, 'token': csrf_token('remove_image') }) }}"><i class="fa fa-trash"></i></a>
+        {% else %}
+        <span class="text-muted">Document en cours d'enregistrement</span>
+        {% endif %}
+    {% else %}
+        <div class="js-doc-upload" data-max-size="10485760" data-label="F.A.Q">
+            {{ form_widget(form.doc_faq, {'attr': {'class': 'form-control overflow'}}) }}
+        </div>
+    {% endif %}
+  </div>
+</div>
+
+{# Contenu caché utilisé par colorbox pour les erreurs documents #}
+<div id="docErrorBox" style="display:none;">
+    <div class="colorBox-content">
+        <i class="fa fa-exclamation-triangle danger fa-2xl"></i>
+        <p id="docErrorMessage"></p>
+    </div>
+</div>
+
+<script>
+(function() {
+    var allowedExtensions = /\.(pdf|doc|docx)$/i;
+    var allowedMimes = [
+        'application/pdf',
+        'application/x-pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    function showDocError(message) {
+        document.getElementById('docErrorMessage').innerHTML = message;
+        $.colorbox({ html: $('#docErrorBox').html() });
+    }
+
+    function initDocUpload(wrapper) {
+        var maxSize = parseInt(wrapper.getAttribute('data-max-size'), 10);
+        var label   = wrapper.getAttribute('data-label') || 'Document';
+        var input   = wrapper.querySelector('input[type="file"]');
+        if (!input) return;
+
+        input.addEventListener('change', function() {
+            var file = this.files[0];
+            if (!file) return;
+
+            var sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+            var maxMb  = (maxSize / (1024 * 1024)).toFixed(0);
+
+            /* Vérification du format */
+            var mimeOk = allowedMimes.indexOf(file.type) !== -1;
+            var extOk  = allowedExtensions.test(file.name);
+            if (!mimeOk && !extOk) {
+                this.value = '';
+                showDocError(
+                    '<strong>' + label + '</strong> : le format de &laquo;&nbsp;<em>' + file.name + '</em>&nbsp;&raquo; n\'est pas accepté.<br><br>' +
+                    'Formats autorisés : <strong>PDF, DOC, DOCX</strong>.'
+                );
+                return;
+            }
+
+            /* Vérification de la taille */
+            if (file.size > maxSize) {
+                this.value = '';
+                showDocError(
+                    '<strong>' + label + '</strong> : le fichier &laquo;&nbsp;<em>' + file.name + '</em>&nbsp;&raquo; est trop volumineux (<strong>' + sizeMb + ' Mo</strong>).<br><br>' +
+                    'Taille maximale autorisée : <strong>' + maxMb + ' Mo</strong>.'
+                );
+            }
+        });
+    }
+
+    /* Initialise chaque zone d'upload de document */
+    var wrappers = document.querySelectorAll('.js-doc-upload');
+    for (var i = 0; i < wrappers.length; i++) {
+        initDocUpload(wrappers[i]);
+    }
+})();
+</script>

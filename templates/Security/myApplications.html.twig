@@ -1,0 +1,316 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Styles pour les espaces suspendus */
+        .space_item_suspended {
+          padding: 0;
+          border-radius: 1rem;
+          position: relative;
+          height: 100%;
+          background: #F8F9FA; /* Couleur gris clair pour indiquer la suspension */
+        }
+
+        .foot-suspended {
+          position: relative;
+          background: #F8F9FA;
+          padding: 20px;
+          border-bottom-left-radius: 1rem;
+          border-bottom-right-radius: 1rem;
+        }
+
+        .foot-suspended h5 {
+          position: relative;
+          padding-bottom: 10px;
+        }
+
+        .foot-suspended .statut-aac {
+          position: absolute;
+          top: 13px;
+          right: 10px;
+          background: #FFF;
+          border-radius: 5px;
+          border: 1px solid #6C757D; /* Bordure grise pour indiquer la suspension */
+        }
+
+        .foot-suspended .statut-aac .suspended {
+          background: #6C757D; /* Fond gris pour le statut suspendu */
+          color: #FFF;
+          padding: 5px 10px;
+          border-radius: 3px;
+          font-size: 12px;
+          font-weight: bold;
+        }
+
+        .foot-suspended .statut-aac .suspended i {
+          margin-right: 5px;
+        }
+
+        /* Overlay pour les espaces suspendus */
+        #overlay-suspended {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          opacity: 0.2;
+          background: #6C757D; /* Overlay gris semi-transparent */
+          z-index: 1000;
+          border-radius: 1rem;
+        }
+
+        /* Bouton pour les candidatures en brouillon d'espaces suspendus */
+        .btn-draft-suspended {
+          background-color: #6C757D !important;
+          color: #FFF !important;
+          border-color: #6C757D !important;
+          font-weight: bold;
+        }
+
+        .btn-draft-suspended:hover {
+          background-color: #5A6268 !important;
+          border-color: #5A6268 !important;
+          color: #FFF !important;
+        }
+
+        /* Styles pour les images des espaces suspendus */
+        .space_item_suspended img {
+          width: 100%;
+          height: 340px;
+          border-top-left-radius: 1rem;
+          object-fit: cover;
+          border-top-right-radius: 1rem;
+        }
+
+        .space_item_suspended ul {
+          display: block;
+          padding: 5px 0px 20px 20px;
+          border-bottom: 1px solid #000;
+        }
+
+        .space_item_suspended ul li {
+          color: black;
+          line-height: 24px;
+        }
+
+        .space_item_suspended h4 {
+          color: black;
+        }
+    </style>
+{% endblock %}
+
+{# {% block breadcrumb_items %}
+  <li><a href="{{ path('security_profil') }}">Mon compte</a></li>
+  <li><span>Mes candidatures</span></li>
+{% endblock %} #}
+
+{% block body %}
+<div class="white"> 
+        <div class="container"> 
+   <div class="row top-profil">
+        <!-- BEGIN MAIN CONTENT -->
+        <div class=" col-sm-12">
+            <div class="titre-page">
+                <h1>Mes candidatures</h1>
+            </div>
+
+        </div>
+      </div>
+
+   <div id="listing-header" class="clearfix">
+    <div class="row">
+      <div class="col-sm-6 results-numbers">
+        <h4>
+          {% include 'SpaceManagement/Partials/results_numbers.html.twig' with {'pagination' : applications, 'label' : 'candidatures' } %}
+        </h4>
+      </div>
+      <div class="col-sm-6">
+        {{ form_start(filterForm, { 'attr': { 'data-submit': true } } ) }}
+
+        <div class="col-sm-4">
+          {{ form_widget(filterForm.status_filter) }}
+        </div>
+
+        <div class="col-sm-4">
+          {{ form_widget(filterForm.sort_field) }}
+        </div>
+
+        <div class="col-sm-4">
+          {{ form_widget(filterForm.sort_order) }}
+        </div>
+
+        {{ form_end(filterForm) }}
+      </div>
+    </div>
+  </div> 
+
+  {% if applications | length == 0 %}
+    <div class="no-results">
+      <p>
+        Vous n'avez aucune candidature :
+        <a href="{{ path('search_index') }}">Rechercher un espace</a>
+      </p>
+    </div>
+  </div>
+  {% else %}
+    <!-- BEGIN PROPERTY LISTING -->
+    <div id="property-listing" class=" clearfix">
+      <div class="row last-space row-flex">
+        {% for application in applications %}
+                 <div class="item col-xs-12 col-md-6 col-lg-4">
+                 
+                   {% if application.space.isClosed %}
+                            <div class="space_item_unavailable{{ application.space.isProposedByAdmin ? ' space-card--by-admin' : ' space-card--by-proprio' }}">
+                  {% elseif not application.space.isEnabled %}
+                            <div class="space_item_suspended{{ application.space.isProposedByAdmin ? ' space-card--by-admin' : ' space-card--by-proprio' }}">
+                  {% else %}
+                           <div class="space_item{{ application.space.isProposedByAdmin ? ' space-card--by-admin' : ' space-card--by-proprio' }}">
+                  {% endif %}
+                  <a href="{{ path('space_show', {'id': application.space.id}) }}">
+                    <div class="image">
+                      <img src="{% if application.space.pics.0 is not null %}{{ vich_uploader_asset(application.space.pics.0, 'file') }}{% endif %}" alt="" />
+                      <div class="availability-overlay">
+                        <span class="availability-text">Période de disponibilité : {{ application.space.availability }}</span>
+                      </div>
+                    </div>
+                  </a>
+              
+                   {% if application.space.isClosed %}
+                            <div class="foot-unavailable">
+                  {% elseif not application.space.isEnabled %}
+                            <div class="foot-suspended">
+                  {% else %}
+                           <div class="foot">
+                  {% endif %}              
+                          <p class="ville">{{ application.space.zipCode }} {{ application.space.city }}</p>
+                          <div class="statut-aac">
+                        {% if application.space.isClosed %}
+                          <div class="clos"><span><i class="fa fa-times fa-lg"></i>Cloturé</span></div>
+                        {% elseif not application.space.isEnabled %}
+                          <div class="suspended"><span><i class="fa fa-pause fa-lg"></i>Suspendu</span></div>
+                        {% else %}
+                          <div class="encours"><span><i class="fa fa-check fa-lg"></i>En cours</span></div>
+                        {% endif %}
+                      </div>
+                          <h5>{{ application.space.name }}</h5>
+                      
+                        {#   <a href="{{ path('space_show', {'id': application.space.id}) }}" class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Voir l'annonce</a> #}
+                    
+                   
+                      <ul>
+                        <li>{{ application.space.type }}</li>
+                        <li>
+                          {% if application.space.priceText %}
+                            {{ application.space.priceText }}
+                          {% else %}
+                            À partir de {{ application.space.price * 12 }} € / m<sup>2</sup> / an
+                          {% endif %}
+                        </li>
+                        <li>
+                          <strong>{{ application.space.nbSpaces }}</strong> espace(s) de {{ application.space.minSpace }} m<sup>2</sup> à {{ application.space.maxSpace }} m<sup>2</sup>
+                        </li>
+                        <li> Bailleur: {{ application.space.owner.company }}
+                        </li>
+                        </ul>
+                            <div class="calendar"></div>
+                            <div class="apply-date">
+                            <p class="apply-date-p">Date limite de candidature</p>
+                              {% if application.space.isClosed %}
+                            <p class="apply-date-b"> 
+                             Terminé
+                            </p>
+                                 {% else %}
+                            <p class="apply-date-b"> 
+                             {{ application.space.limitAvailability|localizeddate('long', 'none') }} à {{ application.space.limitAvailability|date('H') }}h{{ application.space.limitAvailability|date('i') }}
+                            </p>
+                                {% endif %}
+                          
+                        {% if not application.space.isClosed %}
+                        <p>Statut de votre candidature</p> 
+                          {% if application.status == 'draft' %}
+                            {% if not application.space.isEnabled %}
+                              <a href="{{ path('space_apply', {'space': application.space.id}) }}" class="btn btn-line-19 btn-draft-suspended"> <i class="fa fa-pencil"></i>À compléter</span></a>
+                            {% else %}
+                              <a href="{{ path('space_apply', {'space': application.space.id}) }}" class="btn btn-line-19 btn-draft"> <i class="fa fa-pencil"></i>À compléter</span></a>
+                            {% endif %}
+                          {% elseif application.status == 'unread' or application.status == 'awaiting'  %}
+                            <a href="#" class="btn btn-line-19 btn-awaiting"><i class="fa fa-hourglass-half"></i>Envoyée</a>
+                          {% elseif application.status == 'accepted'  %}
+                            <a href="#" class="btn btn-line-19 btn-accepted"><i class="fa fa-check"></i>Acceptée</a>
+                          {% elseif application.status == 'rejected'  %}
+                            <a href="#" class="btn btn-line-19 btn-refuse"><i class="fa fa-times"></i>Refusée</a>
+                          {% endif %}
+                        {% endif %}
+                    
+                        {% if not application.space.isClosed %}
+                          {% if application.status != 'draft' %}
+                            <a href="{{ path('my_application_show', { 'id': application.id }) }}" class="btn btn-line-19 btn-grey"> <i class="fa fa-eye fa-lg"></i></a>
+                          {% endif %}
+                        {% endif %}
+                       </div>
+                        
+                    
+                      
+                   
+              </div>
+              {% if application.space.isClosed %}
+                           <div id="overlay"></div>
+              {% elseif not application.space.isEnabled %}
+                           <div id="overlay-suspended"></div>
+              {% else %}
+                         
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+  {{ knp_pagination_render(applications) }}
+{% endif %}
+
+<div class="content plusinfos">
+    <div class="container">
+        <div class="row pu-home-content info">
+
+            <div class="col-xs-12 col-md-8 col-lg-8">
+                <h4>Vous souhaitez obtenir plus d'informations ?</h4>
+            </div>
+            <div class="col-xs-12 col-md-4 col-lg-4  btn-right">
+                <a href='https://www.plateau-urbain.com/contactez-nous/' target="_blank" class='btn btn-line'><span>Contactez-nous</span></a>
+            </div>
+
+    </div>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+          $(function () {
+              $('.sort').on('click', 'label', function () {
+                  var $input = $(this).find('input');
+
+                  $('.sort').find('label').removeClass('checked');
+
+                  if ($input.is(':checked')) {
+                      $(this).addClass('checked');
+                  }
+              });
+          });
+
+            // Submit form
+            $('form[data-submit]').on('change', function () {
+                $(this).trigger('submit');
+            });
+
+        });
+    </script>
+{% endblock %}

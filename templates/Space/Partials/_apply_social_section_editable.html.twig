@@ -1,0 +1,54 @@
+{# Sauvegarde/référence de la version "éditable" de la section Réseaux sociaux (apply) #}
+<div class="row" >
+    <div class="col-sm-6 form-group{% if not form.projectHolder.facebookUrl.vars.valid %} has-error{% endif %}">
+        <div class="input-group social-group">
+            <span class="input-group-addon"><i class="fa-brands fa-facebook-f fa-lg"></i></span>
+            {{ form_widget(form.projectHolder.facebookUrl) }}
+            {{ form_errors(form.projectHolder.facebookUrl) }}
+        </div>
+    </div>
+
+    <div class="col-sm-6 form-group{% if not form.projectHolder.twitterUrl.vars.valid %} has-error{% endif %}">
+        <div class="input-group social-group">
+            <span class="input-group-addon"><i class="fa-brands fa-twitter fa-lg"></i></span>
+            {{ form_widget(form.projectHolder.twitterUrl) }}
+            {{ form_errors(form.projectHolder.twitterUrl) }}
+        </div>
+    </div>
+</div>
+
+<div class="row" >
+    <div class="col-sm-6 form-group{% if not form.projectHolder.linkedinUrl.vars.valid %} has-error{% endif %}">
+        <div class="input-group social-group">
+            <span class="input-group-addon"><i class="fa-brands fa-linkedin-in fa-lg"></i></span>
+            {{ form_widget(form.projectHolder.linkedinUrl) }}
+            {{ form_errors(form.projectHolder.linkedinUrl) }}
+        </div>
+    </div>
+
+    <div class="col-sm-6 form-group{% if not form.projectHolder.instagramUrl.vars.valid %} has-error{% endif %}">
+        <div class="input-group social-group">
+            <span class="input-group-addon"><i class="fa-brands fa-instagram fa-lg"></i></span>
+            {{ form_widget(form.projectHolder.instagramUrl) }}
+            {{ form_errors(form.projectHolder.instagramUrl) }}
+        </div>
+    </div>
+</div>
+
+<div class="row" >
+    <div class="col-sm-6 form-group{% if not form.projectHolder.googleUrl.vars.valid %} has-error{% endif %}">
+        <div class="input-group social-group">
+            <span class="input-group-addon"><i class="fa-brands fa-youtube fa-lg"></i></span>
+            {{ form_widget(form.projectHolder.googleUrl) }}
+            {{ form_errors(form.projectHolder.googleUrl) }}
+        </div>
+    </div>
+
+    <div class="col-sm-6 form-group{% if not form.projectHolder.otherUrl.vars.valid %} has-error{% endif %}">
+        <div class="input-group social-group">
+            <span class="input-group-addon"><i class="fa-brands fa-tiktok fa-lg"></i></span>
+            {{ form_widget(form.projectHolder.otherUrl) }}
+            {{ form_errors(form.projectHolder.otherUrl) }}
+        </div>
+    </div>
+</div>

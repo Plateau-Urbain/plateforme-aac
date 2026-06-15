@@ -1,0 +1,44 @@
+{# Version "figée" de la section Réseaux sociaux (apply) - rendu "récap" #}
+{% set projectHolder = form.projectHolder.vars.data %}
+{% set nextUrl = path('space_apply', { 'space': space.id }) %}
+{% set profileRole = 'candidat' %}
+
+<div class="pu-profile-recap">
+    <p class="pu-profile-recap__hint">
+        <i class="fa fa-info-circle"></i>
+        Ces informations proviennent de votre profil. Pour les modifier :
+        <a href="{{ path('security_profil_role', { 'role': profileRole, 'next': nextUrl, 'return_anchor': 'three' }) ~ '#three' }}">Mon profil</a>
+    </p>
+
+    <div class="pu-profile-recap__grid">
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Facebook</span>
+            <span class="pu-profile-recap__value">{{ projectHolder.facebookUrl ? projectHolder.facebookUrl : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Twitter / X</span>
+            <span class="pu-profile-recap__value">{{ projectHolder.twitterUrl ? projectHolder.twitterUrl : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">LinkedIn</span>
+            <span class="pu-profile-recap__value">{{ projectHolder.linkedinUrl ? projectHolder.linkedinUrl : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Instagram</span>
+            <span class="pu-profile-recap__value">{{ projectHolder.instagramUrl ? projectHolder.instagramUrl : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">YouTube</span>
+            <span class="pu-profile-recap__value">{{ projectHolder.youtubeUrl ? projectHolder.youtubeUrl : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">TikTok</span>
+            <span class="pu-profile-recap__value">{{ projectHolder.tiktokUrl ? projectHolder.tiktokUrl : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Autre URL</span>
+            <span class="pu-profile-recap__value">{{ projectHolder.otherUrl ? projectHolder.otherUrl : '-' }}</span>
+        </div>
+    </div>
+</div>
+

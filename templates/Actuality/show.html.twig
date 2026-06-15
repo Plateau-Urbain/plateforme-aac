@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Actualités | Plateau Urbain{% endblock %}
+
+{% block body %}
+<section class="actualities">
+    {% for actuality in actualities %}
+        <article class="actuality">
+            <h2>{{ actuality.title }}</h2>
+            {% if actuality.subtitle %}<p class="subtitle">{{ actuality.subtitle }}</p>{% endif %}
+            {% if actuality.date %}<time>{{ actuality.date|date('d/m/Y') }}</time>{% endif %}
+            {% if actuality.link %}<a href="{{ actuality.link }}">En savoir plus</a>{% endif %}
+        </article>
+    {% else %}
+        <p>Aucune actualité pour le moment.</p>
+    {% endfor %}
+</section>
+{% endblock %}

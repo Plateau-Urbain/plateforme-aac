@@ -1,0 +1,14 @@
+{% extends "base.html.twig" %}
+{%  block header %}
+<div class="container">
+    <!-- HEADING -->
+    <h1 class="intro">
+        <p>Votre candidature a bien été envoyée.</p></h1>
+
+    <!-- CALL TO ACTION BUTTONS -->
+    <div class="buttons inpage-scroll">
+        <a href="{{ path('space_list') }}" class="btn btn-primary custom-button green-btn">Retour aux plateaux</a>
+    </div>
+
+</div>
+{% endblock %}

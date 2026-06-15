@@ -1,0 +1,69 @@
+{% extends "bundles/FOSUserBundle/views/layout.html.twig" %}
+
+{% block fos_user_content %}
+
+    <div class="row-flex">
+        <div class="login-page  col-xs-12 col-md-6"> 
+           <div class="colorBox-content registration">
+             <img class="icon" src="{{ asset('/bundles/app/images/lock_icon.png') }}" />
+
+            <h4>Connexion</h4>
+
+     
+
+        <div id="cboxContent white">
+
+            <form action="{{ path("fos_user_security_check") }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon"><img src="{{ asset('/bundles/app/images/user_login.png') }}" alt="user" class="closed" /></span>
+                        <input type="text" placeholder="Votre email" id="username" name="_username" value="" required="required" class="form-control"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon"><img src="{{ asset('/bundles/app/images/lock_login.png') }}" alt="mdp" class="closed"/></span>
+                        <input type="password" placeholder="Votre mot de passe" id="password" name="_password" required="required" class="form-control"/>
+                    </div>
+                </div>
+                <div class="alert alert-danger alert-error">
+               
+                {% if error is defined and error%}
+             
+                Login ou mot de passe incorrect
+                
+                {% endif %}
+                </div>
+                <input type="submit" id="_submit" name="_submit" value="Je me connecte" class="btn btn-line-login"/>             
+
+            </form>
+
+            <div class="text-left">
+                <p class="forgotten"><a href="{{ path('fos_user_resetting_request') }}">Identifiant ou mot de passe oublié ?</a></p>
+            </div>
+            <hr class="black"/>
+            <div class="text-left">
+                <p >
+                    <span class="connex">Vous n'avez pas de compte Plateau Urbain ?</span>
+                    <br />
+                    <i class="fa-solid fa-arrow-right"></i><a class="connex" href="{{ path('fos_user_registration_register') }}">Inscription</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="col-xs-12 col-md-6 sans-marge">
+        <img src="" id="image" />
+    </div>
+</div>
+<script type="text/javascript">
+    (function randomImg(){
+        var tabImg = ["village-reille.jpg", "asnieres.jpg", "opale.jpg", "opale-1.jpg"];
+        document.getElementById('image').src = '/bundles/app/images/' + tabImg[Math.floor(Math.random() * tabImg.length)];
+    })();
+</script>
+
+{% endblock %}

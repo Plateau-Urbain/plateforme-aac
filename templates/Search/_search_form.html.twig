@@ -1,0 +1,55 @@
+<!-- BEGIN SEARCH FORM -->
+{#
+<div id="home-map">
+    <div id="properties_map"></div>
+
+    <!-- BEGIN MAP PROPERTY FILTER -->
+    <div id="map-property-filter">
+#}
+        <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+            <div class="row">
+                <div class="col-sm-12">
+{#
+                    <i id="filter-close" class="fa fa-minus"></i>
+#}
+                    {{ form_start(form, {'attr': {'id':'searchForm'}, 'action' : path('search_action') } )  }}
+                    <div class="form-group">
+
+                        <div class="form-control-large">
+                            {{ form_widget(form.localType) }}
+                        </div>
+
+                        <div class="form-control-large">
+                            {{ form_widget(form.minimumPrice) }}
+                        </div>
+
+                        <div class="form-control-large">
+                            {{ form_widget(form.maximumPrice) }}
+                        </div>
+
+                        <div class="form-control-large">
+                            {{ form_widget(form.minimumSurface) }}
+                        </div>
+
+                        <div class="form-control-large">
+                            {{ form_widget(form.maximumSurface) }}
+                        </div>
+
+                        <div class="form-control-large">
+                            <button id="searchSubmit" type="submit" class="btn btn-fullcolor search-btn">Rechercher</button>
+                        </div>
+                    </div>
+                    <div class="hidden">
+                        {{ form_rest(form) }}
+                    </div>
+                    {{ form_end(form) }}
+
+                </div>
+            </div>
+        </div>
+{#
+    </div>
+    <!-- END MAP PROPERTY FILTER -->
+</div>
+#}
+<!-- END SEARCH FORM -->

@@ -1,0 +1,46 @@
+{% extends "base.html.twig" %}
+
+{% block breadcrumb_items %}
+    <li><a href="{{ path('security_profil') }}">Mon compte</a></li>
+    <li><span>Ajouter un espace</span></li>
+{% endblock %}
+
+{% block body %}
+<div id="js-form-space">
+    {% include "SpaceManagement/Partials/edit_spaces.html.twig" with {'form': form} %}
+</div>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+
+{# Thomas BERNARD datepicker supprime
+#}
+
+    <script src="{{ asset('bundles/app/js/space.js') }}"></script>
+
+    <div id="saveBox" style="display: none;">
+        <div class="colorBox-content">
+            <i class="fa fa-info-circle danger"></i>
+            <p>L'espace a été enregistré.</p>
+        </div>
+    </div>
+
+    <script>
+        $.trumbowyg.svgPath = "{{ asset('images/icons-trumbowyg.svg') }}"
+        $('textarea').trumbowyg({
+            lang: 'fr',
+            resetCss: true,
+            removeformatPasted: true,
+            autogrow: true
+        });
+    </script>
+{% endblock %}
+
+
+{% block stylesheets %}
+    {{ parent() }}
+
+{# Thomas BERNARD datepicker supprime
+#}
+{% endblock %}

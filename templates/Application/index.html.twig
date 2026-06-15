@@ -1,0 +1,58 @@
+{% extends "base.html.twig" %}
+
+{%  block headerSize %}header-hidden{% endblock headerSize %}
+{#{% block header %}#}
+    {#{% endblock %}#}
+
+{% block body %}
+
+    <!-- =========================
+   PRODUCTS SECTION
+============================== -->
+
+    <section class="products" data-type="background" data-speed="1" id="products">
+        <div class="color-overlay">
+            <div class="container">
+
+                <!-- SECTION HEADER -->
+                <div class="section-header">
+
+                    <!-- SECTION TITLE -->
+                    <h2 class="white-text">Vos candidatures</h2>
+
+                    <!-- SHORT DESCRIPTION ABOUT THE SECTION -->
+                    <h6 class="white-text">
+                        Les différents plateaux urbains
+                    </h6>
+                </div>
+                <!-- / END SECTION HEADER -->
+
+                <!-- PRODUCTS -->
+                <div class="row wow fadeInLeft animated" data-wow-offset="30" data-wow-duration="1.5s" data-wow-delay="0.15s">
+                    <table class="table table-bordered">
+                        <tr class="white-text">
+                            <th>Espace</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Actions</th>
+                        </tr>
+                    {% for application in applications %}
+                        <tr class="white-text">
+                            <td>{{ application.space.name }}</td>
+                            <td>{{ application.projectHolder.lastName }}</td>
+                            <td>{{  application.projectHolder.firstName }}</td>
+                            <td>
+                                <a href="{{ path('application_show', {'id':application.id}) }}" class="btn btn-primary custom-button green-btn">Voir</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </table>
+                </div> <!-- END ROW -->
+
+            </div> <!-- / END CONTAINER -->
+        </div> <!-- / END COLOR OVERLAY -->
+    </section> <!-- / END PRODUCTS SECTION -->
+
+
+
+{% endblock body %}

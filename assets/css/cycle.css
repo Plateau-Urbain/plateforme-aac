@@ -1,0 +1,6 @@
+.cycle-slideshow img{width:100%;height:auto;}
+.cycle-slideshow  div{float:none;}
+
+.cycle-container.container{padding:50px 0;overflow:hidden;white-space:nowrap;}
+
+.cycle-carousel-wrap{top:0 !important;}

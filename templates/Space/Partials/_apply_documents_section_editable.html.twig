@@ -1,0 +1,91 @@
+{# Sauvegarde/référence de la version "éditable" de la section Mes documents (apply) #}
+<div class="row">
+    <div class="col-sm-12 required-files">
+        <div class="col-sm-6">
+            <label class="control-label ">Mes téléchargements</label>
+
+            <dl class="dl-horizontal info-block">
+                <dd>
+                Les documents suivants seront attachés à toutes vos candidatures.
+                Les fichiers complémentaires qui peuvent être joints dans toutes vos candidatures
+                doivent être téléchargés à partir de chaque fiche projet.
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="col-sm-6 required-files">
+            <ul class="list-unstyled">
+                <li class="idcard-file">
+                    {% if app.user and app.user.hasDocuments('id') %}
+                    <i class="fa fa-check fa-lg"></i>
+                    {% else %}
+                    <i class="fa fa-times fa-lg"></i>
+                    {% endif %}
+                    <label class="required">Pièce d'identité</label>
+                </li>
+            </ul>
+             
+            <div class="files">
+                {% if app.user and app.user.hasDocuments('id') %}
+                    <div class="idcard-file file-infos clearfix">
+                        <div class="clearfix actions overflow">
+                            {% set file =  app.user.getDocumentsType('id')[0] %}
+                            <div style="display:inline-block; width:80%">{{ file.originalname }}</div>
+                            <div style="display:inline-block" class="pull-right">
+                                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
+                                {% if file.id %}<a href="#" class="js-profile-remove-doc" data-url="{{ path('profile_removedocument', { 'id': file.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ file.id) }}" data-service="{{ path('space_apply', { 'space': space.id }) }}" data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="idcard-file file-infos clearfix{% if not form.projectHolder.idcard.vars.valid %} has-error{% endif %}">
+                        <div class=" actions overflow">
+                            <label class="btn btn-accepted">
+                                {{ form_widget(form.projectHolder.idcard) }}
+                            </label>
+                        </div>
+                        {{ form_errors(form.projectHolder.idcard) }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-sm-6 required-files">
+            <ul class="list-unstyled">
+                    <li class="kbis-file">
+                        {% if app.user and app.user.hasDocuments('kbis') %}
+
+                        <i class="fa fa-check fa-lg"></i>
+                        {% else %}
+                        <i class="fa fa-times fa-lg"></i>
+                        {% endif %}
+                        <label class="required">justificatif d'activité</label>
+                    </li>
+                </ul>
+            
+                <div class="files">
+                    {% if app.user and app.user.hasDocuments('kbis') %}
+                        <div class="kbis-file file-infos clearfix">
+                            <div class="clearfix actions overflow">
+                                {% set file =  app.user.getDocumentsType('kbis')[0] %}
+                                <div style="display:inline-block; width:80%">{{ file.originalname }}</div>
+                                <div style="display:inline-block" class="pull-right">
+                                    <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
+                                    {% if file.id %}<a href="#" class="js-profile-remove-doc" data-url="{{ path('profile_removedocument', { 'id': file.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ file.id) }}" data-service="{{ path('space_apply', { 'space': space.id }) }}" data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="kbis-file file-infos clearfix{% if not form.projectHolder.kbis.vars.valid %} has-error{% endif %}">
+                            <div class=" actions overflow">
+                                <label class="btn btn-accepted">
+                                    {{ form_widget(form.projectHolder.kbis) }}
+                                </label>
+                            </div>
+                            {{ form_errors(form.projectHolder.kbis) }}
+                        </div>
+                    {% endif %}
+                </div>
+        </div>   
+    </div>
+</div>

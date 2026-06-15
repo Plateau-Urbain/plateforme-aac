@@ -1,0 +1,158 @@
+{% extends "base.html.twig" %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block prebody %}
+    {{ include("Search/_search_form.html.twig") }}
+{% endblock %}
+
+
+{% block body %}
+<div id="js-results">
+    {% if pagination | length > 0 %}
+    <div id="listing-header" class="clearfix">
+        <div class="row">
+            <div class="col-sm-8 results-numbers">
+                {% include 'SpaceManagement/Partials/results_numbers.html.twig' with {'pagination' : pagination, 'label' : 'espaces' } %}
+            </div>
+            <div class="col-sm-4">
+                    <div class="form-control-small">
+                        <select id="sort_by" name="sort_by" data-placeholder="Trier par">
+                            <option {% if form.vars.value.orderBy == 'name' %}selected="selected"{% endif %} value="name">Nom</option>
+                            <option {% if form.vars.value.orderBy == 'price' %}selected="selected"{% endif %} value="price">Prix</option>
+                            <option {% if form.vars.value.orderBy == 'city' %}selected="selected"{% endif %} value="city">Ville</option>
+                            <option {% if form.vars.value.orderBy == 'limitAvailability' %}selected="selected"{% endif %} value="limitAvailability">Date limite de candidature</option>
+                            <option {% if form.vars.value.orderBy == 'availability' %}selected="selected"{% endif %} value="availability">Date disponibilité</option>
+                        </select>
+                    </div>
+
+                <div class="sort">
+                    <ul>
+                        <li id="desc" {% if form.vars.value.sort =='desc'  %}class="active" {% endif %}>
+                            <label {% if form.vars.value.sort =='desc'  %}class="checked" {% endif %}>
+                                <i data-toggle="tooltip" data-placement="top" title="Sort Descending" class="fa fa-chevron-down"></i>
+                            </label>
+                        </li>
+                        <li id="asc" {% if form.vars.value.sort =='asc'  %}class="active" {% endif %}>
+                            <label {% if form.vars.value.sort =='asc'  %}class="checked" {% endif %}>
+                                <i data-toggle="tooltip" data-placement="top" title="Sort Ascending" class="fa fa-chevron-up"></i>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- BEGIN PROPERTY LISTING -->
+    <div id="property-listing" class="list-style clearfix">
+        <div class="row">
+        {% for space in pagination %}
+
+        <div class="col-sm-12">
+            <div class="item application-space space-card">
+                <div class="row  margin-15">
+                    <div class="col-sm-4">
+                        <div class="image">
+                            <div class="overlay">
+                                {% if space.isClosed %}
+                                    <img src="{{ asset('/bundles/app/images/closed.png')  }}" alt=""/>
+                                {% endif %}
+                            </div>
+                            <div class="image-wrapper">
+                                {% if space.pics.first %}
+                                    <img src="{{ vich_uploader_asset(space.pics.first, 'file') }}" alt="{{ space.pics.first.fileName }}" class="img-responsive">
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="info">
+
+                            <div class="row">
+                                <div class="col-sm-7">
+                                    <h3>
+                                        <small>{{ space.city }} ({{ space.zipCode|slice(0,2)}})</small>
+                                        {{ space.name }} {% if space.size is not empty %}à partir de {{ space.size }}m<sup>2</sup>{% endif %}<br/>
+                                    </h3>
+                                </div>
+                                <div class="col-sm-5">
+                                    <h3 class="price">
+                                        <small>À partir de</small>
+                                        {{ space.price }}€/m²/mois
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="row margin-15">
+                                <div class="col-sm-3 item-desc border-box">
+                                    <dl class="dl-horizontal dl-with-icon">
+                                        <dt><i class="icon small square-brown"></i></dt>
+                                        <dd>
+                                            <span class="dd-title"><strong>{{ space.nbSpaces }}</strong> espaces</span><br/>
+                                            À partir de {{ space.minSpace }}m<sup>2</sup>
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-sm-4 item-desc border-box">
+                                    <dl class="dl-horizontal dl-with-icon">
+                                        <dt><i class="icon small cal-brown"></i></dt>
+                                        <dd>
+                                            <span class="dd-title">Disponibilité</span><br/>
+                                            {{ space.availability }}
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-sm-5 item-desc">
+                                    <dl class="dl-horizontal dl-with-icon">
+                                        <dt><i class="icon small time-brown"></i></dt>
+                                        <dd>
+                                            <span class="dd-title">Date limite de candidature</span><br/>
+                                            {{ space.limitAvailability|localizeddate('long', 'none') }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+
+
+                            <div class="row margin-15">
+                                <div class="col-sm-7">
+                                    <dl class="dl-horizontal dl-with-icon">
+                                        <dt><i class="icon small building-brown"></i></dt>
+                                        <dd>
+                                            <span class="dd-title">Bailleur</span><br/>
+                                            {{ (space.owner) ? space.owner.company : "Sans bailleur" }}
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-sm-5">
+                                    <a href="{{ path('space_show', {'id' : space.id}) }}" class="btn btn-status btn-secondary" target="_blank">Voir ce projet</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <div class="no-results">
+                <p>Aucun espace ne correspond à votre recherche</p>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+
+    {{ knp_pagination_render(pagination) }}
+</div>
+<!-- END PROPERTY LISTING -->
+
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+
+    {% include "Search/_map_js.html.twig" with {'departements' : departements} %}
+{% endblock %}

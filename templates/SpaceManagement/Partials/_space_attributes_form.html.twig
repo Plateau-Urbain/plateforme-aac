@@ -1,0 +1,32 @@
+<div class="alert alert-info" role="alert" style="margin-bottom: 12px;">
+    <strong>Note “Date d’entrée souhaitée” :</strong>
+    si vous marquez l’attribut contenant <em>“au fil de l’eau”</em> en <strong>Inclus</strong>,
+    alors la candidature affichera le champ <strong>“Date d’entrée souhaitée”</strong> (et il sera requis).
+</div>
+
+<table class="tags table">
+    <thead>
+    <tr>
+        <th class="">Famille de prestations</th>
+        <th class="center">Non inclus</th>
+        <th class="center">Inclus</th>
+        <th class="center">À prévoir</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for subForm in form %}
+        <tr>
+            <td>
+                {{ form_errors(subForm.availability) }}
+                {{ subForm.vars.data.attribute }}
+            </td>
+            {% for choiceForm in subForm.availability.children %}
+                <td class="center">
+                    {{ form_widget(choiceForm, { 'label': false, 'required': false, 'attr': { 'style': 'float: none;' }, 'parent_label_class': 'radio-inline' }) }}
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{{ form_errors(form) }}

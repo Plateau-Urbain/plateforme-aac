@@ -1,0 +1,64 @@
+<h6>
+    Enregistrez jusqu'à 20 photos (max 600 Ko par photo)
+</h6>
+<p class="text-muted small">
+    <i class="fa fa-info-circle"></i>
+    Formats acceptés : JPEG, PNG, WebP
+</p>
+
+
+<div class="row photo-list">
+    {% for image in images %}
+        <div class="col-sm-4 photo-item">
+            <div class="thumbnail">
+                <div class="image"  style="background-image:url({{ vich_uploader_asset(image, 'file') }})"></div>
+                <!-- <img src="{{ vich_uploader_asset(image, 'file') }}" alt="{{ image.fileName }}"> -->
+                <div class="caption clearfix">
+                    <span class="pull-right remove-picture">
+                        {% if image.id is not empty %}
+                            <a href="{{ path('space_manager_removepicture', { 'id': image.id, 'token': csrf_token('remove_image') }) }}" class="btn js-btn-space" role="button" data-link-method="post">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        {% endif %}
+                    </span>
+                    <span class="move-image">
+                        {% if image.id is not empty %}
+                            <a href="{{ path('space_manager_movepicture', { 'id': image.id, 'position': image.position-1, 'token': csrf_token('move_image') }) }}" class="btn {{ loop.first ? 'disabled' :'' }} js-btn-space" role="button" data-link-method="post">
+                                <i class="fa fa-chevron-left"></i>
+                            </a>
+                            <a href="{{ path('space_manager_movepicture', { 'id': image.id, 'position': image.position+1, 'token': csrf_token('move_image') }) }}" class="btn {{ loop.last ? 'disabled' :'' }} js-btn-space" role="button" data-link-method="post">
+                                <i class="fa fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+  {% endfor %}
+</div>
+
+
+
+{{ form_errors(form) }}
+
+<!-- Zone d'affichage des erreurs de validation -->
+<div id="file-validation-errors" class="alert alert-danger" style="display: none;">
+    <i class="fa fa-exclamation-triangle"></i>
+    <span id="file-error-message"></span>
+</div>
+
+<div class="row">
+  <div class="col-sm-7">
+    {{ form_widget(form, {'attr': {'class': 'form-control overflow'}}) }}
+  </div>
+
+  <div class="col-sm-5">
+    <button type="submit" name="add_photo" value="1" class="btn btn-block form-control no-ajax">Ajouter</button>
+  </div>
+
+
+<div class="col-sm-7">
+   La taille recommandée est de 765 x 570 pixels en 72 dpi.
+
+</div>
+</div>

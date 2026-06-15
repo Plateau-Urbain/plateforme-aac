@@ -1,0 +1,771 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .export-page {
+            background: white;
+            padding: 30px 0;
+        }
+        
+        .export-header {
+            margin-bottom: 30px;
+        }
+        
+        .export-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .space-info {
+            
+            padding: 15px 0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .space-info h3 {
+            margin: 0 0 10px 0;
+            color: #555;
+            font-size: 30px;
+        }
+        
+        .filters-applied {
+            background: #2D74BA;
+            padding: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .filters-applied h4 {
+            margin: 0 0 10px 0;
+            color: #000000;
+            font-size: 21px;
+        }
+        
+        .filters-applied ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .no-filters-applied {
+            background: #F2BE6A;
+            
+            padding: 15px;
+            margin-bottom: 30px;
+        }
+         .no-filters-applied H4{
+            margin: 0 0 10px 0;
+            color: #000000;
+            font-size: 21px;
+        }
+        
+        .field-selection {
+            background: white;
+            padding: 20px;
+        }
+        
+        .selection-controls {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .selection-controls h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .selection-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .selection-buttons .btn {
+            font-size: 16px;
+        }
+        
+        .field-counter {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        
+        .field-category {
+            margin-bottom: 25px;
+        }
+        
+        .category-header {
+            background: #f5f5f5;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-header:hover {
+            background: #ececec;
+        }
+        
+        .category-header h4 {
+            margin: 0;
+            font-size: 16px;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        .category-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .category-actions a {
+            font-size: 12px;
+            color: #000;
+            text-decoration: none;
+        }
+        
+        .category-actions a:hover {
+            text-decoration: underline;
+        }
+        
+        .category-count {
+            font-size: 12px;
+            color: #777;
+            font-weight: normal;
+            padding:0 5px;
+        }
+        
+        .category-fields {
+            padding: 10px 20px;
+        }
+        
+        .field-item {
+            margin-bottom: 8px;
+        }
+        
+        .field-item label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+        
+        .field-item label:hover {
+            background: #f9f9f9;
+        }
+        
+        .field-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .field-item .field-label {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .export-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-export {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn-export:hover {
+            background: #45a049;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-export:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-cancel {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        
+        .btn-cancel:hover {
+            background: #da190b;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .help-text {
+            color: #777;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        
+        /* Options d'export documents */
+        .export-options-section {
+            background: #f8f8f8;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 18px 20px;
+            margin-bottom: 25px;
+        }
+        .export-options-section h4 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .docs-option-main {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            transition: background 0.2s;
+        }
+        .docs-option-main:hover { background: #f0f7ff; }
+        .docs-option-main input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .docs-suboptions {
+            display: none;
+            margin-top: 10px;
+            padding: 12px 15px;
+            background: #eef6ff;
+            border-radius: 5px;
+            border-left: 3px solid #2D74BA;
+        }
+        .docs-suboptions label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            color: #444;
+        }
+        .docs-suboptions label:last-child { margin-bottom: 0; }
+        .docs-suboptions input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        .zip-badge {
+            display: inline-block;
+            background: #2D74BA;
+            color: white;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 3px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+        .btn-export-zip {
+            background: #2D74BA;
+        }
+        .btn-export-zip:hover { background: #245f9a; }
+        
+        .mobile-center {
+            text-align: left;
+        }
+        
+        /* Correction z-index pour que les dropdowns restent sous le header */
+        .chzn-container,
+        .chzn-container .chzn-drop,
+        .chzn-container-single .chzn-search,
+        .chzn-container.chzn-with-drop .chzn-drop {
+            z-index: 999 !important;
+        }
+        
+        /* Pour les autres types de selects */
+        select:focus,
+        .form-control:focus + .dropdown-menu,
+        .dropdown-menu {
+            z-index: 999 !important;
+        }
+        
+        /* S'assurer que le header reste au-dessus */
+        #header,
+        .navbar,
+        nav,
+        header {
+            z-index: 1001 !important;
+            position: relative;
+        }
+        
+        /* Responsive pour mobile */
+        @media (max-width: 768px) {
+            .export-page {
+                padding: 15px 0;
+            }
+            
+            .mobile-center {
+                text-align: center;
+            }
+            
+            .space-info h3 {
+                font-size: 22px;
+            }
+            
+            .filters-applied,
+            .no-filters-applied {
+                padding: 12px;
+                margin-bottom: 20px;
+            }
+            
+            .filters-applied h4,
+            .no-filters-applied h4 {
+                font-size: 18px;
+            }
+            
+            .filters-applied ul {
+                padding-left: 15px;
+                font-size: 14px;
+            }
+            
+            .filters-applied .btn,
+            .no-filters-applied .btn {
+                width: 100%;
+                margin-top: 10px;
+                text-align: center;
+            }
+            
+            .field-selection {
+                padding: 15px;
+            }
+            
+            .selection-controls {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+            }
+            
+            .selection-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .selection-buttons .btn {
+                width: 100%;
+                font-size: 14px;
+                padding: 10px;
+            }
+            
+            .help-text {
+                font-size: 12px;
+                margin-top: 8px;
+            }
+            
+            .category-header {
+                padding: 10px 12px;
+                flex-wrap: wrap;
+            }
+            
+            .category-header h4 {
+                font-size: 14px;
+                width: 100%;
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+            
+            .category-header h4 i {
+                margin-right: 8px;
+            }
+            
+            .category-actions {
+                width: 100%;
+                justify-content: space-between;
+                gap: 8px;
+                margin-top: 5px;
+                flex-wrap: wrap;
+            }
+            
+            .category-actions a {
+                font-size: 12px;
+                white-space: nowrap;
+                padding: 4px 8px;
+                background: rgba(0,0,0,0.05);
+                border-radius: 3px;
+            }
+            
+            .category-actions a:hover {
+                background: rgba(0,0,0,0.1);
+            }
+            
+            .category-fields {
+                padding: 8px 12px;
+            }
+            
+            .field-item label {
+                padding: 10px 8px;
+                font-size: 13px;
+            }
+            
+            .field-item input[type="checkbox"] {
+                width: 20px;
+                height: 20px;
+                margin-right: 12px;
+                flex-shrink: 0;
+            }
+            
+            .field-item .field-label {
+                font-size: 13px;
+                line-height: 1.4;
+            }
+            
+            .export-actions {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 20px;
+                padding-top: 15px;
+            }
+            
+            .btn-export,
+            .btn-cancel {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 15px;
+                text-align: center;
+            }
+            
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+    <div class="white">
+        <!-- En-tête -->
+        <div class="container">
+        <div class="page-header top-candidats">
+            <h4> Export Personnalisé des Candidatures</h4>
+        </div>
+
+        <!-- Informations sur l'espace -->
+        <div class="space-info">
+            <h2> {{ space.name }}</h2>
+        </div>
+
+        <!-- Affichage des filtres et du tri appliqués -->
+        <div class="filters-applied" style="background: #eef6ff; border: 1px solid #2d74ba; color: #333;">
+            <h4 style="color: #2d74ba; margin-bottom: 15px;"><i class="fa fa-info-circle"></i> Paramètres de l'export</h4>
+            <div class="row">
+                <div class="col-sm-6">
+                    <p><strong><i class="fa fa-filter"></i> Filtrage :</strong></p>
+                    <ul>
+                        {% if filterData.status_filter %}
+                            <li>Statut : 
+                                <strong>
+                                    {% if filterData.status_filter == 'unread' %}Non lue
+                                    {% elseif filterData.status_filter == 'awaiting' %}En attente
+                                    {% elseif filterData.status_filter == 'accepted' %}Accepté
+                                    {% elseif filterData.status_filter == 'rejected' %}Refusé
+                                    {% elseif filterData.status_filter == 'selected' %}Sélectionné
+                                    {% else %}{{ filterData.status_filter }}{% endif %}
+                                </strong>
+                            </li>
+                        {% else %}
+                            <li>Aucun filtre de statut (toutes les candidatures)</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col-sm-6">
+                    <p><strong><i class="fa fa-sort"></i> Tri des données :</strong></p>
+                    <ul>
+                        <li>
+                            Trié par : 
+                            <strong>
+                                {% if filterData.sort_field == 'created' %}Date de candidature
+                                {% elseif filterData.sort_field == 'wishedSize' %}Surface souhaitée (candidature)
+                                {% elseif filterData.sort_field == 'startOccupation' %}Date d'entrée souhaitée
+                                {% elseif filterData.sort_field == 'lengthOccupation' %}Durée d'occupation
+                                {% else %}{{ filterData.sort_field }}{% endif %}
+                            </strong>
+                            ({{ filterData.sort_order == 'desc' ? 'du plus récent au plus ancien' : 'du plus ancien au plus récent' }})
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top: 15px; border-top: 2px solid #2d74ba; padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <p class="small" style="color: #666; font-style: italic; margin: 0;">Note : l'export respectera l'ordre et le filtrage définis ci-dessus.</p>
+                <a href="{{ path('space_manager_candidates', {'id': space.id}) }}" class="btn btn-sm btn-line-16" style="background-color: #f0ad4e; border-color: #eea236; color: white !important; font-weight: bold; border-width: 2px;">
+                    <i class="fa fa-edit"></i> MODIFIER LE FILTRAGE OU LE TRI
+                </a>
+            </div>
+        </div>
+
+        <!-- Formulaire de sélection des champs -->
+        <form method="post" id="exportForm">
+            <input type="hidden" name="_token" value="{{ csrf_token('export_fields') }}" />
+
+            <!-- Options d'export -->
+            <div class="export-options-section">
+                <h4><i class="fa fa-cog"></i> Options d'export</h4>
+                <label class="docs-option-main">
+                    <input type="checkbox" id="includeDocsCheckbox" name="include_documents" value="1">
+                    Inclure les documents des candidats
+                    <span class="zip-badge"><i class="fa fa-file-archive-o"></i> ZIP</span>
+                </label>
+                <p class="help-text" style="margin: 8px 0 0 0;">
+                    <i class="fa fa-info-circle"></i> Si coché, l'export sera un fichier ZIP contenant le CSV et les documents pour chaque candidat.
+                </p>
+                <div class="docs-suboptions" id="docsSuboptions">
+                    <label>
+                        <input type="checkbox" name="include_application_files" value="1" checked id="includeAppFiles">
+                        <i class="fa fa-file-pdf-o"></i> Documents de candidature (dossiers déposés)
+                    </label>
+                    <label>
+                        <input type="checkbox" name="include_user_documents" value="1" checked id="includeUserDocs">
+                        <i class="fa fa-id-card"></i> Documents du profil (pièces d'identité, etc.)
+                    </label>
+                </div>
+            </div>
+            <div class="field-selection">
+                <!-- Contrôles de sélection -->
+                <div class="selection-controls">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            <div class="selection-buttons">
+                                <button type="button" class="btn btn-sm btn-line-16" id="selectAllBtn">
+                                    <i class="fa fa-check-square"></i> Tout sélectionner
+                                </button>
+                                <button type="button" class="btn btn-sm btn-line-16" id="deselectAllBtn">
+                                    <i class="fa fa-square-o"></i> Tout désélectionner
+                                </button>
+                                <button type="button" class="btn btn-sm btn-line-16 btn-primary" id="presetBtn" title="Pré-sélectionne les champs essentiels pour un premier export rapide">
+                                    <i class="fa fa-star"></i> Sélection type
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6">
+                            <div style="text-align: left; padding-top: 10px;" class="mobile-center">
+                                <h3 style="margin: 0; font-size: 18px;">
+                                    <span class="" id="selectedCount">0 champ sélectionné</span>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+             
+
+                <!-- Organisation des champs par catégories -->
+                {% set categories = {} %}
+                {% for key, field in availableFields %}
+                    {% set category = field.category %}
+                    {% if category not in categories|keys %}
+                        {% set categories = categories|merge({(category): []}) %}
+                    {% endif %}
+                    {% set categories = categories|merge({(category): categories[category]|merge([{key: key, field: field}])}) %}
+                {% endfor %}
+
+                {% for categoryName, fields in categories %}
+                <div class="field-category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <h4>
+                            <i class="fa fa-folder-open"></i> {{ categoryName }}
+                            <span class="category-count">({{ fields|length }} champ{{ fields|length > 1 ? 's' : '' }})</span>
+                        </h4>
+                        <div class="category-actions">
+                            <a href="#" onclick="selectCategoryFields(this, true); return false;">Tout sélectionner</a>
+                            <a href="#" onclick="selectCategoryFields(this, false); return false;">Tout désélectionner</a>
+                            <i class="fa fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="category-fields">
+                        {% for item in fields %}
+                            <div class="field-item">
+                                <label>
+                                    <input type="checkbox" 
+                                           name="fields[]" 
+                                           value="{{ item.key }}" 
+                                           class="field-checkbox"
+                                           data-category="{{ categoryName }}">
+                                    <span class="field-label">
+                                        {{ item.field.label }}
+                                    </span>
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Actions d'export -->
+                <div class="export-actions">
+                    <button type="submit" class="btn-export" id="exportBtn" disabled>
+                        <i class="fa fa-download" id="exportBtnIcon"></i>
+                        <span id="exportBtnLabel">Exporter en CSV</span>
+                    </button>
+                    <a href="{{ path('space_manager_candidates', {'id': space.id}) }}" class="btn-cancel">
+                        <i class="fa fa-times"></i> Annuler
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function() {
+    // Fonction pour mettre à jour le compteur
+    function updateCounter() {
+        const count = $('.field-checkbox:checked').length;
+        $('#selectedCount').text(count + ' champ' + (count > 1 ? 's' : '') + ' sélectionné' + (count > 1 ? 's' : ''));
+        $('#exportBtn').prop('disabled', count === 0);
+    }
+
+    // Tout sélectionner
+    $('#selectAllBtn').click(function() {
+        $('.field-checkbox').prop('checked', true);
+        updateCounter();
+    });
+
+    // Tout désélectionner
+    $('#deselectAllBtn').click(function() {
+        $('.field-checkbox').prop('checked', false);
+        updateCounter();
+    });
+
+    // Sélection type : champs essentiels prédéfinis
+    var presetFields = [
+        'space',                          // Espace
+        'name',                           // Nom du projet
+        'created',                        // Date de dépôt de la candidature
+        'projectHolder_fullName',         // Nom complet du porteur
+        'projectHolder_company',          // Nom de la structure
+        'projectHolder_phone',            // Téléphone personnel
+        'projectHolder_email',            // Email
+        'projectHolder_companyDescription', // Présentation de la structure
+        'projectHolder_facebookUrl',      // Facebook
+        'projectHolder_twitterUrl',       // Twitter
+        'projectHolder_linkedinUrl',      // LinkedIn
+        'projectHolder_instagramUrl',     // Instagram
+        'projectHolder_youtubeUrl',       // YouTube
+        'projectHolder_tiktokUrl',        // TikTok
+        'projectHolder_otherUrl',         // Autre URL
+        'projectHolder_useType',          // Type de projet
+        'wishedSize',                     // Surface recherchée (candidature)
+        'projectHolder_usageDuration',    // Durée d'occupation souhaitée
+        'localUsageDescription'           // Quel sera l'usage du local ?
+    ];
+
+    $('#presetBtn').click(function() {
+        // D'abord tout décocher
+        $('.field-checkbox').prop('checked', false);
+        // Puis cocher uniquement les champs prédéfinis
+        presetFields.forEach(function(key) {
+            $('input.field-checkbox[value="' + key + '"]').prop('checked', true);
+        });
+        updateCounter();
+        // Ouvrir les catégories qui contiennent au moins un champ coché
+        $('.field-category').each(function() {
+            var $cat = $(this);
+            if ($cat.find('.field-checkbox:checked').length > 0) {
+                $cat.find('.category-fields').show();
+                $cat.find('.category-header .fa-chevron-down').show();
+                $cat.find('.category-header .fa-chevron-right').hide();
+            }
+        });
+    });
+
+    // Écouter les changements sur les checkboxes
+    $('.field-checkbox').change(updateCounter);
+
+    // Initialiser le compteur
+    updateCounter();
+
+    // Gestion de la checkbox "Inclure les documents"
+    $('#includeDocsCheckbox').change(function() {
+        if ($(this).is(':checked')) {
+            $('#docsSuboptions').slideDown(200);
+            $('#exportBtnLabel').text('Exporter en ZIP (avec documents)');
+            $('#exportBtnIcon').removeClass('fa-download').addClass('fa-file-archive-o');
+            $('#exportBtn').addClass('btn-export-zip');
+        } else {
+            $('#docsSuboptions').slideUp(200);
+            $('#exportBtnLabel').text('Exporter en CSV');
+            $('#exportBtnIcon').removeClass('fa-file-archive-o').addClass('fa-download');
+            $('#exportBtn').removeClass('btn-export-zip');
+        }
+    });
+
+    // Validation du formulaire
+    $('#exportForm').submit(function(e) {
+        const count = $('.field-checkbox:checked').length;
+        if (count === 0) {
+            e.preventDefault();
+            alert('Veuillez sélectionner au moins un champ à exporter.');
+            return false;
+        }
+    });
+});
+
+// Fonction pour replier/déplier une catégorie
+function toggleCategory(header) {
+    const fields = $(header).next('.category-fields');
+    const icon = $(header).find('.fa-chevron-down, .fa-chevron-up');
+    
+    fields.slideToggle(300);
+    
+    if (icon.hasClass('fa-chevron-down')) {
+        icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        $(header).find('.fa-folder-open').removeClass('fa-folder-open').addClass('fa-folder');
+    } else {
+        icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        $(header).find('.fa-folder').removeClass('fa-folder').addClass('fa-folder-open');
+    }
+}
+
+// Fonction pour sélectionner/désélectionner une catégorie
+function selectCategoryFields(link, select) {
+    const categoryHeader = $(link).closest('.category-header');
+    const categoryFields = categoryHeader.next('.category-fields');
+    
+    categoryFields.find('.field-checkbox').prop('checked', select);
+    
+    // Mettre à jour le compteur
+    const count = $('.field-checkbox:checked').length;
+    $('#selectedCount').text(count + ' champ' + (count > 1 ? 's' : '') + ' sélectionné' + (count > 1 ? 's' : ''));
+    $('#exportBtn').prop('disabled', count === 0);
+}
+</script>
+{% endblock %}

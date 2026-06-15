@@ -1,0 +1,242 @@
+</div><!-- END CONTAINER -->
+
+<div class="row candidate-application">
+  <div class="top"></div>
+
+  <div class="container">
+    <div class="row">
+
+      <div class="col-sm-12">
+        <h3 class="has-icon medium no-margin">
+          <i class="icon medium icon-inline bkg list-red-bold"></i>
+          {{ 'Vous êtes candidat' }}
+        </h3>
+        <small>
+          Attention ! Assurez-vous que votre profil soit le plus à jour possible avant de candidater :
+          <a href="{{ path('security_profil') }}">voir mon profil</a>
+        </small>
+
+        <div class="pu-col-container content-block">
+          <div class="row">
+            {{ form_start(form, {'attr' : {'class' : 'col-md-12'} } ) }}
+            {{ form_errors(form) }}
+              <div class="col-md-6">
+                <div class="col-sm-12">
+                  {{ form_row(form.name) }}
+                </div>
+                <div class="col-sm-12">
+                  <div class="row">
+                    <div class="col-sm-4">
+                      {{ form_label(form.category, null, {'label_attr' : {'class' : 'inline-label'}}) }}
+                    </div>
+                    <div class="col-sm-8{% if not form.category.vars.valid %} has-error{% endif %}">
+                      {{ form_widget(form.category) }}
+                      {{ form_errors(form.category) }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-sm-12">
+                  {{ form_row(form.wishedSize) }}
+                </div>
+
+                <div class="col-sm-12">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      {{ form_label(form.lengthOccupation, null, {'label_attr' : {'class' : 'inline-label'}}) }}
+                    </div>
+
+                    <div class="col-sm-3{% if not form.lengthOccupation.vars.valid %} has-error{% endif %}">
+                      {{ form_widget(form.lengthOccupation) }}
+                      {{ form_errors(form.lengthOccupation) }}
+                    </div>
+
+                    <div class="col-sm-4{% if not form.lengthTypeOccupation.vars.valid %} has-error{% endif %}">
+                      {{ form_widget(form.lengthTypeOccupation) }}
+                      {{ form_errors(form.lengthTypeOccupation) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      {{ form_label(form.startOccupation, null, {'label_attr' : {'class' : 'inline-label'}}) }}
+                    </div>
+                    <div class="col-sm-6{% if not form.startOccupation.vars.valid %} has-error{% endif %}">
+                      {{ form_widget(form.startOccupation) }}
+                      {{ form_errors(form.startOccupation) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  {{ form_row(form.description) }}
+                </div>
+                <div class="col-sm-12">
+                  {{ form_row(form.openToGlobalProject, { 'attr': { 'data-checkbox-toggle': '#toggle_' ~ form.contribution.vars.id } }) }}
+                </div>
+                <div class="col-sm-12" id="toggle_{{ form.contribution.vars.id }}">
+                  {{ form_row(form.contribution) }}
+                </div>
+              </div>
+
+              <div class="col-md-6 files">
+
+                {% if space.getDocuments() | length > 0 %}
+                  <h4>{{space.getDocuments() | length}} fichier{% if space.getDocuments() | length > 1%}s{% endif %} à joindre à votre candidature *</h4>
+                {% endif %}
+
+                <ul class="list-unstyled files-list"></ul>
+
+                {% for document in space.documents %}
+                  <div class="file-infos">
+                    <span>{{document.name}}</span>
+                    <div class="pull-right actions">
+
+                      <label class="custom-file-input btn btn-accepted">
+                        {{ form_widget(attribute(form, "document_#{document.id}")) }}
+                        {{ form_errors(attribute(form, "document_#{document.id}")) }}
+                        <i class="fa fa-upload"></i>
+                      </label>
+                      {% if form.vars.data.getFilesType(document.id) %}
+                        <a target="_blank" href="{{ asset(vich_uploader_asset(form.vars.data.getFilesType(document.id)[0], 'file')) }}" class="btn btn-show"><i class="fa fa-search"></i></a>
+                        <a href="{{ path('space_removefile', { 'id': form.vars.data.getFilesType(document.id)[0].id, '_token': csrf_token('remove_file_' ~ form.vars.data.getFilesType(document.id)[0].id) }) }}" class="btn btn-delete"><i class="fa fa-trash"></i></a>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+
+
+                <label class="control-label">Fichiers déjà enregistrés dans votre compte, et qui seront joints à votre fichier de candidature</label>
+                <dl class="dl-horizontal dl-with-fa-icon tip">
+                  <dt><i class="fa fa-info-circle"></i></dt>
+                  <dd>
+                    Pour ajouter ou supprimer des fichiers de cette liste,
+                    rendez-vous dans la section "Documents à fournir" de
+                    votre profil
+                  </dd>
+                </dl>
+
+                <div class="row">
+                  <div class="files col-sm-12">
+
+                    {% if app.user.getCompanyStatus() == 'Association' %}
+
+                      {% if app.user.getDocumentsType('id') is not empty %}
+                        {% set idcard = app.user.getDocumentsType('id')[0]%}
+
+                        <div class="kbis-file file-infos">
+                          <span>Pièce d'identité</span>
+                          <div class="pull-right actions">
+                            <a target="_blank" href="{{ asset(vich_uploader_asset(idcard, 'file')) }}" class="btn btn-show"><i class="fa fa-search"></i></a>
+                          </div>
+                        </div>
+                      {% endif %}
+
+                    {% else %}
+
+                      {% if app.user.getDocumentsType('kbis') is not empty %}
+                        {% set kbis = app.user.getDocumentsType('kbis')[0] %}
+                        <div class="kbis-file file-infos">
+                          <span>Document justifiant la création de la structure</span>
+                          <div class="pull-right actions">
+                            <a target="_blank" href="{{ asset(vich_uploader_asset(kbis, 'file')) }}" class="btn btn-show"><i class="fa fa-search"></i></a>
+                          </div>
+                        </div>
+                      {% endif %}
+
+                    {% endif %}
+
+                    {% for doc in app.user.getDocumentsType('') %}
+                        <div class="file-infos">
+                          <span>{{doc.fileName | slice(14, 100)}}</span>
+                          <div class="pull-right actions">
+                              <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="btn btn-show"><i class="fa fa-search"></i></a>
+                          </div>
+                        </div>
+                    {% endfor %}
+
+                  </div>
+                </div>
+
+                <label class="control-label">Joindre de nouveaux fichiers</label>
+                <dl class="dl-horizontal dl-with-fa-icon tip">
+                  <dt><i class="fa fa-info-circle"></i></dt>
+                  <dd>
+                    Les documents suivants seront seulement attachés à la
+                    candidature de cet espace. Les fichiers qui peuvent être
+                    joints dans toutes vos candidatures doivent être téléchargés
+                    dans la section "Documents à fournir" de votre profil.
+                  </dd>
+                </dl>
+
+                <div class="row">
+                  <div class="files col-sm-12">
+
+                    {% for file in form.vars.data.getFilesType(null) %}
+                        <div class="file-infos">
+                          <span>{{file.fileName | slice(14, 100)}}</span>
+                          <div class="pull-right actions">
+                              <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="btn btn-show"><i class="fa fa-search"></i></a>
+                              {% if file.id is not empty %}
+                                <a href="{{ path('space_removefile', { 'id': file.id, '_token': csrf_token('remove_file_' ~ file.id) }) }}" class="btn btn-delete"><i class="fa fa-trash"></i></a>
+                              {% endif %}
+                          </div>
+                        </div>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="add-file col-xs-12">
+                    <h4>
+                      <i class="icon small icon-inline add-red"></i>
+                      Ajouter un fichier
+                    </h4>
+
+                    <dl class="dl-horizontal dl-with-fa-icon tip">
+                      <dt><i class="fa fa-info-circle"></i></dt>
+                      <dd>
+                        Formats autorisés : JPG, GIF, PNG, PDF ou DOC.<br/>
+                        Chaque fichier ne doit pas excéder 10MO.
+                      </dd>
+                    </dl>
+
+                    {{ form_widget(form.newDocument, {'attr': {'class': 'form-control'}}) }}
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="center">
+                    <p>
+                      {{ form_widget(form.save_file, {'attr': {'class': 'btn-fullcolor btn-wide'}}) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-12">
+                <div class="center">
+                  {{ form_widget(form.save, {'attr': {'class': 'btn-fullcolor btn-grey btn-wide'}}) }}
+                  {{ form_widget(form.submit, {'attr': {'class': 'btn-fullcolor btn-wide submit'}}) }}
+                </div>
+              </div>
+
+              <div class="col-sm-12">
+                <p class="tip text-center">
+                  Il vous manque une pièce ? Cliquez sur "Enregistrer" : votre
+                  formulaire sera<br/> sauvegardé en l'état, et vous pourrez reprendre
+                  la constitution plus tard.<br/>
+                  Cliquez sur "Clôturer ma candidature" quand votre dossier est
+                  prêt<br/> à être envoyé au propriétaire.
+                </p>
+              </div>
+
+            {{ form_end(form) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container"><!-- REOPEN CONTAINER -->

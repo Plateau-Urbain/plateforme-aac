@@ -1,0 +1,17 @@
+<html>
+<body>
+    <p>Bonjour {{ user.fullName }},</p>
+
+    <p>Votre candidature sur le site {{ url('homepage') }} pour l'espace {{ space.name }} à {{ space.city }} a été {{ isAccepted ? "acceptée" : 'refusée' }}.</p>
+
+    <p>
+        {{ message }}
+    </p>
+
+    <p>
+        Cordialement,
+    </p>
+--<br />
+L'équipe Plateau Urbain
+</body>
+</html>

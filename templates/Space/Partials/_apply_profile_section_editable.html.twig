@@ -1,0 +1,121 @@
+{# Sauvegarde/référence de la version "éditable" de la section Mes informations (apply) #}
+<div class="row">
+    <div class="col-sm-6 inline-controls form-group civility-group{% if not form.projectHolder.userInfo.civility.vars.valid %} has-error{% endif %}">
+        {{ form_label(form.projectHolder.userInfo.civility) }}
+        {{ form_widget(form.projectHolder.userInfo.civility, {
+            'label_attr': { 'class': 'radio-inline' },
+            'attr': {
+                'aria-required': 'true',
+                'aria-invalid': form_errors(form.projectHolder.userInfo.civility) ? 'true' : 'false',
+                'aria-describedby': 'civility-error'
+            }
+        }) }}
+        {{ form_errors(form.projectHolder.userInfo.civility, {
+            'attr': {
+                'id': 'civility-error',
+                'role': 'alert',
+                'aria-live': 'polite'
+            }
+        }) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6 form-group{% if not form.projectHolder.userInfo.firstname.vars.valid %} has-error{% endif %}">
+        {{ form_label(form.projectHolder.userInfo.firstname, null, {'label_attr': {'class': 'required'}}) }}
+        {{ form_widget(form.projectHolder.userInfo.firstname, {
+            'attr': {
+                'aria-required': 'true',
+                'aria-invalid': form_errors(form.projectHolder.userInfo.firstname) ? 'true' : 'false',
+                'aria-describedby': 'firstname-error'
+            }
+        }) }}
+        {{ form_errors(form.projectHolder.userInfo.firstname, {
+            'attr': {
+                'id': 'firstname-error',
+                'role': 'alert',
+                'aria-live': 'polite'
+            }
+        }) }}
+    </div>
+    <div class="col-sm-6 form-group{% if not form.projectHolder.userInfo.lastname.vars.valid %} has-error{% endif %}">
+        {{ form_label(form.projectHolder.userInfo.lastname, null, {'label_attr': {'class': 'required'}}) }}
+        {{ form_widget(form.projectHolder.userInfo.lastname, {
+            'attr': {
+                'aria-required': 'true',
+                'aria-invalid': form_errors(form.projectHolder.userInfo.lastname) ? 'true' : 'false',
+                'aria-describedby': 'lastname-error'
+            }
+        }) }}
+        {{ form_errors(form.projectHolder.userInfo.lastname, {
+            'attr': {
+                'id': 'lastname-error',
+                'role': 'alert',
+                'aria-live': 'polite'
+            }
+        }) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6 form-group{% if not form.projectHolder.userInfo.birthday.vars.valid %} has-error{% endif %}">
+        {{ form_label(form.projectHolder.userInfo.birthday) }}
+        {{ form_widget(form.projectHolder.userInfo.birthday, {
+            'attr': {
+                'aria-invalid': form_errors(form.projectHolder.userInfo.birthday) ? 'true' : 'false',
+                'aria-describedby': 'birthday-error'
+            }
+        }) }}
+        {{ form_errors(form.projectHolder.userInfo.birthday, {
+            'attr': {
+                'id': 'birthday-error',
+                'role': 'alert',
+                'aria-live': 'polite'
+            }
+        }) }}
+    </div>
+    <div class="col-sm-6 form-group{% if not form.projectHolder.userInfo.phone.vars.valid %} has-error{% endif %}">
+        {{ form_label(form.projectHolder.userInfo.phone, null, {'label_attr': {'class': 'required'}}) }}
+        {{ form_widget(form.projectHolder.userInfo.phone, {
+            'attr': {
+                'aria-required': 'true',
+                'aria-invalid': form_errors(form.projectHolder.userInfo.phone) ? 'true' : 'false',
+                'aria-describedby': 'phone-error'
+            }
+        }) }}
+        {{ form_errors(form.projectHolder.userInfo.phone, {
+            'attr': {
+                'id': 'phone-error',
+                'role': 'alert',
+                'aria-live': 'polite'
+            }
+        }) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 form-group{% if not form.projectHolder.userInfo.email.vars.valid %} has-error{% endif %}">
+        {{ form_label(form.projectHolder.userInfo.email, null, {'label_attr': {'class': 'required'}}) }}
+        {{ form_widget(form.projectHolder.userInfo.email, {
+            'attr': {
+                'aria-required': 'true',
+                'aria-invalid': form_errors(form.projectHolder.userInfo.email) ? 'true' : 'false',
+                'aria-describedby': 'email-error'
+            }
+        }) }}
+        {{ form_errors(form.projectHolder.userInfo.email, {
+            'attr': {
+                'id': 'email-error',
+                'role': 'alert',
+                'aria-live': 'polite'
+            }
+        }) }}
+    </div>
+</div>
+{% if not app.user %}
+<div class="row">
+    <div class="col-sm-6 form-group">
+        {{ form_row(form.projectHolder.userInfo.plainPassword.first) }}
+    </div>
+    <div class="col-sm-6 form-group">
+        {{ form_row(form.projectHolder.userInfo.plainPassword.second) }}
+    </div>
+</div>
+{% endif %}

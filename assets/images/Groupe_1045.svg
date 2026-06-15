@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="83.729" height="85" viewBox="0 0 83.729 85">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_1347" data-name="Rectangle 1347" width="83.729" height="85" fill="none" stroke="#14151b" stroke-width="3"/>
+    </clipPath>
+  </defs>
+  <g id="Groupe_1045" data-name="Groupe 1045" transform="translate(0 0)">
+    <g id="Groupe_1044" data-name="Groupe 1044" transform="translate(0 0)" clip-path="url(#clip-path)">
+      <path id="Tracé_1709" data-name="Tracé 1709" d="M7.256,22.358A19.445,19.445,0,0,1,26.023,8h31.4A19.438,19.438,0,0,1,76.864,27.436V49.306a3.547,3.547,0,0,1-3.546,3.546H10.133a3.545,3.545,0,0,1-3.546-3.546v-3.74" transform="translate(5.093 6.186)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <rect id="Rectangle_1344" data-name="Rectangle 1344" width="15.959" height="6.917" transform="translate(28.815 1.771)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <line id="Ligne_335" data-name="Ligne 335" y1="14.186" transform="translate(28.815 8.308)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <rect id="Rectangle_1345" data-name="Rectangle 1345" width="9.512" height="24.189" transform="translate(41.017 59.038)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <path id="Tracé_1710" data-name="Tracé 1710" d="M17.4,8h0A19.179,19.179,0,0,1,36.581,27.179V52.852" transform="translate(13.456 6.186)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <rect id="Rectangle_1346" data-name="Rectangle 1346" width="34.997" height="23.203" rx="0.436" transform="translate(1.774 28.549)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <path id="Tracé_1711" data-name="Tracé 1711" d="M36,16.536,19,30.286a.772.772,0,0,1-1.005,0L1,16.536" transform="translate(0.773 12.786)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <line id="Ligne_336" data-name="Ligne 336" x1="12.803" y1="11.601" transform="translate(23.388 40.151)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <line id="Ligne_337" data-name="Ligne 337" y1="11.214" x2="12.375" transform="translate(2.547 40.538)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    </g>
+  </g>
+</svg>

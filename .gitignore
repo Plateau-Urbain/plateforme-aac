@@ -1,0 +1,47 @@
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+# Documentation interne (non publiée)
+/docs/
+
+# Outils IDE et assistants locaux
+/.idea/
+/.vscode/
+/.claude/
+*.swp
+*.swo
+*~
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Logs et caches divers
+*.log
+.php-cs-fixer.cache
+.phpstan.cache
+
+# Fichiers utilisateur et médias
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# Dumps et scripts de migration ponctuels (données / infra internes)
+*.sql
+/align-schema-prod.sql
+/update.sql
+/convert-roles.php
+
+# Sauvegardes locales de la refactorisation
+*_backup/

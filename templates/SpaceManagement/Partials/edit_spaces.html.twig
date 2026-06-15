@@ -1,0 +1,277 @@
+
+<div class="white"> 
+        <div class="container"> 
+<div class="bkg-img"></div>
+     
+    <div class="row top-profil">
+        <!-- BEGIN MAIN CONTENT -->
+        <div class=" col-sm-12">
+            <div class="titre-page">
+        <h1>
+          {{ 'Ajouter un espace' }}
+        </h1>
+         <div class="img-aac"><img src="{{ asset('images/groupe_ajouter_espace.png') }}" alt="Plateau Urbain" /></div>
+         </div>
+            </div>
+            <div class="col-sm-8">
+            <p class="left">
+            Pour ajouter une offre sur la plate-forme Plateau urbain, il vous suffit de remplir le formulaire ci-dessus.<br /> A tout moment, vous pouvez enregistrer le formulaire et reprendre son édition ultérieurement. Une fois complet, procédez à sa validation : un administrateur du site interviendra pour s’assurer qu’elle est complète et procéder à sa mise en ligne.
+            </p>     
+    </div>
+</div>
+
+<div class="row">
+        <div class=" col-xs-1 bkg ">
+            <ul>
+                <li>
+                    <a class="indicator active" href="#one"></a>
+                </li>
+                <li>
+                    <a class="indicator" href="#two"></a>
+                </li>
+                <li>
+                    <a class="indicator" href="#three"></a>
+                </li>
+                <li>
+                    <a class="indicator" href="#four"></a>
+                </li>
+                <li>
+                    <a class="indicator" href="#five"></a>
+                </li>
+                
+            </ul>
+        </div>     
+
+
+{{ form_start(form) }}
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'success' ? 'success' : 'info') }}">{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+<div class="main col-xs-10">
+    <div id="one" class="section">
+        <span class="section-title form-one"></span>
+        <div  class="form-contener bleu">
+            <h3>Votre espace</h3>
+         
+         {{ form_errors(form) }}
+     
+             <div class="row">
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                    {{ form_row(form.name) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                    {{ form_row(form.zipCode) }}
+                </div>
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                    {{ form_row(form.city) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                    {{ form_label(form.limitAvailability) }}
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6 form-group">
+                            {{ form_widget(form.limitAvailability.date) }}
+                        </div>
+                        <div class="col-xs-6 col-sm-3 form-group">
+                            {{ form_widget(form.limitAvailability.time.hour) }}
+                        </div>
+                        <div class="col-xs-6 col-sm-3 form-group">
+                            {{ form_widget(form.limitAvailability.time.minute) }}
+                        </div>
+                    </div>
+                    {{ form_errors(form.limitAvailability) }}
+                </div>
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                    {{ form_row(form.availability) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12 form-group">
+                    {{ form_row(form.type) }}
+                </div>
+               
+            </div>
+
+         <div class="row" style="display: flex; align-items: center;">
+            <div class="col-md-5 col-sm-12 col-xs-12 form-group">
+                {{ form_row(form.price) }}
+        </div>
+        <div class="col-sm-2 text-center form-group">
+                <span>ou</span>
+        </div>
+        <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+            {{ form_row(form.priceText, { 'attr': { 'placeholder': 'Lorem ipsum' } }) }}
+        </div>
+</div>
+
+            <div class="row">
+                <div class="col-sm-4 form-group">
+                    {{ form_row(form.nbSpaces) }}
+                </div>
+                <div class="col-sm-4 form-group">
+                    {{ form_row(form.minSpace) }}
+                </div>
+                <div class="col-sm-4 form-group">
+                    {{ form_row(form.maxSpace) }}
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-sm-12 form-group">
+                    {{ form_row(form.description) }}
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-sm-12 form-group">
+                    {{ form_row(form.activityDescription) }}
+                </div>
+            </div>
+
+            {% if form.rollingApplications is defined %}
+            <div class="row">
+                <div class="col-sm-12 form-group">
+                    <div class="alert alert-info" role="alert" style="margin-top: 8px;">
+                        <strong>Candidature au fil de l’eau :</strong> active l’affichage (et l’obligation) du champ
+                        <strong>“Date d’entrée souhaitée”</strong> côté candidat.
+                    </div>
+                    {{ form_row(form.rollingApplications) }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if form.isErp is defined %}
+            <div class="row">
+                <div class="col-sm-12 form-group">
+                    <div class="alert alert-info" role="alert" style="margin-top: 8px;">
+                        <strong>ERP (Établissement Recevant du Public) :</strong> activer si le lieu est ouvert au public.
+                        Certains "types d’usage" réservés aux ERP seront alors proposés aux candidats.
+                    </div>
+                    {{ form_row(form.isErp) }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    
+
+    <div id="two" class="section">
+        <span class="section-title form-two"></span>
+        <div class="form-contener bleu">
+            <h3>
+                Photos du lieu
+            </h3>
+            <div class="row">
+                <div class="col-sm-12">
+                    {% include 'SpaceManagement/Partials/_space_images_form.html.twig' with { 'images': form.vars.data.pics,'form': form.pics } %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="three" class="section">
+        <span class="section-title form-three"></span>
+        <div class="form-contener bleu">
+            <h3>
+                Pièce(s) demandée(s)
+            </h3>
+            <div class="row">
+                <div class="col-sm-12">
+                    {% include 'SpaceManagement/Partials/_space_documents_form.html.twig' with { 'documents': form.vars.data.documents,'form': form.newDocument } %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="four" class="section">
+        <span class="section-title form-four"></span>
+        <div class="form-contener bleu">
+            <h3>
+                Documents ressources
+            </h3>
+            <div class="row">
+                <div class="col-sm-12">
+                {% include 'SpaceManagement/Partials/_space_required_form.html.twig' with { 'form': form, 'space': space } %}
+               
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="five" class="section">
+        <span class="section-title form-five"></span>
+        <div class="form-contener bleu">
+            <h3>
+                Visites organisées
+            </h3>
+            <div class="row">
+                <div class="col-sm-12">
+                    {% include 'SpaceManagement/Partials/_space_visits_form.html.twig' with { 'visits': form.vars.data.visits,'form': form.newVisit } %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+        <div class="row btns">
+            <div class="col-sm-12">
+                {{ form_widget(
+                    form.preview, {
+                        'attr': {
+                            'class': 'btn btn-line-s',
+                        }
+                    })
+                }}
+
+                <input type="submit" value="Enregistrer" class="btn btn-line-s save no-ajax" data-save='{% if app.user and is_granted("ROLE_ADMIN") %}Vous pourrez compléter et publier votre espace depuis la rubrique "Gestion des espaces".{% else %}Vous pourrez compléter votre saisie depuis la rubrique "Mes espaces", puis la soumettre pour validation.{% endif %}'>
+
+               {{ form_widget(
+                    form.publish, {
+                        'label': is_granted('ROLE_ADMIN') ? 'Publier' : 'Soumettre pour validation',
+                        'attr': {
+                            'class': 'btn btn-line-s js-publish',
+                            'onclick': "return confirm(\'{% if app.user and is_granted('ROLE_ADMIN') %}ADMIN : Êtes-vous sûr de vouloir publier cet espace ?\n\nL\'espace sera immédiatement visible par tous les candidats et le propriétaire sera notifié par email.{% else %}Êtes-vous sûr de vouloir soumettre cet espace pour validation ?\n\nUn administrateur vérifiera votre espace et le publiera. Vous serez notifié par email une fois l\'espace publié.{% endif %}\');"
+                        }
+                    })
+                }}
+            </div>
+        </div> <!--end row btns-->
+
+
+<div style="display:none;">{{ form_rest(form) }}</div>
+{{ form_end(form) }}
+
+</div>
+</div>
+</div>
+
+
+
+
+<div class="content plusinfos margin">
+    <div class="container">
+        <div class="row pu-home-content info">
+            <div class="col-xs-12 col-md-8 col-lg-8">
+                <h4>Vous souhaitez obtenir plus d'informations</h4>
+            </div>
+            <div class="col-xs-12 col-md-4 col-lg-4  btn-right">
+                <a href='https://www.plateau-urbain.com/contactez-nous/' target="_blank" class='btn btn-line'><span>Contactez-nous</span></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+

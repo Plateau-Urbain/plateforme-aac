@@ -1,0 +1,54 @@
+sonata_admin:
+    title: 'Plateau Urbain — Admin'
+    title_logo: '/bundles/sonataadmin/images/logo_title.png'
+    options:
+        html5_validate: true
+        confirm_exit: true
+        use_select2: true
+        use_icheck: false
+    assets:
+        extra_javascripts: []
+        extra_stylesheets: []
+    dashboard:
+        groups:
+            plateau_urbain.admin.group.spaces:
+                label: 'Espaces'
+                icon: '<i class="fa fa-building"></i>'
+                items:
+                    - app.admin.space
+                    - app.admin.parcel
+                    - app.admin.floor
+            plateau_urbain.admin.group.applications:
+                label: 'Candidatures'
+                icon: '<i class="fa fa-file-text"></i>'
+                items:
+                    - app.admin.application
+                    - app.admin.application_file
+            plateau_urbain.admin.group.users:
+                label: 'Utilisateurs'
+                icon: '<i class="fa fa-users"></i>'
+                items:
+                    - app.admin.owner
+                    - app.admin.project_holder
+                    - app.admin.user
+                    - app.admin.user_document
+            plateau_urbain.admin.group.content:
+                label: 'Contenu'
+                icon: '<i class="fa fa-newspaper-o"></i>'
+                items:
+                    - app.admin.actuality
+            plateau_urbain.admin.group.referentials:
+                label: 'Référentiels'
+                icon: '<i class="fa fa-list"></i>'
+                items:
+                    - app.admin.category
+                    - app.admin.attribute
+                    - app.admin.space_type
+                    - app.admin.use_type
+                    - app.admin.local_type
+
+sonata_block:
+    default_contexts: [sonata_page_bundle]
+    blocks:
+        sonata.admin.block.admin_list:
+            contexts: [admin]

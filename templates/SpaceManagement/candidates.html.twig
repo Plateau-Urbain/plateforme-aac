@@ -1,0 +1,1267 @@
+{% extends "base.html.twig" %}
+
+{# {% block breadcrumb_items %}
+  <li><a href="{{ path('space_manager_list') }}">Liste de mes espaces</a></li>
+  <li><a href="{{ path('space_show', { 'id': space.id }) }}">{{ space.name }}</a></li>
+  <li><span>Liste des candidats</span></li>
+{% endblock %} #}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/print.css') }}" type="text/css" media="print" />
+    
+    <style>
+        .selection-controls {
+            margin-top: 10px;
+        }
+        .selection-controls .btn {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .exportCheck {
+            margin: 4px -6px 0 !important;
+        }
+        #exportSelectedBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .actions {
+            padding: 10px;
+        }
+        #secondChart {
+            padding: 20px 0;
+        }
+        /* Correction pour l'ouverture des selects */
+        #listing-header .row {
+            overflow: visible !important;
+            position: relative;
+        }
+        #listing-header .form-control-small,
+        #listing-header .col-sm-6,
+        #listing-header .col-sm-4,
+        #listing-header .col-sm-2,
+        #listing-header .col-sm-12 {
+            overflow: visible !important;
+        }
+        /* Z-index élevé pour les dropdowns Chosen */
+        .chzn-container {
+            z-index: 999 !important;
+        }
+        .chzn-drop {
+            z-index: 10000 !important;
+        }
+        /* S'assurer que les selects peuvent s'ouvrir */
+        #listing-header {
+            overflow: visible !important;
+        }
+        /* Forcer l'overflow visible sur tous les conteneurs */
+        #listing-header form,
+        #listing-header .results-numbers {
+            overflow: visible !important;
+        }
+        /* Assurer que le dropdown peut dépasser */
+        .chzn-container,
+        .chzn-container .chzn-drop {
+            overflow: visible !important;
+        }
+        /* Pour les grands écrans, s'assurer que rien ne coupe le dropdown */
+        @media (min-width: 768px) {
+            #listing-header,
+            #listing-header * {
+                overflow: visible !important;
+            }
+            .chzn-drop {
+                max-height: none !important;
+            }
+        }
+        /* ===== Dashboard Charts Styles ===== */
+        .chart-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        .chart-section h4 {
+            margin-top: 0;
+            margin-bottom: 18px;
+            font-size: 15px;
+            color: #444;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 8px;
+        }
+        .horizontal-bar-item {
+            display: flex;
+            align-items: center;
+            min-height: 32px;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+        .bar-label {
+            flex: 0 0 140px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .bar-container {
+            flex: 1;
+            position: relative;
+        }
+        .bar-value {
+            text-shadow: 0 0 2px rgba(255,255,255,0.8);
+        }
+        /* Stacked bar */
+        .stacked-bar {
+            display: flex;
+            height: 28px;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        .stacked-segment {
+            height: 100%;
+            transition: width 0.6s ease;
+            position: relative;
+        }
+        .stacked-segment:hover {
+            opacity: 0.85;
+        }
+        .bar-total-label {
+            flex: 0 0 auto;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+        }
+        /* Legend */
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #555;
+        }
+        .chart-legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            margin-right: 5px;
+            display: inline-block;
+        }
+        /* Simple bar (for surface, usage, timeline) */
+        .simple-bar-bg {
+            background-color: #f0f0f0;
+            height: 24px;
+            border-radius: 4px;
+            position: relative;
+        }
+        .simple-bar-fill {
+            height: 100%;
+            border-radius: 4px 0 0 4px;
+            transition: width 0.5s ease;
+        }
+        .simple-bar-value {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+        }
+        .simple-bar-subvalue {
+            display: block;
+            margin-top: 3px;
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+            text-align: right;
+        }
+        /* Timeline line chart */
+        .line-chart-container {
+            position: relative;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .line-chart-svg {
+            display: block;
+            min-width: 100%;
+        }
+        .line-chart-line {
+            fill: none;
+            stroke: #5B9BD5;
+            stroke-width: 2.5;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+        }
+        .line-chart-area {
+            fill: url(#lineGradient);
+            opacity: 0.3;
+        }
+        .line-chart-dot {
+            fill: #5B9BD5;
+            stroke: #fff;
+            stroke-width: 2;
+            cursor: pointer;
+            transition: r 0.2s ease;
+        }
+        .line-chart-dot:hover {
+            r: 6;
+            fill: #4178A4;
+        }
+        .line-chart-grid line {
+            stroke: #e8e8e8;
+            stroke-dasharray: 3,3;
+        }
+        .line-chart-axis-label {
+            font-size: 10px;
+            fill: #888;
+        }
+        .line-chart-y-label {
+            font-size: 10px;
+            fill: #999;
+        }
+        .line-chart-tooltip {
+            position: absolute;
+            background: rgba(50, 50, 50, 0.9);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 10;
+            transform: translate(-50%, -110%);
+        }
+        /* New UI Refactoring Styles */
+        .ctrl-panel {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+        .ctrl-panel h5 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel-export {
+            border-top: 3px solid #4CAF50;
+            background-color: #f9fff9;
+        }
+        .panel-export h5 { color: #2e7d32; }
+        
+        .panel-actions {
+            border-top: 3px solid #2D74BA;
+            background-color: #f5f9ff;
+        }
+        .panel-actions h5 { color: #1a548e; }
+        
+        .panel-filters {
+            border-top: 3px solid #f0ad4e;
+            background-color: #fffdf5;
+        }
+        .panel-filters h5 { color: #8a6d3b; }
+
+        .btn-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .row-flex-panels {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        .col-panel {
+            padding: 0 10px;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        /* Print Optimization */
+        .print-header { display: none; }
+        @media print {
+            .print-header { display: block !important; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        }
+    </style>
+    {# Styles d'impression gérés par bundles/app/css/print.css #}
+{% endblock %}
+
+{% block body %}
+<div class="white"> 
+        <div class="container"> 
+<div class="page-header top-candidats">
+  <div class="row ">
+    <!-- BEGIN MAIN CONTENT -->
+  {# <div class="col-sm-6">
+      <h1 class="page-title">Liste des candidats ({{ pagination| length }})</h1>
+    </div>  #}
+  <div class="col-sm-12 ">
+    <h6><a href="{{ path('space_manager_list', {'id': space.id}) }}"class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Tous les espaces</a></h6>  
+   <p>&nbsp;</p>
+    <h2>{{ space.name }}</h2>
+    </div>
+</div>
+  </div>
+  
+
+
+<!-- BEGIN PROPERTY LISTING -->
+<div id="property-listing">
+  <div id="space-card" class="item application-space space-card no-bkg lst">
+  
+    <div class="row row-flex">
+      <div class="col-sm-4">
+    
+        <div class="image">
+          <div class="overlay">
+             {% if space.isClosed %}
+                          <div class="clos"><p> Appel à candidature cloturé</p></div>
+                        {% else %}
+                          <div class="encours"><p> Appel à candidature en cours</p></div>
+                        {% endif %}
+          </div>
+          <div class="image-wrapper">
+              {% if space.pics.0 is not null %}
+                    <img src="{{ vich_uploader_asset(space.pics.0, 'file') }}" alt="{{ space.pics.0.fileName }}" />
+              {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-8">
+        <div class="no-padding">
+          <div class="row margin-15">
+            {# <div class="col-sm-7">
+              <h3>
+                <p class="ville">{{ space.city }} ({{ space.zipCode|slice(0,2)}})</p>
+                <h4>{{ space.name }}</h4>
+                 {% if space.size is not empty %}à partir de {{ space.size }}m<sup>2</sup>{% endif %}<br/>
+              </h3>
+            </div> #}
+           {#  <div class="col-sm-5">
+             <div class="btn-toolbar pull-right">
+        <a href="{{ path('space_manager_candidatesexport', { 'id': space.id }) }}" class="btn btn-line-19">
+          <i class="fa fa-download"></i>
+          Exporter la liste
+        </a>
+        <a href="javascript:print();" class="btn btn-line-19">
+          <i class="fa fa-print"></i>
+          Imprimer
+        </a>
+      </div>
+            </div> #}
+          </div>
+
+          <div class="row margin-15">
+             <div class="col-sm-12">
+             <div class="space-description">
+                {# <p>
+                  {{ space.description | raw }} ...
+                  <a href="{{ path('space_show', { 'id': space.id }) }}">Voir l'annonce</a>
+                </p> #}
+              </div> 
+              <h4 class="stats-summary">
+        Cet espace compte <strong>{{ space.nbValidApplication }}</strong> candidature(s)<br>
+        représentant une demande totale de <strong>{{ space.totalWishedSize }} m<sup>2</sup></strong>
+        {% if space.nbValidApplication > 0 %}<br>
+        moyenne pondérée globale de la surface demandée : <strong>{{ (space.totalWishedSize / space.nbValidApplication)|number_format(1, ',', ' ') }} m<sup>2</sup></strong> par candidature
+        {% endif %}
+      </h4>
+            {#  <div class="col-sm-6">
+                            <div class="calendar"></div>
+                            <div class="apply-date">
+                            <p class="apply-date-p">Date limite de candidature</p>
+                            <p class="apply-date-b">
+                  {{ space.limitAvailability | localizeddate("long", "none") }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
+                  </p>
+                      </div>
+            </div>
+        
+
+
+          <div class="row margin-15">
+            <div class="col-sm-4">
+              {% if not space.submitted and not space.enabled and not space.closed %}
+                <a href="{{ path('space_manager_edit', { 'id': space.id }) }}" class="btn btn-line-19">Modifier</a>
+              {% endif %}
+            </div>
+            <div class="col-sm-4">
+              {% if space.isEnabled and not space.isClosed %}
+                {% if app.user and is_granted('ROLE_ADMIN') %}
+                  <form method="post" action="{{ path('space_manager_close', {'id' : space.id}) }}" style="display:inline;" onsubmit="return confirm('ADMIN : Êtes-vous sûr de vouloir clôturer cet espace ?\n\nCette action fermera définitivement l\'appel à candidatures.');">
+                    <button type="submit" class="btn btn-line-19"><span>Clôturer</span></button>
+                  </form>
+                {% else %}
+                  <form method="post" action="{{ path('space_manager_close', {'id' : space.id}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir clôturer cet espace ?');">
+                    <button type="submit" class="btn btn-line-19"><span>Clôturer</span></button>
+                  </form>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div> #}
+
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# <hr class="brown" />
+
+<div class="center space-stats">
+  <a href="#space-stats" data-toggle="collapse" class="toggle-stats">
+    <i class="fa fa-lg fa-eye-slash" title="Masquer/Afficher les statistiques" data-toggle="tooltip"></i>
+  </a>
+</div> #}
+
+<div class="space-stats collapse in" id="space-stats">
+
+  <div class="row">
+    {# === Graphique 1 : Barres empilées par statut === #}
+    <div class="col-sm-6">
+      <div class="chart-section">
+        <h4><i class="fa fa-bar-chart"></i> Candidatures par type d'usage — répartition par statut de traitement</h4>
+        <div class="chart-legend">
+          <span class="chart-legend-item"><span class="chart-legend-color" style="background:#FDB45C;"></span> En attente ({{ space.nbApplication(constant('App\\Entity\\Application::WAIT_STATUS')) | default(0) }})</span>
+          <span class="chart-legend-item"><span class="chart-legend-color" style="background:#46BFBD;"></span> Acceptée ({{ space.nbApplication(constant('App\\Entity\\Application::ACCEPT_STATUS')) | default(0) }})</span>
+          <span class="chart-legend-item"><span class="chart-legend-color" style="background:#F7464A;"></span> Refusée ({{ space.nbApplication(constant('App\\Entity\\Application::REJECT_STATUS')) | default(0) }})</span>
+        </div>
+        <div id="stackedChart"></div>
+      </div>
+    </div>
+
+    {# === Graphique 1b : Surface demandée par catégorie === #}
+    <div class="col-sm-6">
+      <div class="chart-section">
+        <h4><i class="fa fa-arrows-alt"></i> Surface demandée par type d'usage (m²) + moyenne pondérée</h4>
+        <div id="surfaceChart"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    {# === Graphique 3 : Par type de projet === #}
+    <div class="col-sm-6">
+      <div class="chart-section">
+        <h4><i class="fa fa-users"></i> Candidatures par type de projet</h4>
+        <div id="usageChart"></div>
+      </div>
+    </div>
+
+    {# === Graphique 5 : Par statut juridique (candidature) === #}
+    <div class="col-sm-6">
+      <div class="chart-section">
+        <h4><i class="fa fa-building"></i> Candidatures par statut juridique</h4>
+        <div id="companyStatusChart"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    {# === Graphique 4 : Timeline par jour (ligne) === #}
+    <div class="col-sm-12">
+      <div class="chart-section">
+        <h4><i class="fa fa-line-chart"></i> Candidatures reçues par jour</h4>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+          <div id="timelineChartContainer" class="line-chart-container">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+ {#  <div class="row">
+    <div class="col-sm-12 center">
+      <a href="javascript:print();" class="btn btn-secondary">
+        <i class="fa fa-print"></i>
+        Imprimer
+      </a>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="listing-header" class="clearfix">
+  <div class="row">
+    <div class="col-sm-12 results-numbers">
+     {#  <h4>
+        {% include 'SpaceManagement/Partials/results_numbers.html.twig' with {'pagination' : pagination, 'label' : 'candidatures' } %}
+      </h4> #}
+
+      <div class="">
+        <h3 class="page-title">Liste des candidat•es</h3>
+        <div style="margin-top: 10px; margin-bottom: 15px;">
+          <p style="margin-bottom: 5px;">
+            <strong>{{ space.nbValidApplication }}</strong> candidature(s) au total
+            
+          </p>
+          <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 8px;">
+            <span class="label-status awaiting" style="display: inline-block; padding: 5px 10px; border-radius: 4px;">
+              <i class="fa fa-hourglass-half"></i>&nbsp;
+              {{ space.nbApplication(constant('App\\Entity\\Application::WAIT_STATUS')) }} en attente
+            </span>
+            <span class="label-status rejected" style="display: inline-block; padding: 5px 10px; border-radius: 4px;">
+              <i class="fa fa-times"></i>&nbsp;
+              {{ space.nbApplication(constant('App\\Entity\\Application::REJECT_STATUS')) }} refusées
+            </span>
+            <span class="label-status accepted" style="display: inline-block; padding: 5px 10px; border-radius: 4px;">
+              <i class="fa fa-check"></i>&nbsp;
+              {{ space.nbApplication(constant('App\\Entity\\Application::ACCEPT_STATUS')) }} acceptées
+            </span>
+            {% if space.nbApplication(constant('App\\Entity\\Application::UNREAD_STATUS')) > 0 %}
+              <span class="label-status" style="display: inline-block; padding: 5px 10px; border-radius: 4px; background-color: #6c757d; color: white;">
+                <i class="fa fa-envelope"></i>&nbsp;
+                {{ space.nbApplication(constant('App\\Entity\\Application::UNREAD_STATUS')) }} non lues
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="management-toolbar">
+      <div class="row row-flex-panels">
+        <!-- 1. SECTION GESTION / ACTIONS GROUPÉES -->
+        <div class="col-panel">
+          <div class="ctrl-panel panel-actions" style="height: calc(100% - 20px);">
+            <h5><i class="fa fa-cogs"></i> Gestion des candidatures</h5>
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+              <div class="form-control-large" style="margin: 0; flex: 1;">
+                <select id="groupActionSelect" data-placeholder="Appliquer une action aux sélectionnés...">
+                  <option value=""> </option>
+                  <option value="accept">Accepter les candidatures</option>
+                  <option value="refuse">Refuser les candidatures</option>
+                </select>
+              </div>
+              <div class="btn-appli">
+                <a href="#accept_content" class="btn btn-line-19 btn-form" id="groupActionBtn" style="margin-top: 0;">Appliquer</a>
+              </div>
+            </div>
+            <p class="small text-muted" style="margin-top: 10px;">
+              <i class="fa fa-info-circle"></i> Sélectionnez les candidat·es via les cases à cocher dans la liste ci-dessous.
+            </p>
+          </div>
+        </div>
+
+        <!-- 2. SECTION FILTRES ET TRI -->
+        <div class="col-panel">
+          <div class="ctrl-panel panel-filters" style="height: calc(100% - 20px);">
+            <h5><i class="fa fa-filter"></i> Filtres et Tri</h5>
+            {{ form_start(filterForm, { 'attr': { 'data-submit': true } } ) }}
+            <div class="row">
+              <div class="col-xs-12 col-sm-4" style="margin-bottom: 5px;">
+                <label class="small">Statut :</label>
+                {{ form_widget(filterForm.status_filter) }}
+              </div>
+              <div class="col-xs-12 col-sm-5" style="margin-bottom: 5px;">
+                <label class="small">Trier par :</label>
+                {{ form_widget(filterForm.sort_field) }}
+              </div>
+              <div class="col-xs-12 col-sm-3" style="margin-bottom: 5px;">
+                <label class="small">Ordre :</label>
+                {{ form_widget(filterForm.sort_order) }}
+              </div>
+            </div>
+            {{ form_end(filterForm) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. SECTION EXPORT -->
+      <div class="ctrl-panel panel-export">
+        <h5><i class="fa fa-download"></i> Export des données</h5>
+        <div class="btn-toolbar">
+          <a href="{{ path('space_manager_select_export_fields', { 'id': space.id }) }}" class="btn btn-success btn-line-16" style="background-color: #4CAF50; border-color: #4CAF50; color: white !important;">
+            <i class="fa fa-star"></i>
+            Export personnalisé
+          </a>
+          <a href="{{ path('space_manager_candidatesexport', { 'id': space.id }) }}" class="btn btn-line-16">
+            <i class="fa fa-download"></i>
+            Export CSV sans tri
+          </a>
+          <a href="{{ path('space_manager_candidatesexportzip', { 'id': space.id }) }}" class="btn btn-line-16">
+            <i class="fa fa-file-archive-o"></i>
+            Export complet (avec documents)
+          </a>
+          <button type="button" class="btn btn-line-16" id="exportSelectedBtn" disabled>
+            <i class="fa fa-check-square-o"></i>
+            Export sélection (avec documents) (<span id="selectedCount">0</span>)
+          </button>
+          <a href="javascript:print();" class="btn btn-line-16">
+            <i class="fa fa-print"></i>
+            Imprimer
+          </a>
+        </div>
+      </div>
+    </div>
+ 
+ 
+
+
+  
+
+
+{# En-tête visible uniquement à l'impression #}
+<div class="print-header">
+    <h2>{{ space.name }}</h2>
+    <p style="font-size: 11pt; color: #333; margin: 5px 0;">
+        <strong>{{ space.nbValidApplication }}</strong> candidature(s) au total &nbsp;&mdash;&nbsp;
+        <span style="color: #8a6d3b;">{{ space.nbApplication(constant('App\\Entity\\Application::WAIT_STATUS')) }} en attente</span> &nbsp;&mdash;&nbsp;
+        <span style="color: #2d6a2d;">{{ space.nbApplication(constant('App\\Entity\\Application::ACCEPT_STATUS')) }} acceptée(s)</span> &nbsp;&mdash;&nbsp;
+        <span style="color: #a94442;">{{ space.nbApplication(constant('App\\Entity\\Application::REJECT_STATUS')) }} refusée(s)</span>
+    </p>
+    <p style="font-size: 10pt; color: #666; margin: 3px 0;">Imprimé le {{ "now"|date("d/m/Y à H:i") }}</p>
+</div>
+
+<div class="application-list">
+  {% for application in pagination %}
+    <div class="item candidate-item" id="application-{{ application.id }}">
+      <div class="row row-flex">
+        <div class=" col-xs-12 col-md-12 border-box">
+          
+           <div class="actions" {% if application.category %}data-category="{{ application.category.id }}"{% endif %}>
+            <input type="checkbox" class="exportCheck" value="{{ application.id }}" data-status="{{ application.status }}" />
+        </div>
+        <div class="candidate-argus">
+          <div class="cell-content ">
+            <div class="application-status">
+              {% if application.status == 'unread' or application.status == 'awaiting'  %}
+                Statut: <strong class="awaiting">{{ application.statusLabel | upper }}</strong>
+              {% elseif application.status == 'accepted'  %}
+                Statut: <strong class="accepted">{{ application.statusLabel | upper }}</strong>
+              {% elseif application.status == 'rejected'  %}
+                Statut: <strong class="rejected">{{ application.statusLabel | upper }}</strong>
+              {% endif %}
+            </div>
+            <div class="application-title">
+                <h3>{{ application.name }}</h3>
+                PAR <strong>{{ application.projectHolder.company }}</strong>
+            </div>
+
+            <dl class="dl-horizontal dl-with-icon">
+             {#  <dt><i class="icon small user-brown"></i></dt> #}
+              <p class="dd-title"><strong>{{ application.projectHolder.fullName }}</strong></p>
+             
+              <p><span class="">{{ application.description|length > 250 ? application.description|slice(0, 250) ~ '…' : application.description }}</span></p>
+            </dl>
+          </div>
+      
+           <div class="border-candidat">
+           <div class="pull-right star">
+              <a class="toggle-star" href="{{ path('space_manager_toggle_selected_application', { 'id': application.id, '_token': csrf_token('toggle_selected_' ~ application.id) }) }}">
+                {% if application.selected %}
+                  <i class="fa-solid fa-star fa-lg"></i>
+                {% else %}
+                  <i class="fa-regular fa-star fa-lg"></i>
+                {% endif %}
+              </a>
+            </div>
+         
+          <div class="cell-content-right ">
+            <ul class="application-desc">
+              <li>Candidature déposée le : <strong>{{ application.created | date('d/m/Y') }}</strong></li>
+              <li>Type de projet : <strong>{{ application.projectHolder.useType }}</strong></li>
+              <li>Type d'usage : <strong>{{ application.category }}</strong></li>
+              <li>Départements souhaités : <strong>{% if application.projectHolder.preferredDepartmentsLabels|length %}{{ application.projectHolder.preferredDepartmentsLabels|join(', ') }}{% else %}—{% endif %}</strong></li>
+              <li>Statut juridique (profil) : <strong>{% if application.projectHolder.companyStatus %}{{ application.projectHolder.companyStatus }}{% else %}—{% endif %}</strong></li>
+              <li>Statut juridique (candidature) : <strong>{% if application.companyStatus %}{{ application.companyStatus }}{% else %}—{% endif %}</strong></li>
+              <li>Surface souhaitée (profil) : <strong>{% if application.projectHolder.wishedSize %}{{ application.projectHolder.wishedSize }}{% else %}—{% endif %} m²</strong></li>
+              <li>Surface souhaitée (candidature) : <strong>{% if application.wishedSize %}{{ application.wishedSize }}{% else %}—{% endif %} m²</strong></li>
+              {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
+              {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
+              <li>Durée d'occupation : <strong>{% if _lengthValue %}{{ _lengthValue }}{% if _lengthType %} {{ _lengthType }}{% endif %}{% else %}—{% endif %}</strong></li>
+              <li>Date d'entrée souhaitée : <strong>{{ application.startOccupation|localizeddate('long', 'none') }}</strong></li>
+            </ul>
+
+            <a href="{{ path('application_show', { 'id': application.id }) }}" class="btn btn-line-19"><span>Voir la candidature</span></a>
+            </div>
+        </div>
+        </div>
+      </div>
+    </div>
+      </div>
+  {% else %}
+    <div class="no-results">
+      <p class="center">Il n'y a aucune candidature sur cet espace</p>
+    </div>
+  {% endfor %}
+</div>
+
+<div>
+  <div class="row">
+    <div class="col-sm-12">
+      {{ knp_pagination_render(pagination) }}
+    </div>
+  </div>
+</div>
+
+<div style="display: none;">
+    <div id="accept_content">
+        <form action="{{ path('space_manager_candidates', {'id' : space.id}) }}#accept_confirm" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('candidates_action') }}" />
+            <div class="colorBox-content">
+                <h4>Accepter les candidatures selectionnées</h4>
+                <br />
+                <p class="text-left">Vous allez accepter les dossiers de <strong>$nb_candidates$ candidature(s)</strong>. Les candidats recevront le texte-type suivant :</p>
+
+                <p class="text-left"><i>
+                  Bonjour,<br>
+                  Votre candidature sur le site plateau-urbain pour l'espace {{space.name}} à {{space.city}} a été acceptée.
+                </i></p>
+
+                <p class="text-left">
+                  Souhaitez-vous compléter ce message ?
+                </p>
+
+                <textarea name="message" rows="5" class="form-control"></textarea>
+                <input type="submit" value="Accepter" class="btn btn-fullcolor">
+                <input type="hidden" name="action" value="accept" />
+                <input type="hidden" name="applications" value="" />
+            </div>
+        </form>
+    </div>
+    <div id="refuse_content">
+        <form action="{{ path('space_manager_candidates', {'id' : space.id}) }}#refuse_confirm" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('candidates_action') }}" />
+            <div class="colorBox-content">
+                <h4>Refuser les candidatures selectionnées</h4>
+                <br />
+                <p class="text-left">Vous allez effectuer un refus de <strong>$nb_candidates$ candidature(s)</strong>. Les candidats recevront le texte-type suivant :</p>
+
+                <p class="text-left"><i>
+                  Bonjour,<br>
+                  Votre candidature sur le site plateau-urbain pour l'espace {{space.name}} à {{space.city}} a été refusée.
+                </i></p>
+
+                <p class="text-left">
+                  Souhaitez-vous compléter ce message ?
+                </p>
+
+                <textarea name="message" rows="5" class="form-control"></textarea>
+                <input type="submit" value="Envoyer un refus groupé" class="btn btn-fullcolor">
+                <input type="hidden" name="action" value="refuse" />
+                <input type="hidden" name="applications" value=""/>
+            </div>
+        </form>
+    </div>
+    <div id="accept_confirm">
+        <div class="colorBox-content">
+            <h4>Le message d'acceptation a été envoyé aux candidatures sélectionnées</h4>
+            <br />
+        </div>
+    </div>
+    <div id="refuse_confirm">
+        <div class="colorBox-content">
+            <h4>Le message de refus a été envoyé aux candidatures sélectionnées</h4>
+            <br />
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript" src="{{ asset('bundles/app/js/chart.min.js') }}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            $("#groupActionBtn").click(function(e) {
+                e.preventDefault();
+                var nbCandidates = $('.exportCheck:checked').length;
+
+                var ids = '';
+                $('.exportCheck:checked').each(function() {
+                     ids += (ids === '' ? '' : '-') + $(this).val();
+                });
+
+                var action = $('#groupActionSelect').val();
+                if (nbCandidates > 0 && action !== '') {
+                    $('#accept_content input[name="applications"]').attr('value', ids);
+                    $('#refuse_content input[name="applications"]').attr('value', ids);
+                    var content = $('#' + action + '_content').html().replace(/\$nb_candidates\$/g, nbCandidates);
+                    $.colorbox({ width: "500px", html: content });
+                }
+            });
+
+            // Manage sort field
+            $(function () {
+                $('.sort').on('click', 'label', function () {
+                    var $input = $(this).find('input');
+
+                    $('.sort').find('label').removeClass('checked');
+
+                    if ($input.is(':checked')) {
+                        $(this).addClass('checked');
+                    }
+                });
+            });
+
+            // Submit form
+            $('form[data-submit]').on('change', function () {
+                // Sauvegarder la position du scroll avant la soumission
+                var scrollKey = 'scroll_' + window.location.pathname;
+                sessionStorage.setItem(scrollKey, window.pageYOffset);
+                $(this).trigger('submit');
+            });
+
+            // Restaurer la position du scroll si elle est présente en session
+            (function() {
+                var scrollKey = 'scroll_' + window.location.pathname;
+                var scrollPos = sessionStorage.getItem(scrollKey);
+                if (scrollPos) {
+                    window.scrollTo(0, scrollPos);
+                    sessionStorage.removeItem(scrollKey);
+                }
+            })();
+
+            var colors = ['#F7464A', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360'];
+            var hightLightColors = ['#FF5A5E', '#5AD3D1', '#FFC870', '#A8B3C5', '#616774'];
+
+            // Créer un mapping entre les catégories et leurs couleurs
+            var categoryColorMap = {};
+            {% for key, cat in categories %}
+            categoryColorMap[{{ cat.id }}] = colors[{{ key }} % 5];
+            {% endfor %}
+
+            // Créer un mapping pour les couleurs de hover
+            var categoryHoverColorMap = {};
+            {% for key, cat in categories %}
+            categoryHoverColorMap[{{ cat.id }}] = hightLightColors[{{ key }} % 5];
+            {% endfor %}
+
+            // Appliquer les couleurs aux barres de gauche selon le type d'usage
+            $('.actions[data-category]').each(function() {
+                var $actions = $(this);
+                var categoryId = $actions.attr('data-category');
+                if (categoryId && categoryColorMap[categoryId]) {
+                    var color = categoryColorMap[categoryId];
+                    var hoverColor = categoryHoverColorMap[categoryId] || color;
+                    $actions.css('background-color', color);
+                    
+                    // Stocker les couleurs pour le hover
+                    $actions.data('category-color', color);
+                    $actions.data('category-hover-color', hoverColor);
+                }
+            });
+
+            // Gérer le hover avec la couleur du type d'usage (plus foncée)
+            $('.candidate-item').hover(
+                function() {
+                    var $actions = $(this).find('.actions');
+                    var hoverColor = $actions.data('category-hover-color');
+                    if (hoverColor) {
+                        $actions.css('background-color', hoverColor);
+                    }
+                },
+                function() {
+                    var $actions = $(this).find('.actions');
+                    var categoryColor = $actions.data('category-color');
+                    if (categoryColor) {
+                        $actions.css('background-color', categoryColor);
+                    }
+                }
+            );
+
+            // ======================================================
+            // GRAPHIQUE 1 : Barres empilées par statut par catégorie
+            // ======================================================
+            var stackedData = [
+                {% for key, cat in categories %}
+                {% set catLabel = cat.name ~ (cat.isActive ? '' : ' (archivé)') %}
+                {
+                    label: {{ catLabel|json_encode|raw }},
+                    awaiting: {{ space.nbApplicationCategoryByStatus(cat, constant('App\\Entity\\Application::WAIT_STATUS')) }},
+                    accepted: {{ space.nbApplicationCategoryByStatus(cat, constant('App\\Entity\\Application::ACCEPT_STATUS')) }},
+                    rejected: {{ space.nbApplicationCategoryByStatus(cat, constant('App\\Entity\\Application::REJECT_STATUS')) }},
+                    total: {{ space.nbApplicationCategory(cat) }},
+                    color: colors[{{ key }} % 5]
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            var maxStacked = Math.max.apply(Math, stackedData.map(function(d) { return d.total; }));
+            if (maxStacked === 0) maxStacked = 1;
+
+            var stackedContainer = $('#stackedChart');
+            stackedContainer.empty();
+
+            var statusColors = { awaiting: '#FDB45C', accepted: '#46BFBD', rejected: '#F7464A' };
+            var statusLabels = { awaiting: 'En attente', accepted: 'Acceptée(s)', rejected: 'Refusée(s)' };
+
+            stackedData.forEach(function(item) {
+                var totalPct = (item.total / maxStacked) * 100;
+                var segments = '';
+                if (item.total > 0) {
+                    ['awaiting', 'accepted', 'rejected'].forEach(function(s) {
+                        var val = item[s];
+                        if (val > 0) {
+                            var segPct = (val / item.total) * 100;
+                            segments += '<div class="stacked-segment" style="width:' + segPct + '%;background:' + statusColors[s] + ';" title="' + statusLabels[s] + ': ' + val + '"></div>';
+                        }
+                    });
+                }
+
+                var html = '<div class="horizontal-bar-item">' +
+                    '<div class="bar-label">' + item.label + '</div>' +
+                    '<div class="bar-container">' +
+                    '<div class="stacked-bar" style="width:' + totalPct + '%;">' + segments + '</div>' +
+                    '</div>' +
+                    '<span class="bar-total-label" title="Total : ' + item.total + '&#10;En attente : ' + item.awaiting + '&#10;Acceptée(s) : ' + item.accepted + '&#10;Refusée(s) : ' + item.rejected + '" style="cursor:help;">' + item.total + ' candidature(s)</span>' +
+                    '</div>';
+                stackedContainer.append(html);
+            });
+
+            // ======================================================
+            // GRAPHIQUE 1b : Surface demandée par catégorie
+            // ======================================================
+            var surfaceData = [
+                {% for key, cat in categories %}
+                {% set catLabel = cat.name ~ (cat.isActive ? '' : ' (archivé)') %}
+                {
+                    label: {{ catLabel|json_encode|raw }},
+                    value: {{ space.totalWishedSizeByCategory(cat) }},
+                    count: {{ space.nbApplicationCategory(cat) }},
+                    countWithSurface: {{ space.nbApplicationCategoryWithSurface(cat) }},
+                    weightedAverage: {% set nbWithSurface = space.nbApplicationCategoryWithSurface(cat) %}{% if nbWithSurface > 0 %}{{ (space.totalWishedSizeByCategory(cat) / nbWithSurface)|number_format(1, '.', '') }}{% else %}0{% endif %},
+                    color: colors[{{ key }} % 5]
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            var maxSurface = Math.max.apply(Math, surfaceData.map(function(d) { return d.value; }));
+            if (maxSurface === 0) maxSurface = 1;
+
+            var surfaceContainer = $('#surfaceChart');
+            surfaceContainer.empty();
+
+            surfaceData.forEach(function(item) {
+                var pct = (item.value / maxSurface) * 100;
+                var valuePos = pct < 30 ? 'left:' + (pct + 2) + '%;' : 'left:' + pct + '%;transform:translateX(-100%) translateY(-50%);';
+                if (pct < 30) valuePos += 'transform:translateY(-50%);';
+                var weightedText = item.countWithSurface > 0
+                    ? 'Moy. ' + item.weightedAverage + ' m² <small style="color:#aaa;" title="Calculée sur ' + item.countWithSurface + ' candidature(s) ayant renseigné une surface (sur ' + item.count + ' au total)">(' + item.countWithSurface + '/' + item.count + ')</small>'
+                    : '<span style="color:#aaa;">Aucune surface renseignée</span>';
+
+                var html = '<div class="horizontal-bar-item">' +
+                    '<div class="bar-label">' + item.label + '</div>' +
+                    '<div class="bar-container">' +
+                    '<div class="simple-bar-bg"><div class="simple-bar-fill" style="background:' + item.color + ';width:' + pct + '%;"></div>' +
+                    '<span class="simple-bar-value" style="' + valuePos + 'top:50%;">' + item.value + ' m²</span>' +
+                    '</div><span class="simple-bar-subvalue" style="cursor:help;">' + weightedText + '</span></div></div>';
+                surfaceContainer.append(html);
+            });
+
+            // ======================================================
+            // GRAPHIQUE 3 : Par type de projet (barres horizontales)
+            // ======================================================
+            var usageColors = ['#5B9BD5', '#ED7D31', '#A5A5A5', '#FFC000', '#4472C4', '#70AD47', '#264478', '#9B59B6'];
+            var usageData = [
+                {% for key, use in useTypes %}
+                {% set useLabel = use.name ~ (use.isActive ? '' : ' (archivé)') %}
+                {
+                    label: {{ useLabel|json_encode|raw }},
+                    value: {{ space.nbApplicationUseType(use) }},
+                    color: usageColors[{{ key }} % 8]
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            var maxUsage = Math.max.apply(Math, usageData.map(function(d) { return d.value; }));
+            if (maxUsage === 0) maxUsage = 1;
+
+            var usageContainer = $('#usageChart');
+            usageContainer.empty();
+
+            usageData.forEach(function(item) {
+                if (item.value === 0) return; // masquer les types sans candidature
+                var pct = (item.value / maxUsage) * 100;
+                var valuePos = pct < 30 ? 'left:' + (pct + 2) + '%;' : 'left:' + pct + '%;transform:translateX(-100%) translateY(-50%);';
+                if (pct < 30) valuePos += 'transform:translateY(-50%);';
+
+                var html = '<div class="horizontal-bar-item">' +
+                    '<div class="bar-label">' + item.label + '</div>' +
+                    '<div class="bar-container">' +
+                    '<div class="simple-bar-bg"><div class="simple-bar-fill" style="background:' + item.color + ';width:' + pct + '%;"></div>' +
+                    '<span class="simple-bar-value" style="' + valuePos + 'top:50%;">' + item.value + ' candidature(s)</span>' +
+                    '</div></div></div>';
+                usageContainer.append(html);
+            });
+
+            // ======================================================
+            // GRAPHIQUE 5 : Statuts juridiques (candidature)
+            // ======================================================
+            var companyStatusColors = ['#4472C4', '#ED7D31', '#A5A5A5', '#FFC000'];
+            var companyStatusData = [
+                { label: 'Association',        value: {{ space.nbApplicationByCompanyStatus('Association') }},        color: companyStatusColors[0] },
+                { label: 'Artiste',            value: {{ space.nbApplicationByCompanyStatus('Artiste') }},            color: companyStatusColors[1] },
+                { label: 'Entreprise',         value: {{ space.nbApplicationByCompanyStatus('Entreprise') }},         color: companyStatusColors[2] },
+                { label: 'Structure publique', value: {{ space.nbApplicationByCompanyStatus('Structure publique') }}, color: companyStatusColors[3] }
+            ];
+
+            var maxCompanyStatus = Math.max.apply(Math, companyStatusData.map(function(d) { return d.value; }));
+            if (maxCompanyStatus === 0) maxCompanyStatus = 1;
+
+            var companyStatusContainer = $('#companyStatusChart');
+            companyStatusContainer.empty();
+
+            companyStatusData.forEach(function(item) {
+                var pct = (item.value / maxCompanyStatus) * 100;
+                var valuePos = pct < 30 ? 'left:' + (pct + 2) + '%;' : 'left:' + pct + '%;transform:translateX(-100%) translateY(-50%);';
+                if (pct < 30) valuePos += 'transform:translateY(-50%);';
+
+                var html = '<div class="horizontal-bar-item">' +
+                    '<div class="bar-label">' + item.label + '</div>' +
+                    '<div class="bar-container">' +
+                    '<div class="simple-bar-bg"><div class="simple-bar-fill" style="background:' + item.color + ';width:' + pct + '%;"></div>' +
+                    '<span class="simple-bar-value" style="' + valuePos + 'top:50%;">' + item.value + ' candidature(s)</span>' +
+                    '</div></div></div>';
+                companyStatusContainer.append(html);
+            });
+
+            // ======================================================
+            // GRAPHIQUE 4 : Timeline — candidatures par jour (ligne)
+            // ======================================================
+            var timelineRaw = [
+                {% for app in space.application %}
+                    {% if app.status != 'draft' %}
+                    "{{ app.created|date('Y-m-d') }}"{% if not loop.last %},{% endif %}
+                    {% endif %}
+                {% endfor %}
+            ];
+
+            // Compter par jour
+            var dayCounts = {};
+            timelineRaw.forEach(function(d) {
+                if (!d) return;
+                dayCounts[d] = (dayCounts[d] || 0) + 1;
+            });
+
+            // Trier les clés par date
+            var days = Object.keys(dayCounts).sort();
+
+            if (days.length > 0) {
+                // Remplir les jours manquants entre le premier et le dernier
+                var startDate = new Date(days[0]);
+                var endDate = new Date(days[days.length - 1]);
+                var allDays = [];
+                var currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    var key = currentDate.toISOString().slice(0, 10);
+                    allDays.push({ date: key, count: dayCounts[key] || 0 });
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                var maxCount = Math.max.apply(Math, allDays.map(function(d) { return d.count; }));
+                if (maxCount === 0) maxCount = 1;
+
+                // Dimensions du SVG
+                var margin = { top: 20, right: 20, bottom: 50, left: 35 };
+                var totalW = Math.max(500, allDays.length * 28 + margin.left + margin.right);
+                var totalH = 220;
+                var w = totalW - margin.left - margin.right;
+                var h = totalH - margin.top - margin.bottom;
+
+                var container = $('#timelineChartContainer');
+                container.empty();
+                container.css('width', totalW + 'px');
+
+                // Construire le SVG
+                var svg = '<svg class="line-chart-svg" width="' + totalW + '" height="' + totalH + '" viewBox="0 0 ' + totalW + ' ' + totalH + '">';
+
+                // Dégradé pour l'aire sous la courbe
+                svg += '<defs><linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">';
+                svg += '<stop offset="0%" stop-color="#5B9BD5" stop-opacity="0.4"/>';
+                svg += '<stop offset="100%" stop-color="#5B9BD5" stop-opacity="0.05"/>';
+                svg += '</linearGradient></defs>';
+
+                // Grille horizontale
+                var nbGridLines = 4;
+                for (var gi = 0; gi <= nbGridLines; gi++) {
+                    var gy = margin.top + (h - (gi / nbGridLines) * h);
+                    var gridVal = Math.round((gi / nbGridLines) * maxCount);
+                    svg += '<line class="line-chart-grid" x1="' + margin.left + '" y1="' + gy + '" x2="' + (totalW - margin.right) + '" y2="' + gy + '" stroke="#e8e8e8" stroke-dasharray="3,3"/>';
+                    svg += '<text class="line-chart-y-label" x="' + (margin.left - 6) + '" y="' + (gy + 3) + '" text-anchor="end">' + gridVal + '</text>';
+                }
+
+                // Calculer les points
+                var points = [];
+                allDays.forEach(function(d, i) {
+                    var x = margin.left + (i / (allDays.length - 1 || 1)) * w;
+                    var y = margin.top + h - (d.count / maxCount) * h;
+                    points.push({ x: x, y: y, date: d.date, count: d.count });
+                });
+
+                // Aire sous la courbe
+                var areaPath = 'M' + points[0].x + ',' + (margin.top + h);
+                points.forEach(function(p) { areaPath += ' L' + p.x + ',' + p.y; });
+                areaPath += ' L' + points[points.length - 1].x + ',' + (margin.top + h) + ' Z';
+                svg += '<path class="line-chart-area" d="' + areaPath + '"/>';
+
+                // Ligne
+                var linePath = 'M';
+                points.forEach(function(p, i) {
+                    linePath += (i > 0 ? ' L' : '') + p.x + ',' + p.y;
+                });
+                svg += '<path class="line-chart-line" d="' + linePath + '"/>';
+
+                // Points (dots)
+                points.forEach(function(p) {
+                    svg += '<circle class="line-chart-dot" cx="' + p.x + '" cy="' + p.y + '" r="4" data-date="' + p.date + '" data-count="' + p.count + '"/>';
+                });
+
+                // Labels de l'axe X (afficher un label sur N pour ne pas surcharger)
+                var labelStep = Math.max(1, Math.ceil(allDays.length / 15));
+                allDays.forEach(function(d, i) {
+                    if (i % labelStep === 0 || i === allDays.length - 1) {
+                        var x = margin.left + (i / (allDays.length - 1 || 1)) * w;
+                        var parts = d.date.split('-');
+                        var label = parts[2] + '/' + parts[1];
+                        svg += '<text class="line-chart-axis-label" x="' + x + '" y="' + (totalH - 5) + '" text-anchor="middle" transform="rotate(-35,' + x + ',' + (totalH - 10) + ')">' + label + '</text>';
+                    }
+                });
+
+                svg += '</svg>';
+                container.html(svg);
+
+                // Tooltip au survol des points
+                var $tooltip = $('<div style="position:fixed;background:#333;color:#fff;padding:5px 10px;border-radius:4px;font-size:12px;pointer-events:none;display:none;z-index:9999;white-space:nowrap;"></div>').appendTo('body');
+
+                container.on('mouseenter', '.line-chart-dot', function(e) {
+                    var dateStr = $(this).attr('data-date');
+                    var count = $(this).attr('data-count');
+                    var parts = dateStr.split('-');
+                    var label = parts[2] + '/' + parts[1] + '/' + parts[0];
+                    $tooltip.text(label + ' — ' + count + ' candidature(s)').show();
+                }).on('mousemove', '.line-chart-dot', function(e) {
+                    $tooltip.css({ left: e.clientX + 12, top: e.clientY - 28 });
+                }).on('mouseleave', '.line-chart-dot', function() {
+                    $tooltip.hide();
+                });
+            } else {
+                $('#timelineChartContainer').html('<p style="color:#999;font-style:italic;">Aucune donnée de timeline disponible.</p>');
+            }
+        });
+
+        var hash = window.location.hash.substring(1);
+        $(function() {
+
+            if (hash == "accept_confirm") {
+                $.colorbox({width:"400px", html:$('#accept_confirm').html()});
+            } else if (hash == "refuse_confirm") {
+                $.colorbox({width:"400px", html:$('#refuse_confirm').html()});
+            }
+        });
+
+        // Gestion de la sélection pour l'export
+        $(document).ready(function() {
+            // Mettre à jour le compteur de sélection
+            function updateSelectionCount() {
+                var selectedCount = $('.exportCheck:checked').length;
+                $('#selectedCount').text(selectedCount);
+                $('#exportSelectedBtn').prop('disabled', selectedCount === 0);
+            }
+
+            // Écouter les changements sur les cases à cocher
+            $(document).on('change', '.exportCheck', updateSelectionCount);
+
+            // Bouton "Tout sélectionner"
+            $('#selectAllBtn').click(function() {
+                $('.exportCheck').prop('checked', true);
+                updateSelectionCount();
+            });
+
+            // Bouton "Tout désélectionner"
+            $('#selectNoneBtn').click(function() {
+                $('.exportCheck').prop('checked', false);
+                updateSelectionCount();
+            });
+
+            // Bouton "Sélectionner acceptées"
+            $('#selectAcceptedBtn').click(function() {
+                $('.exportCheck').prop('checked', false);
+                $('.exportCheck[data-status="accepted"]').prop('checked', true);
+                updateSelectionCount();
+            });
+
+            // Bouton "Sélectionner refusées"
+            $('#selectRejectedBtn').click(function() {
+                $('.exportCheck').prop('checked', false);
+                $('.exportCheck[data-status="rejected"]').prop('checked', true);
+                updateSelectionCount();
+            });
+
+            // Export des candidatures sélectionnées
+            $('#exportSelectedBtn').click(function() {
+                var selectedIds = [];
+                $('.exportCheck:checked').each(function() {
+                    selectedIds.push($(this).val());
+                });
+
+                if (selectedIds.length === 0) {
+                    alert('Veuillez sélectionner au moins une candidature à exporter.');
+                    return;
+                }
+
+                // Créer un formulaire pour envoyer les IDs sélectionnés
+                var form = $('<form>', {
+                    'method': 'POST',
+                    'action': '{{ path("space_manager_candidatesexportzip_selected", {"id": space.id}) }}'
+                });
+
+                // Ajouter les IDs sélectionnés comme champs cachés
+                selectedIds.forEach(function(id) {
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': 'selected_applications[]',
+                        'value': id
+                    }));
+                });
+
+                // Ajouter le token CSRF
+                form.append($('<input>', {
+                    'type': 'hidden',
+                    'name': '_token',
+                    'value': '{{ csrf_token("export_selected") }}'
+                }));
+
+                // Soumettre le formulaire
+                $('body').append(form);
+                form.submit();
+                form.remove();
+            });
+
+            // Initialiser le compteur
+            updateSelectionCount();
+        });
+
+    </script>
+{% endblock %}

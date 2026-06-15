@@ -1,0 +1,36 @@
+{% extends "@!SonataAdmin/standard_layout.html.twig" %}
+
+{% block notice %}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type }} alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                {{ message|trans({}, 'SonataAdminBundle') }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/trumbowyg.min.css') }}" media="all" />
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent () }}
+    <script type="text/javascript" src="{{ asset('bundles/app/js/trumbowyg.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/langs/fr.min.js') }}"></script>
+    <script>
+        $.trumbowyg.svgPath = "{{ asset('images/icons-trumbowyg.svg') }}"
+        document.addEventListener('DOMContentLoaded', function () {
+            $('textarea.trumbowyg').trumbowyg({
+                lang: 'fr',
+                resetCss: true,
+                removeformatPasted: true,
+                autogrow: true
+            })
+        })
+    </script>
+
+{% endblock %}

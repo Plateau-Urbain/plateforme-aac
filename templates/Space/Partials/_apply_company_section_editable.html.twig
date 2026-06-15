@@ -1,0 +1,65 @@
+{# Sauvegarde/référence de la version "éditable" de la section Ma structure (apply) #}
+<div class="row">
+    <div class="col-sm-6 form-group{% if not form.projectHolder.companyInfo.company.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.company) }}
+    </div>
+    <div class="col-sm-6 form-group{% if not form.projectHolder.companyInfo.companyStatus.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.companyStatus) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6  form-group{% if not form.projectHolder.companyInfo.companyCreationDate.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.companyCreationDate) }}
+    </div>
+    <div class="col-sm-6  form-group{% if not form.projectHolder.companyInfo.siret.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.siret)}}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 form-group{% if not form.projectHolder.companyInfo.address.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.address)}}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6 form-group{% if not form.projectHolder.companyInfo.zipcode.vars.valid %} has-error{% endif %}">
+        {{ form_label(form.projectHolder.companyInfo.zipcode, null, {'label_attr': {'class': 'required'}}) }}
+        {{ form_widget(form.projectHolder.companyInfo.zipcode, {'attr': {'class': 'form-control', 'pattern': '[0-9]{5}', 'maxlength': '5', 'title': 'Le code postal doit contenir exactement 5 chiffres'}}) }}
+        {{ form_errors(form.projectHolder.companyInfo.zipcode) }}
+    </div>
+    <div class="col-sm-6 form-group{% if not form.projectHolder.companyInfo.city.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.city)}}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6 form-group{% if not form.projectHolder.companyInfo.companyPhone.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.companyPhone)}}
+    </div>
+    <div class="col-sm-6 form-group{% if not form.projectHolder.companyInfo.companyMobile.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.companyMobile) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 form-group{% if not form.projectHolder.companyInfo.companyDescription.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.companyDescription, {'attr': {'placeholder': 'Présentez votre structure (emojis non autorisés)'}}) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6 form-group{% if not form.projectHolder.companyInfo.companyEffective.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.companyEffective)}}
+    </div>
+    <div class="col-sm-6 form-group{% if not form.projectHolder.companyInfo.companyStructures.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.companyStructures)}}
+    </div>
+</div>
+
+<div class="row" >
+    <div class="col-sm-12 form-group{% if not form.projectHolder.companyInfo.companySite.vars.valid %} has-error{% endif %}">
+        {{ form_row(form.projectHolder.companyInfo.companySite)}}
+    </div>
+</div>

@@ -1,0 +1,30 @@
+vich_uploader:
+    db_driver: orm
+    metadata:
+        type: attribute
+
+    mappings:
+        file:
+            uri_prefix: /uploads/space
+            upload_destination: '%kernel.project_dir%/public/uploads/space'
+            delete_on_remove: true
+            delete_on_update: true
+            namer: Vich\UploaderBundle\Naming\OrignameNamer
+        actuality:
+            uri_prefix: /uploads/actuality
+            upload_destination: '%kernel.project_dir%/public/uploads/actuality'
+            delete_on_remove: true
+            delete_on_update: true
+            namer: Vich\UploaderBundle\Naming\OrignameNamer
+        user_documents:
+            uri_prefix: /uploads/user_documents
+            upload_destination: '%kernel.project_dir%/public/uploads/user_documents'
+            delete_on_remove: true
+            delete_on_update: true
+            namer: Vich\UploaderBundle\Naming\OrignameNamer
+        application:
+            uri_prefix: /uploads/application_files
+            upload_destination: '%kernel.project_dir%/public/uploads/application_files'
+            delete_on_remove: true
+            delete_on_update: true
+            namer: Vich\UploaderBundle\Naming\OrignameNamer

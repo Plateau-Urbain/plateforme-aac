@@ -1,0 +1,1614 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="white"> 
+        <div class="container"> 
+   <div class="bkg-img"></div>
+     
+    <div class="row top-profil">
+        <!-- BEGIN MAIN CONTENT -->
+        <div class=" col-sm-12 ">
+
+            <div class="titre-page">
+                <h1>Mon profil candidat</h1>
+            </div>
+           <h6> <a href="{{ path('search_index') }}" class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Tous les appels à candidatures</a></h6>
+            {# <p>Voir les <a href="{{ path('cgu') }}">Conditions générales d'utilisation</a></p> #}
+            
+            {% if next is defined and next %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fa fa-info-circle"></i>
+                    <strong>Information :</strong> Mettez à jour votre profil. Une fois vos modifications enregistrées, vous serez automatiquement redirigé vers votre candidature.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="js-form-space"{% if form.vars.value.useType is not null and not form.vars.value.useType.isActive %} data-use-type-archived="1"{% endif %}>
+    
+        {% for message in  app.flashes('error_msg') %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    
+    
+        {% for message in  app.flashes('success_msg') %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if form.vars.value.useType is not null and not form.vars.value.useType.isActive %}
+            <div class="alert alert-warning" role="alert">
+                <strong>Type de projet :</strong>
+                la valeur enregistrée n’est plus proposée sur la plateforme. Vous devez en sélectionner une nouvelle dans la section « Mes souhaits » (en bas du formulaire), puis enregistrer.
+            </div>
+        {% endif %}
+
+        {% if form.vars.submitted is defined and form.vars.submitted and form.vars.valid is defined and not form.vars.valid and form.useType.vars.errors|length %}
+            <div id="js-profile-usetype-validation-alert" class="alert alert-danger" role="alert">
+                <strong>Enregistrement impossible.</strong>
+                {% for error in form.useType.vars.errors %}
+                    {{ error.message }}
+                {% endfor %}
+                Rendez-vous dans la section « Mes souhaits » pour choisir un type de projet actuellement proposé.
+            </div>
+        {% endif %}
+    
+        <div id="js-profile-incomplete-banner" style="display:none;" role="alert" aria-live="polite"></div>
+
+        {# Si on arrive depuis apply, conserver next aussi dans l'action du form #}
+        {% set formAction = (next is defined and next) ? path('security_profil_role', { 'role': 'candidat', 'next': next, 'return_anchor': (return_anchor is defined ? return_anchor : null) }) : null %}
+        {{ form_start(form, {
+            'action': formAction,
+            'attr': {'class': 'has-crosses', 'novalidate': 'novalidate'}
+        }) }}
+        {# Propager la redirection vers la candidature après mise à jour du profil #}
+        {% if next is defined and next %}
+            <input type="hidden" name="next" value="{{ next }}" />
+            {% if return_anchor is defined and return_anchor %}
+                <input type="hidden" name="return_anchor" value="{{ return_anchor }}" />
+            {% endif %}
+        {% endif %}
+            <div class="row">
+                <div class=" col-xs-1 bkg ">
+                    <ul>
+                        <li>
+                            <a class="indicator active" href="#one"></a>
+                        </li>
+                        <li>
+                            <a class="indicator" href="#two"></a>
+                        </li>
+                        <li>
+                            <a class="indicator" href="#three"></a>
+                        </li>
+                        <li>
+                            <a class="indicator" href="#four"></a>
+                        </li>
+                        <li>
+                            <a class="indicator" href="#five"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="main col-xs-10 ">
+
+                    <div id="one" class="section">
+                        <span class="section-title form-one"></span>
+                        <div class="form-contener">
+                            <h3>Mes informations</h3>
+                            <div class="row">
+                                <div class="col-sm-6 inline-controls form-group civility-group{% if form.userInfo.civility.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.userInfo.civility, null, {'label_attr': {'class': 'required'}}) }}
+                                    {{ form_widget(form.userInfo.civility, { 
+                                        'label_attr': { 'class': 'radio-inline' },
+                                        'attr': {
+                                            'aria-required': 'true',
+                                            'aria-invalid': form.userInfo.civility.vars.errors|length ? 'true' : 'false',
+                                            'aria-describedby': 'civility-error'
+                                        }
+                                    }) }}
+                                    {{ form_errors(form.userInfo.civility, {
+                                        'attr': {
+                                            'id': 'civility-error',
+                                            'role': 'alert',
+                                            'aria-live': 'polite'
+                                        }
+                                    }) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 form-group{% if form.userInfo.firstname.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.userInfo.firstname, null, {'label_attr': {'class': 'required'}}) }}
+                                    {{ form_widget(form.userInfo.firstname, {
+                                        'attr': {
+                                            'required': 'required',
+                                            'aria-required': 'true',
+                                            'aria-invalid': form.userInfo.firstname.vars.errors|length ? 'true' : 'false',
+                                            'aria-describedby': 'firstname-error',
+                                            'data-error-message': 'Veuillez renseigner votre prénom'
+                                        }
+                                    }) }}
+                                    {{ form_errors(form.userInfo.firstname, {
+                                        'attr': {
+                                            'id': 'firstname-error',
+                                            'role': 'alert',
+                                            'aria-live': 'polite'
+                                        }
+                                    }) }}
+                                </div>
+                                <div class="col-sm-6 form-group{% if form.userInfo.lastname.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.userInfo.lastname, null, {'label_attr': {'class': 'required'}}) }}
+                                    {{ form_widget(form.userInfo.lastname, {
+                                        'attr': {
+                                            'required': 'required',
+                                            'aria-required': 'true',
+                                            'aria-invalid': form.userInfo.lastname.vars.errors|length ? 'true' : 'false',
+                                            'aria-describedby': 'lastname-error',
+                                            'data-error-message': 'Veuillez renseigner votre nom'
+                                        }
+                                    }) }}
+                                    {{ form_errors(form.userInfo.lastname, {
+                                        'attr': {
+                                            'id': 'lastname-error',
+                                            'role': 'alert',
+                                            'aria-live': 'polite'
+                                        }
+                                    }) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.userInfo.birthday) }}
+                                </div>
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.userInfo.phone) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    {{ form_row(form.userInfo.email) }}
+                                    <small class="help-block text-muted">
+                                        <i class="fa fa-info-circle"></i> 
+                                        L'adresse email ne peut pas être modifiée après la création du compte. 
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-sm-12 ">
+                                    {{ form_row(form.newsletter) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="two" class="section">
+                        <span class="section-title form-two"></span>
+                        <div class="form-contener">
+                            <h3>Ma structure</h3>
+                            <div class="row">
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.company) }}
+                                </div>
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.companyStatus) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6  form-group">
+                                    {{ form_row(form.companyInfo.companyCreationDate) }}
+                                </div>
+                                <div class="col-sm-6  form-group">
+                                    {{ form_row(form.companyInfo.siret)}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    {{ form_row(form.companyInfo.address)}}
+                                </div>
+                                {# <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.addressSuite) }}
+                                </div> #}
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.zipcode) }}
+                                </div>
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.city)}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.companyPhone)}}
+                                </div>
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.companyMobile) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    {{ form_row(form.companyInfo.companyDescription, {'attr': {'placeholder': 'Présentez votre structure (emojis non autorisés)'}}) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.companyEffective)}}
+                                </div>
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.companyStructures)}}
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-sm-12 form-group{% if not form.companyInfo.companySite.vars.valid %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.companySite) }}
+                                    {{ form_widget(form.companyInfo.companySite) }}
+                                    {{ form_errors(form.companyInfo.companySite) }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <span id="three" class="section"></span>
+                    <span class="section-title form-three"></span>
+                    <div class="form-contener">
+                        <h3>Réseaux sociaux</h3>
+                        <div class="row">
+                            <div class="col-sm-6 form-group{% if form.facebookUrl.vars.errors|length %} has-error{% endif %}">
+                                <div class="input-group social-group">
+                                    <span class="input-group-addon"><i class="fa-brands fa-facebook-f fa-lg"></i></span>
+                                    {{ form_widget(form.facebookUrl) }}
+                                </div>
+                                {{ form_errors(form.facebookUrl) }}
+                            </div>
+                            <div class="col-sm-6 form-group{% if form.twitterUrl.vars.errors|length %} has-error{% endif %}">
+                                <div class="input-group social-group">
+                                    <span class="input-group-addon"><i class="fa-brands fa-twitter fa-lg"></i></span>
+                                    {{ form_widget(form.twitterUrl) }}
+                                </div>
+                                {{ form_errors(form.twitterUrl) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6 form-group{% if form.linkedinUrl.vars.errors|length %} has-error{% endif %}">
+                                <div class="input-group social-group">
+                                    <span class="input-group-addon"><i class="fa-brands fa-linkedin-in fa-lg"></i></span>
+                                    {{ form_widget(form.linkedinUrl) }}
+                                </div>
+                                {{ form_errors(form.linkedinUrl) }}
+                            </div>
+                            <div class="col-sm-6 form-group{% if form.instagramUrl.vars.errors|length %} has-error{% endif %}">
+                                <div class="input-group social-group">
+                                    <span class="input-group-addon"><i class="fa-brands fa-instagram fa-lg"></i></span>
+                                    {{ form_widget(form.instagramUrl) }}
+                                </div>
+                                {{ form_errors(form.instagramUrl) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6 form-group{% if form.youtubeUrl.vars.errors|length %} has-error{% endif %}">
+                                <div class="input-group social-group">
+                                    <span class="input-group-addon"><i class="fa-brands fa-youtube fa-lg"></i></span>
+                                    {{ form_widget(form.youtubeUrl) }}
+                                </div>
+                                {{ form_errors(form.youtubeUrl) }}
+                            </div>
+                            <div class="col-sm-6 form-group{% if form.tiktokUrl.vars.errors|length %} has-error{% endif %}">
+                                <div class="input-group social-group">
+                                    <span class="input-group-addon"><i class="fa-brands fa-tiktok fa-lg"></i></span>
+                                    {{ form_widget(form.tiktokUrl) }}
+                                </div>
+                                {{ form_errors(form.tiktokUrl) }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 form-group{% if form.otherUrl.vars.errors|length %} has-error{% endif %}">
+                                <div class="input-group social-group">
+                                    <span class="input-group-addon"><i class="fa fa-link fa-lg"></i></span>
+                                    {{ form_widget(form.otherUrl) }}
+                                </div>
+                                {{ form_errors(form.otherUrl) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <span id="four" class="section"></span>
+                    <span class="section-title form-four"></span>
+                    <div class="form-contener">
+                        <h3>Mes documents</h3>
+                        <div class="row">
+                            <div class="col-sm-12 required-files">
+                                <div class="col-sm-6">
+                                    <label class="control-label">Mes téléchargements</label>
+
+                                    <dl class="dl-horizontal info-block">
+
+                                        <dd>
+                                        Les documents suivants seront attachés à toutes vos candidatures.
+                                        Les fichiers complémentaires qui peuvent être joints dans toutes vos candidatures doivent être téléchargés à partir de chaque fiche projet.
+                                        </dd>
+                                        <br/>
+                                         <dd>
+                                        Formats autorisés : JPG, GIF, PNG, PDF ou DOC.<br/>
+                                        Chaque fichier ne doit pas excéder 10Mo.
+                                         </dd>
+                                                    
+                                    </dl>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12">
+                                <div class="col-sm-6 required-files">
+                                    <ul class="list-unstyled">
+                                        {% if form.idcard is defined or app.user.hasDocuments('id') %}
+                                        <li class="idcard-file">
+                                            {% if app.user.hasDocuments('id') and form.vars.valid %}
+                                                <i class="fa fa-check fa-lg"></i>
+                                            {% else %}
+                                                <i class="fa fa-times fa-lg"></i>
+                                            {% endif %}
+                                            <label class="required">Pièce d'identité</label>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+
+                                    <div class="files">
+                                        {% if form.idcard is not defined %}
+                                            <div class="idcard-file file-infos clearfix">
+                                                <div class="clearfix actions overflow">
+                                                    {% set file =  app.user.getDocumentsType('id')[0] %}
+                                                    <div style="display:inline-block; width:80%">{{ file.originalname }}</div>
+                                                    <div style="display:inline-block" class="pull-right">
+                                                        <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
+                                                        <a href="#" class="js-profile-remove-doc btn btn-link" style="padding:0;border:none;background:none;" data-url="{{ path('profile_removedocument', { 'id': file.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ file.id) }}" data-anchor="four"{% if next is defined and next %} data-service="{{ next }}"{% endif %} data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% elseif form.idcard is defined %}
+                                            <div class="idcard-file file-infos clearfix{% if not form.idcard.vars.valid %} has-error{% endif %}">
+                                                <div class=" actions overflow ">
+                                                    <label class="btn btn-accepted">
+                                                        {{ form_widget(form.idcard, {
+                                                            'attr': {
+                                                                'required': 'required',
+                                                                'aria-required': 'true',
+                                                                'aria-invalid': form.idcard.vars.errors|length ? 'true' : 'false',
+                                                                'aria-describedby': 'idcard-error'
+                                                            }
+                                                        }) }}
+                                                    </label>
+                                                </div>
+                                                {{ form_errors(form.idcard, {
+                                                    'attr': {
+                                                        'id': 'idcard-error',
+                                                        'role': 'alert',
+                                                        'aria-live': 'polite'
+                                                    }
+                                                }) }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 required-files">
+                                        <ul class="list-unstyled">
+                                        {% if form.kbis is defined or app.user.hasDocuments('kbis') %}
+                                        <li class="kbis-file">
+                                            {% if app.user.hasDocuments('kbis') and form.vars.valid %}
+                                                <i class="fa fa-check fa-lg"></i>
+                                            {% else %}
+                                                <i class="fa fa-times fa-lg"></i>
+                                            {% endif %}
+                                            <label class="required">justificatif d'activité</label>
+                                        </li>
+                                        {% endif %}
+                                        </ul>
+                                        {% if form.kbis is not defined %}
+                                            <div class="kbis-file file-infos clearfix">
+                                                <div class="clearfix actions overflow">
+                                                    {% set file =  app.user.getDocumentsType('kbis')[0] %}
+                                                    <div style="display:inline-block; width:80%">{{ file.originalname }}</div>
+                                                    <div style="display:inline-block" class="pull-right">
+                                                        <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
+                                                        <a href="#" class="js-profile-remove-doc btn btn-link" style="padding:0;border:none;background:none;" data-url="{{ path('profile_removedocument', { 'id': file.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ file.id) }}" data-anchor="four"{% if next is defined and next %} data-service="{{ next }}"{% endif %} data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% elseif form.kbis is defined %}
+                                            <div class="kbis-file file-infos clearfix{% if not form.kbis.vars.valid %} has-error{% endif %}">
+                                                <div class="actions overflow">
+                                                    <label class="btn btn-accepted">
+                                                        {{ form_widget(form.kbis, {
+                                                            'attr': {
+                                                                'required': 'required',
+                                                                'aria-required': 'true',
+                                                                'aria-invalid': form.kbis.vars.errors|length ? 'true' : 'false',
+                                                                'aria-describedby': 'kbis-error'
+                                                            }
+                                                        }) }}
+                                                    </label>
+                                                </div>
+                                                {{ form_errors(form.kbis, {
+                                                    'attr': {
+                                                        'id': 'kbis-error',
+                                                        'role': 'alert',
+                                                        'aria-live': 'polite'
+                                                    }
+                                                }) }}
+                                            </div>
+                                        {% endif %}
+
+
+                                        {% for doc in form.vars.data.getDocumentsType('') %}
+                                            <div class="file-infos">
+                                                <span>{{doc.fileName | slice(14, 100)}}</span>
+                                                <div class="pull-right actions ">
+                                                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="btn btn-show"><i class="fa fa-eye"></i></a>
+                                                    <a href="#" class="js-profile-remove-doc btn btn-delete" data-url="{{ path('profile_removedocument', { 'id': doc.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ doc.id) }}" data-anchor="four"{% if next is defined and next %} data-service="{{ next }}"{% endif %} data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+            
+                    <div id="five" class="section">
+                        <span class="section-title form-five"></span>
+                        <div class="form-contener">
+                            <h3>Mes souhaits</h3>
+                            <p class="info-block text-muted" style="margin:-20px 0 30px 0;">
+                                Ces informations sont utilisées à titre informatif et ne sont pas toutes reprises automatiquement dans votre candidature.
+                            </p>
+                            <div class="row" >
+                                <div class="col-sm-4 form-group{% if form.useType.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.useType, null, {'label_attr': {'class': 'required'}}) }}
+                                    {{ form_widget(form.useType) }}
+                                    {{ form_errors(form.useType, {
+                                        'attr': {
+                                            'id': 'useType-error',
+                                            'role': 'alert',
+                                            'aria-live': 'polite'
+                                        }
+                                    }) }}
+                                </div>
+                                <div class="col-sm-4 form-group">
+                                    {{ form_row(form.wishedSize)}}
+                                </div>
+                                <div class="col-sm-4 form-group">
+                                    {{ form_row(form.monthlyBudgetMax) }}
+                                </div>
+                            </div>
+                            <div class="row" >
+                                <div class="col-sm-12 form-group">
+                                    {{ form_row(form.preferredDepartments, {'attr': {'data-placeholder': 'Selectionnez un ou plusieurs departements'}}) }}
+                                    <div class="pu-dept-combobox" id="pu-dept-combobox">
+                                        <div class="pu-dept-inputwrap">
+                                            <input
+                                                type="text"
+                                                id="preferred-departments-combobox-input"
+                                                class="form-control"
+                                                placeholder="Tapez un code (75) ou un nom (Paris)… (sélection multiple possible)"
+                                                autocomplete="off"
+                                            />
+                                            <div id="preferred-departments-combobox-results" class="pu-dept-results" role="listbox" aria-label="Résultats départements"></div>
+                                        </div>
+                                        <div id="preferred-departments-combobox-tags" class="pu-dept-tags" aria-live="polite"></div>
+                                    </div>
+                                    <p class="info-block text-muted pu-dept-help">
+                                        Astuce : tapez le deux premiers chiffres du code postal du département recherché. Vous pouvez ajouter plusieurs départements.
+                                        Retirez un département en cliquant sur la croix du tag.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row" >
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.usageDate)}}
+                                </div>
+                                <div class="col-sm-6 form-group {% if form.usageDuration.vars.errors|length %}has-error{% endif %}">
+                                    {{ form_label(form.usageDuration)}}<br />
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            {{ form_widget(form.usageDuration) }}
+                                        </div>
+                                        <div class="col-sm-7">
+                                            {{ form_widget(form.lengthTypeOccupation) }}
+                                        </div>
+                                    </div>
+                                    {{ form_errors(form.usageDuration) }}
+                                </div>
+                                
+                            </div>
+                                <div class="row form-group">
+                                     <div class="col-sm-12 form-group">
+                                     {{ form_row(form.projectDescription, {'attr': {'placeholder': 'Présentez votre projet (emojis non autorisés)'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="save">
+                <input type="submit" value="Enregistrer" class="btn btn-line-s">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="main col-sm-8 col-sm-offset-2">
+            <center>
+                <p>
+                    Vous souhaitez vous désinscrire ? Merci d’adresser votre demande à <a class="mailto" href="mailto:contact@plateau-urbain.com">contact@plateau-urbain.com</a>
+                </p>
+            </center>
+        </div>
+    </div>
+
+
+    {# Rendre uniquement les champs cachés restants (ex: _token), pas les champs visibles oubliés #}
+    {% for child in form %}
+        {% if not child.rendered and child.vars.name starts with('_') %}
+            {{ form_row(child) }}
+        {% endif %}
+    {% endfor %}
+    {{ form_end(form, {'render_rest': false}) }}
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Compacte uniquement le multi-select des zones géographiques du profil */
+        #project_owner_preferredDepartments_chzn .chzn-choices {
+            padding-bottom: 0;
+            margin-bottom: 8px;
+            min-height: 40px;
+        }
+        /* UX: ne pas permettre la suppression individuelle */
+        #project_owner_preferredDepartments_chzn .search-choice-close {
+            display: none !important;
+            pointer-events: none;
+        }
+        /* On cache l'interface chosen et on affiche notre combobox */
+        #project_owner_preferredDepartments_chzn {
+            display: none !important;
+        }
+
+        .pu-dept-combobox {
+            margin-top: 8px;
+        }
+        .pu-dept-inputwrap {
+            position: relative;
+        }
+        .pu-dept-results {
+            position: absolute;
+            z-index: 9999;
+            left: 0;
+            right: 0;
+            top: 100%;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-top: none;
+            max-height: 240px;
+            overflow: auto;
+            display: none;
+        }
+        .pu-dept-result {
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #333;
+        }
+        .pu-dept-result:hover {
+            background: #f5f5f5;
+        }
+        .pu-dept-tags {
+            margin-top: 10px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .pu-dept-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border: 1px solid #e3e3e3;
+            background: rgba(255,255,255,1);
+            border-radius: 999px;
+            color: #000;
+            font-size: 15px;
+        }
+        .pu-dept-tag-remove {
+            margin-left: 10px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            padding: 0;
+            color: #74777c;
+            font-size: 14px;
+            line-height: 1;
+        }
+        .pu-dept-help {
+            margin-top: 8px;
+            font-size: 15px;
+        }
+        .pu-dept-tag-remove:hover {
+            transform: scale(1.15);
+        }
+        /* Avertissement champ nouveau / modifié (charte Plateau Urbain) */
+        .has-warning-new .help-block-new {
+            display: block;
+            color: #000;
+            background-color: #F1E9E2;
+            border: 1px solid #E6C68D;
+            border-radius: 4px;
+            padding: 6px 12px;
+            margin-top: 6px;
+            font-size: 0.88em;
+        }
+        .has-warning-new .form-control,
+        .has-warning-new input[type="date"] {
+            border-color: #C89641 !important;
+        }
+    </style>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        // Défilement automatique seulement s'il y a des erreurs de validation visibles
+        // Ignorer les messages informatifs (text-muted) et ne garder que les erreurs réelles
+        if (document.querySelector('.form-group.has-error .help-block:not(.text-muted), .file-infos.has-error .help-block, #js-profile-usetype-validation-alert')) {
+            setTimeout(function() {
+                const topAlert = document.querySelector('#js-profile-usetype-validation-alert');
+                if (topAlert) {
+                    topAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+                const firstError = document.querySelector('.form-group.has-error .help-block:not(.text-muted), .file-infos.has-error .help-block');
+                if (firstError) {
+                    const scrollTarget = firstError.closest('.form-group') || firstError.closest('.file-infos');
+                    if (scrollTarget) scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 500);
+        }
+        
+        $(document).ready(function() {
+            // Avertissements au chargement pour les champs nouveaux ou modifiés.
+            // Utilise un style ambre (non bloquant) distinct des erreurs rouges.
+            // Uniquement pour les utilisateurs existants (firstName déjà renseigné).
+            const $firstNameField = $('input[name*="firstname"], input[name*="firstName"]');
+            const isExistingUser = $firstNameField.length && $firstNameField.val().trim() !== '';
+
+            // Définition des champs à surveiller avec leur ancre de section
+            const newFieldWarnings = [
+                {
+                    id:       'warn-birthday',
+                    selector: 'input[name*="birthday"]',
+                    label:    'Date de naissance',
+                    message:  '📅 Ce champ a évolué : veuillez vérifier et confirmer votre date de naissance.',
+                    anchor:   '#one'
+                },
+                {
+                    id:       'warn-companyCreationDate',
+                    selector: 'input[name*="companyCreationDate"]',
+                    label:    'Date de création de la structure',
+                    message:  '📅 Ce champ a évolué : veuillez vérifier et confirmer la date de création de votre structure.',
+                    anchor:   '#two'
+                },
+                {
+                    id:       'warn-monthlyBudgetMax',
+                    selector: 'input[name*="monthlyBudgetMax"]',
+                    label:    'Budget mensuel maximum',
+                    message:  '🆕 Nouveau champ obligatoire : veuillez renseigner votre budget mensuel maximum.',
+                    anchor:   '#five'
+                },
+                {
+                    id:       'warn-preferredDepartments',
+                    selector: null, // traité séparément via $prefDeptLoad
+                    label:    'Zone géographique souhaitée',
+                    message:  '🆕 Nouveau champ obligatoire : veuillez sélectionner au moins un département.',
+                    anchor:   '#five'
+                },
+                {
+                    id:       'warn-useType',
+                    selector: null, // traité séparément via $useTypeField
+                    label:    'Type de projet',
+                    message:  '🆕 Nouveau champ obligatoire : veuillez sélectionner un type de projet.',
+                    anchor:   '#five'
+                },
+                {
+                    id:       'warn-useType-archived',
+                    selector: null,
+                    label:    'Type de projet (archivé)',
+                    message:  'Le type enregistré n\'est plus proposé : choisissez-en un autre dans la liste.',
+                    anchor:   '#five'
+                }
+            ];
+
+            // Bandeau récapitulatif en haut de page
+            const $banner = $('#js-profile-incomplete-banner');
+
+            function buildBanner(missingIds) {
+                if (!missingIds.length) {
+                    $banner.hide().empty();
+                    return;
+                }
+                const items = missingIds.map(function(id) {
+                    const cfg = newFieldWarnings.find(function(w) { return w.id === id; });
+                    if (!cfg) return '';
+                    return '<li><a href="' + cfg.anchor + '" class="js-banner-scroll-link" data-anchor="' + cfg.anchor + '" data-field-id="' + cfg.id + '" style="color:#bc1b38;font-weight:600;">' + cfg.label + '</a></li>';
+                }).join('');
+                $banner.html(
+                    '<div style="background:#F1E9E2;border:1px solid #E6C68D;border-radius:0;padding:14px 18px;margin-bottom:16px;">' +
+                    '<strong style="color:#000;">⚠ Votre profil est à compléter — champs manquants ou à vérifier :</strong>' +
+                    '<ul style="margin:8px 0 0 0;padding-left:20px;color:#000;">' + items + '</ul>' +
+                    '</div>'
+                ).show();
+            }
+
+            // Calcul initial des champs manquants
+            function getMissingIds() {
+                const missing = [];
+                newFieldWarnings.forEach(function(cfg) {
+                    if (!cfg.selector) return; // preferredDepartments traité en dehors
+                    const $field = $(cfg.selector);
+                    if (!$field.length) return;
+                    const val = $field.val();
+                    if (!val || val.trim() === '') missing.push(cfg.id);
+                });
+                // preferredDepartments
+                const $pd = $('#project_owner_preferredDepartments');
+                if ($pd.length) {
+                    const v = $pd.val();
+                    const empty = !v || (Array.isArray(v) ? v.length === 0 : String(v).trim() === '');
+                    if (empty) missing.push('warn-preferredDepartments');
+                }
+                // useType vide
+                const $ut = $('#project_owner_useType');
+                if ($ut.length) {
+                    const utVal = $ut.val();
+                    const utEmpty = !utVal || String(utVal).trim() === '';
+                    if (utEmpty) missing.push('warn-useType');
+                }
+                if ($('#js-form-space').attr('data-use-type-archived') === '1') {
+                    missing.push('warn-useType-archived');
+                }
+                return missing;
+            }
+
+            function removeMissingId(id) {
+                const items = $banner.find('li');
+                items.each(function() {
+                    if ($(this).find('a').data('field-id') === id) $(this).remove();
+                });
+                if ($banner.find('li').length === 0) $banner.hide().empty();
+            }
+
+            if (isExistingUser || $('#js-form-space').attr('data-use-type-archived') === '1' || !$('#project_owner_useType').val()) {
+                buildBanner(getMissingIds());
+            }
+
+            // Clic sur un lien du bandeau → scroll vers la section puis vers le champ
+            $(document).on('click', '.js-banner-scroll-link', function(e) {
+                e.preventDefault();
+                const anchor = $(this).data('anchor');
+                const $section = $(anchor);
+                if ($section.length) {
+                    $section[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+
+            // Avertissements individuels sur chaque champ + mise à jour du bandeau
+            newFieldWarnings.forEach(function(cfg) {
+                if (!isExistingUser || !cfg.selector) return;
+                const $field = $(cfg.selector);
+                if (!$field.length) return;
+                const val = $field.val();
+                const isEmpty = !val || val.trim() === '';
+                if (!isEmpty) return; // déjà renseigné
+
+                const formGroup = $field.closest('.form-group');
+                if (!formGroup.find('.help-block-new').length) {
+                    formGroup.addClass('has-warning-new');
+                    formGroup.append('<span class="help-block-new" role="note">' + cfg.message + '</span>');
+                }
+
+                $field.one('change blur', function() {
+                    if ($(this).val().trim() !== '') {
+                        formGroup.removeClass('has-warning-new');
+                        formGroup.find('.help-block-new').remove();
+                        removeMissingId(cfg.id);
+                    }
+                });
+            });
+
+            // preferredDepartments : avertissement individuel + bandeau
+            const $prefDeptLoad = $('#project_owner_preferredDepartments');
+            if ($prefDeptLoad.length && isExistingUser) {
+                const deptVal = $prefDeptLoad.val();
+                const deptEmpty = !deptVal || (Array.isArray(deptVal) ? deptVal.length === 0 : String(deptVal).trim() === '');
+                if (deptEmpty) {
+                    const deptGroup = $('#pu-dept-combobox').closest('.form-group');
+                    if (!deptGroup.find('.help-block-new').length) {
+                        deptGroup.addClass('has-warning-new');
+                        $('#pu-dept-combobox').after('<span class="help-block-new" role="note">🆕 Nouveau champ obligatoire : veuillez sélectionner au moins un département.</span>');
+                        $prefDeptLoad.one('change', function() {
+                            const v = $(this).val();
+                            if (v && (Array.isArray(v) ? v.length > 0 : v.trim() !== '')) {
+                                deptGroup.removeClass('has-warning-new');
+                                deptGroup.find('.help-block-new').remove();
+                                removeMissingId('warn-preferredDepartments');
+                            }
+                        });
+                    }
+                }
+            }
+
+            // Type de projet vide : avertissement individuel + bandeau
+            const $useTypeField = $('#project_owner_useType');
+            if ($useTypeField.length && isExistingUser) {
+                const utVal = $useTypeField.val();
+                const utEmpty = !utVal || String(utVal).trim() === '';
+                if (utEmpty) {
+                    const utGroup = $useTypeField.closest('.form-group');
+                    if (!utGroup.find('.help-block-new').length) {
+                        utGroup.addClass('has-warning-new');
+                        const $utChosen = $useTypeField.next('.chzn-container');
+                        ($utChosen.length ? $utChosen : $useTypeField).after('<span class="help-block-new" role="note">🆕 Nouveau champ obligatoire : veuillez sélectionner un type de projet.</span>');
+                    }
+                    $useTypeField.one('change', function() {
+                        const v = $(this).val();
+                        if (v && String(v).trim() !== '') {
+                            utGroup.removeClass('has-warning-new');
+                            utGroup.find('.help-block-new').remove();
+                            removeMissingId('warn-useType');
+                            buildBanner(getMissingIds());
+                        }
+                    });
+                }
+            }
+
+            // Type de projet archivé : message sous le select + retrait du bandeau après changement
+            if ($useTypeField.length && $('#js-form-space').attr('data-use-type-archived') === '1') {
+                const utGroup = $useTypeField.closest('.form-group');
+                if (!utGroup.find('.help-block-new').length) {
+                    utGroup.addClass('has-warning-new');
+                    const $utChosen2 = $useTypeField.next('.chzn-container');
+                    ($utChosen2.length ? $utChosen2 : $useTypeField).after('<span class="help-block-new" role="note">Ce type de projet n\'est plus proposé : sélectionnez une autre ligne dans la liste (sans la mention « archivé »), puis enregistrez.</span>');
+                }
+                $useTypeField.on('change', function() {
+                    utGroup.removeClass('has-warning-new');
+                    utGroup.find('.help-block-new').remove();
+                    removeMissingId('warn-useType-archived');
+                    removeMissingId('warn-useType');
+                    $('#js-form-space').attr('data-use-type-archived', '0');
+                    buildBanner(getMissingIds());
+                });
+            }
+
+            // Le select useType est stylé/masqué par chosen:
+            // on retire le required natif HTML5 pour éviter l'erreur focus navigateur.
+            $('#project_owner_useType').prop('required', false).removeAttr('required');
+
+            // Champ departements (multi-select ergonomique avec suppression par croix)
+            const $preferredDepartments = $('#project_owner_preferredDepartments');
+            if ($preferredDepartments.length && $.fn.chosen) {
+                // Le champ natif est masqué par le combobox custom:
+                // on retire le "required" HTML pour éviter l'erreur navigateur
+                // "ne peut recevoir le focus". La contrainte serveur reste active.
+                $preferredDepartments.prop('required', false).removeAttr('required');
+
+                if ($preferredDepartments.hasClass('chzn-done')) {
+                    $preferredDepartments.trigger('chosen:updated');
+                } else {
+                    $preferredDepartments.chosen({
+                        width: '100%',
+                        no_results_text: 'Aucun departement trouve pour : ',
+                        placeholder_text_multiple: 'Selectionnez un ou plusieurs departements'
+                    });
+                }
+            }
+
+            // Combobox / Autocomplete départements (code 75 ou nom Paris)
+            if ($preferredDepartments.length) {
+                const $deptInput = $('#preferred-departments-combobox-input');
+                const $deptResults = $('#preferred-departments-combobox-results');
+                const $deptTags = $('#preferred-departments-combobox-tags');
+
+                const allDepts = $preferredDepartments.find('option').map(function() {
+                    return {
+                        value: String($(this).val()),
+                        text: String($(this).text()).trim()
+                    };
+                }).get();
+
+                function escapeHtml(str) {
+                    return $('<div>').text(str).html();
+                }
+
+                function getSelectedValues() {
+                    const v = $preferredDepartments.val();
+                    if (!v) return [];
+                    return Array.isArray(v) ? v.map(String) : [String(v)];
+                }
+
+                // Etat interne (source de vérité), pour éviter les états transitoires de chosen
+                let selectedCodes = getSelectedValues();
+
+                function syncSelectedToSelect() {
+                    const selectedSet = new Set(selectedCodes.map(String));
+                    $preferredDepartments.find('option').each(function() {
+                        const optValue = String($(this).val());
+                        $(this).prop('selected', selectedSet.has(optValue));
+                    });
+                    $preferredDepartments.trigger('change');
+                    if ($preferredDepartments.hasClass('chzn-done')) {
+                        $preferredDepartments.trigger('chosen:updated');
+                    }
+                }
+
+                function renderTags() {
+                    const selected = selectedCodes;
+                    $deptTags.empty();
+
+                    selected.forEach(function(code) {
+                        const found = allDepts.find(d => d.value === code);
+                        const label = found ? found.text : code;
+                        $deptTags.append(
+                            '<span class="pu-dept-tag" data-value="' + escapeHtml(String(code)) + '">' +
+                                escapeHtml(label) +
+                                '<button type="button" class="pu-dept-tag-remove" aria-label="Retirer">×</button>' +
+                            '</span>'
+                        );
+                    });
+                }
+
+                function hideResults() {
+                    // Rendre le comportement déterministe (stoppe eventuellement des animations/callbacks)
+                    $deptResults.stop(true, true).hide();
+                    $deptResults.empty();
+                }
+
+                function showResults(depts, query) {
+                    $deptResults.empty();
+                    if (!depts.length) {
+                        $deptResults.append('<div class="pu-dept-result" style="cursor:default;color:#888;">Aucun résultat pour "' + escapeHtml(query) + '"</div>');
+                        $deptResults.show();
+                        return;
+                    }
+
+                    depts.forEach(function(d) {
+                        const selectedNow = selectedCodes.map(String).includes(String(d.value));
+                        const label = d.text;
+                        $deptResults.append(
+                            '<div class="pu-dept-result" role="option" data-value="' + escapeHtml(String(d.value)) + '"' + (selectedNow ? ' style="opacity:0.6;"' : '') + '>' +
+                            escapeHtml(label) +
+                            '</div>'
+                        );
+                    });
+                    $deptResults.show();
+                }
+
+                // Mettre à jour les tags quand la valeur change (ex: Tout effacer)
+                $preferredDepartments.on('change', function() {
+                    // On resynchronise l'état interne si besoin (ex: restauration session)
+                    selectedCodes = getSelectedValues();
+                    renderTags();
+
+                    // Validation en temps réel
+                    const deptOuterGroup = $('#pu-dept-combobox').closest('.form-group');
+                    $('#pu-dept-combobox').nextAll('.js-help-block').remove();
+                    const val = $preferredDepartments.val();
+                    const isEmpty = !val || (Array.isArray(val) ? val.length === 0 : String(val).trim() === '');
+                    if (isEmpty) {
+                        deptOuterGroup.addClass('has-error');
+                        $('#pu-dept-combobox').after('<span class="help-block js-help-block" role="alert" aria-live="polite">Veuillez sélectionner au moins un département.</span>');
+                    } else {
+                        deptOuterGroup.removeClass('has-error');
+                        $preferredDepartments.closest('.form-group').removeClass('has-error');
+                    }
+                });
+
+                // Validation au blur de l'input (l'utilisateur quitte le champ sans rien sélectionner)
+                $deptInput.on('blur', function() {
+                    const deptOuterGroup = $('#pu-dept-combobox').closest('.form-group');
+                    const val = $preferredDepartments.val();
+                    const isEmpty = !val || (Array.isArray(val) ? val.length === 0 : String(val).trim() === '');
+                    if (isEmpty) {
+                        $('#pu-dept-combobox').nextAll('.js-help-block').remove();
+                        deptOuterGroup.addClass('has-error');
+                        $('#pu-dept-combobox').after('<span class="help-block js-help-block" role="alert" aria-live="polite">Veuillez sélectionner au moins un département.</span>');
+                    }
+                });
+
+                // Filtrage temps réel
+                $deptInput.on('input', function() {
+                    const q = String($(this).val() || '').trim();
+                    const qLower = q.toLowerCase();
+                    if (!qLower) {
+                        hideResults();
+                        return;
+                    }
+
+                    const matches = allDepts
+                        .filter(d => d.value.toLowerCase().includes(qLower) || d.text.toLowerCase().includes(qLower))
+                        .slice(0, 12);
+
+                    showResults(matches, q);
+                });
+
+                // Sélection: on ajoute sans permettre la suppression individuelle
+                $(document).on('click', '#preferred-departments-combobox-results .pu-dept-result', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // On cache immédiatement les résultats
+                    hideResults();
+
+                    const value = String($(this).data('value') || '');
+                    if (!value) return;
+
+                    if (!selectedCodes.map(String).includes(value)) {
+                        selectedCodes.push(value);
+                    }
+                    syncSelectedToSelect();
+                    renderTags();
+                    // Après ajout, on vide la saisie pour éviter un rendu "bizarre" et
+                    // permettre d'enchaîner avec une nouvelle recherche.
+                    $deptInput.val('');
+                    hideResults();
+                    $deptInput.focus();
+                    return false;
+                });
+
+                // Suppression individuelle via la croix sur le tag
+                $(document).on('click', '#preferred-departments-combobox-tags .pu-dept-tag-remove', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const $tag = $(this).closest('.pu-dept-tag');
+                    const code = String($tag.data('value') || '');
+                    if (!code) return false;
+
+                    selectedCodes = selectedCodes.map(String).filter(v => v !== String(code));
+                    syncSelectedToSelect();
+                    renderTags();
+                    // On referme la liste si elle est ouverte
+                    hideResults();
+                    $deptInput.focus();
+                    return false;
+                });
+
+                // Fermer la liste si clic hors du champ
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('#pu-dept-combobox').length) {
+                        hideResults();
+                    }
+                });
+
+                renderTags();
+            }
+
+            // Suppression de document via POST (évite les formulaires imbriqués qui cassent le formulaire principal)
+            $(document).on('click', '.js-profile-remove-doc', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var $link = $(this);
+                if (!confirm($link.data('confirm'))) return false;
+                var $form = $('<form>').attr({ method: 'POST', action: $link.data('url') });
+                $form.append($('<input>').attr({ type: 'hidden', name: 'token', value: $link.data('token') }));
+                $form.append($('<input>').attr({ type: 'hidden', name: 'anchor', value: $link.data('anchor') }));
+                $('body').append($form);
+                $form.submit();
+                return false;
+            });
+
+            // Restaurer les données du formulaire si elles existent
+            const savedFormData = sessionStorage.getItem('profileFormData');
+            if (savedFormData) {
+                const formData = JSON.parse(savedFormData);
+                
+                // Restaurer chaque champ
+                Object.keys(formData).forEach(function(fieldName) {
+                    const $field = $('[name="' + fieldName + '"]');
+                    if ($field.length > 0) {
+                        const value = formData[fieldName];
+                        const type = $field.attr('type');
+                        
+                        if (type === 'checkbox' || type === 'radio') {
+                            $field.prop('checked', value);
+                        } else {
+                            $field.val(value);
+                        }
+                    }
+                });
+                
+                // Supprimer les données sauvegardées
+                sessionStorage.removeItem('profileFormData');
+            }
+            // Gestion de la navigation par anchor
+            function handleAnchorNavigation() {
+                const hash = window.location.hash;
+                if (hash) {
+                    // Retirer le # du hash
+                    const sectionId = hash.substring(1);
+                    
+                    // Vérifier s'il y a des messages de succès (après soumission du formulaire)
+                    const hasSuccessMessage = $('.alert-success').length > 0;
+                    
+                    // Si c'est après une soumission réussie, faire défiler vers le message de succès
+                    if (hasSuccessMessage) {
+                        // Faire défiler vers le message de succès en haut de page
+                        setTimeout(function() {
+                            $('html, body').animate({
+                                scrollTop: 0
+                            }, 500);
+                        }, 100);
+                        
+                        // Nettoyer l'URL pour éviter la confusion
+                        if (history.replaceState) {
+                            history.replaceState(null, null, window.location.pathname);
+                        }
+                        return;
+                    }
+                    
+                    // Trouver l'indicateur correspondant et l'activer
+                    const $indicator = $('a.indicator[href="#' + sectionId + '"]');
+                    if ($indicator.length > 0) {
+                        // Désactiver tous les indicateurs
+                        $('a.indicator').removeClass('active');
+                        // Activer l'indicateur correspondant
+                        $indicator.addClass('active');
+                        
+                        // Faire défiler vers la section
+                        setTimeout(function() {
+                            $('#' + sectionId)[0].scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                    }
+                }
+            }
+            
+            // Appeler la fonction au chargement
+            handleAnchorNavigation();
+            
+            // Fonction de validation des champs
+            function handleFieldValidation(field) {
+                const $field = $(field);
+                const formGroup = $field.closest('.form-group, .social-group, .civility-group');
+                const value = $field.val();
+                const isRequired = $field.prop('required') || $field.closest('.required').length > 0 || $field.attr('id') === 'project_owner_useType';
+                const isValueEmpty = (val) => {
+                    if (val === null || val === undefined) return true;
+                    if (Array.isArray(val)) return val.length === 0;
+                    if (typeof val === 'string') return val.trim() === '';
+                    // fallback: convertir en string
+                    return String(val).trim() === '';
+                };
+                
+                // Supprimer les anciens messages d'erreur
+                formGroup.find('.js-help-block').remove();
+                
+                if (isRequired && isValueEmpty(value)) {
+                    // Champ requis mais vide - afficher l'erreur
+                    let errorMessage = 'Ce champ est requis';
+                    if ($field.attr('id') === 'project_owner_useType') {
+                        errorMessage = 'Veuillez sélectionner un type d\'usage';
+                    }
+                    formGroup.removeClass('has-error').addClass('has-error');
+                    formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">' + errorMessage + '</span>');
+                } else if (isRequired && !isValueEmpty(value)) {
+                    // Champ requis et rempli - pas d'erreur, pas de vert
+                    formGroup.removeClass('has-error');
+                } else if (!isRequired) {
+                    // Pour les champs non requis, pas de validation visuelle
+                    formGroup.removeClass('has-error');
+                }
+            }
+            
+            // Validation en temps réel sur blur et change (sauf radio buttons et file inputs)
+            $('input, select, textarea').not('input[type="radio"]').not('input[type="file"]').on('blur change', function() {
+                const $field = $(this);
+
+                // Champs numériques (type="number") avec valeur invalide (ex: "vv") :
+                // validity.badInput = true, .val() = "" → le handler spécifique gère,
+                // on laisse passer pour éviter le faux "Ce champ est requis".
+                if (this.validity && this.validity.badInput) {
+                    return;
+                }
+                
+                // Validation spéciale pour les champs texte avec emojis
+                if ($field.is('textarea') && /description/i.test($field.attr('name') || '')) {
+                    const formGroup = $field.closest('.form-group');
+                    const value = $field.val();
+                    const isRequired = $field.prop('required') || $field.closest('.required').length > 0;
+                    
+                    // Supprimer les anciens messages d'erreur
+                    formGroup.find('.js-help-block').remove();
+                    formGroup.removeClass('has-error');
+                    
+                    if (!value || value.trim() === '') {
+                        // Champ vide
+                        if (isRequired) {
+                            formGroup.append('<span class="help-block js-help-block" role="alert">Ce champ est requis</span>');
+                            formGroup.addClass('has-error');
+                            $field.attr('aria-invalid', 'true');
+                        } else {
+                            $field.attr('aria-invalid', 'false');
+                        }
+                    } else {
+                        // Champ rempli - vérifier les emojis
+                        const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u;
+                        const hasEmojis = emojiRegex.test(value);
+                        
+                        if (hasEmojis) {
+                            formGroup.append('<span class="help-block js-help-block" role="alert">Le texte ne doit pas contenir d\'emojis</span>');
+                            formGroup.addClass('has-error');
+                            $field.attr('aria-invalid', 'true');
+                        } else {
+                            // Texte valide
+                            $field.attr('aria-invalid', 'false');
+                        }
+                    }
+                } else {
+                    // Validation standard pour les autres champs
+                    handleFieldValidation(this);
+                }
+            });
+            
+            // Validation spéciale pour les champs téléphone
+            $('input[type="tel"]').on('blur change', function() {
+                const $field = $(this);
+                const formGroup = $field.closest('.form-group');
+                const value = $field.val().trim();
+                
+                // Supprimer les anciens messages d'erreur
+                formGroup.find('.js-help-block').remove();
+                
+                if (value !== '') {
+                    // Regex pour validation téléphone français et international
+                    const phoneRegex = /^(\+33\s?[1-9](\s?\d{2}){4}|0[1-9](\s?\d{2}){4})$/;
+                    
+                    if (!phoneRegex.test(value)) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du téléphone n\'est pas valide. Utilisez le format français (01 23 45 67 89) ou international (+33 1 23 45 67 89).</span>');
+                    } else {
+                        formGroup.removeClass('has-error');
+                    }
+                } else {
+                    // Vérifier si c'est le téléphone personnel (obligatoire)
+                    if ($field.attr('name') && $field.attr('name').includes('phone') && !$field.attr('name').includes('company')) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le téléphone est obligatoire.</span>');
+                    } else {
+                        formGroup.removeClass('has-error');
+                    }
+                }
+            });
+            
+            // Validation spéciale pour le champ SIRET
+            $('input[name*="siret"]').on('blur change', function() {
+                const $field = $(this);
+                const formGroup = $field.closest('.form-group');
+                const value = $field.val().trim();
+                
+                // Supprimer les anciens messages d'erreur
+                formGroup.find('.js-help-block').remove();
+                
+                if (value !== '') {
+                    // Vérifier le format SIRET avec ou sans espaces
+                    if (!/^(\d{3}\s?){4}\d{2}$/.test(value)) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le SIRET doit contenir exactement 14 chiffres. Format accepté : 123 456 789 01234</span>');
+                    } else {
+                        formGroup.removeClass('has-error');
+                    }
+                } else {
+                    formGroup.removeClass('has-error');
+                }
+            });
+            
+            // Validation spéciale pour le champ code postal
+            $('input[name*="zipcode"]').on('blur change', function() {
+                const $field = $(this);
+                const formGroup = $field.closest('.form-group');
+                const value = $field.val().trim();
+                
+                // Supprimer les anciens messages d'erreur
+                formGroup.find('.js-help-block').remove();
+                
+                if (value !== '') {
+                    // Vérifier que c'est exactement 5 chiffres
+                    if (!/^\d{5}$/.test(value)) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le code postal doit contenir exactement 5 chiffres.</span>');
+                    } else {
+                        formGroup.removeClass('has-error');
+                    }
+                } else {
+                    // Champ obligatoire mais vide
+                    formGroup.addClass('has-error');
+                    formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le code postal est obligatoire.</span>');
+                }
+            });
+            
+            // Validation spéciale pour le téléphone mobile (obligatoire)
+            $('input[name*="companyMobile"]').on('blur change', function() {
+                const $field = $(this);
+                const formGroup = $field.closest('.form-group');
+                const value = $field.val().trim();
+                
+                // Supprimer les anciens messages d'erreur
+                formGroup.find('.js-help-block').remove();
+                
+                if (value !== '') {
+                    // Regex pour validation téléphone français et international
+                    const phoneRegex = /^(\+33\s?[1-9](\s?\d{2}){4}|0[1-9](\s?\d{2}){4})$/;
+                    
+                    if (!phoneRegex.test(value)) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du téléphone n\'est pas valide. Utilisez le format français (06 12 34 56 78) ou international (+33 6 12 34 56 78).</span>');
+                    } else {
+                        formGroup.removeClass('has-error');
+                    }
+                } else {
+                    // companyMobile est nullable en base → pas d'erreur si vide
+                    formGroup.removeClass('has-error');
+                }
+            });
+            
+            // Validation spéciale pour les champs URL (réseaux sociaux + site web)
+            // Couvre : facebookUrl, twitterUrl, linkedinUrl, instagramUrl, googleUrl, otherUrl, companySite
+            $('input').filter(function() {
+                const name = $(this).attr('name') || '';
+                return /Url\]|companySite\]/.test(name);
+            }).on('blur change', function() {
+                const $field = $(this);
+                const formGroup = $field.closest('.form-group');
+                const value = $field.val().trim();
+
+                formGroup.find('.js-help-block').remove();
+
+                if (value !== '' && !/^https?:\/\/.+/.test(value)) {
+                    formGroup.addClass('has-error');
+                    formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Seuls les liens commençant par http:// ou https:// sont acceptés.</span>');
+                } else {
+                    formGroup.removeClass('has-error');
+                }
+            });
+
+            // Validation des champs numériques : surface, effectif, budget
+            // Note : ces champs sont type="number" → .val() retourne "" si valeur non numérique.
+            //        On utilise validity.badInput pour détecter ce cas.
+            const numericFieldsConfig = [
+                { selector: 'wishedSize',       label: 'La surface',             unit: 'm²' },
+                { selector: 'companyEffective', label: 'Le nombre de personnes', unit: ''   },
+                { selector: 'monthlyBudgetMax', label: 'Le budget',              unit: '€'  }
+            ];
+            numericFieldsConfig.forEach(function(cfg) {
+                $('input[name*="' + cfg.selector + '"]').on('blur change', function() {
+                    const $field = $(this);
+                    const formGroup = $field.closest('.form-group');
+                    const value = $field.val().trim();
+                    const badInput = this.validity && this.validity.badInput;
+
+                    // Champ vraiment vide (sans badInput) : on n'intervient pas.
+                    // Le handler générique a déjà affiché "Ce champ est requis" si nécessaire.
+                    if (value === '' && !badInput) {
+                        return;
+                    }
+
+                    // À partir d'ici on a quelque chose à valider → on prend la main.
+                    formGroup.find('.js-help-block').remove();
+                    formGroup.removeClass('has-error');
+
+                    // badInput = true  : type="number" avec texte invalide ("vv"),
+                    //                    .val() retourne "" → détecté via badInput
+                    // badInput = false : type="text" (NumberType Symfony), .val() retourne "vv"
+                    //                    → vérifié avec regex
+                    if (badInput || !/^\d+$/.test(value)) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">' +
+                            cfg.label + ' doit être un nombre entier' +
+                            (cfg.unit ? ' en ' + cfg.unit : '') + ' (ex : 50).</span>');
+                    } else if (parseInt(value, 10) < 0) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">' +
+                            cfg.label + ' doit être un nombre positif.</span>');
+                    }
+                });
+            });
+
+            // Validation spéciale pour les groupes de radio (civilité)
+            $('input[name*="civility"]').on('change', function() {
+                const civilityGroup = $('.civility-group');
+                civilityGroup.find('.js-help-block').remove();
+                
+                if ($('input[name*="civility"]:checked').length > 0) {
+                    civilityGroup.removeClass('has-error');
+                } else {
+                    civilityGroup.addClass('has-error');
+                    civilityGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Veuillez sélectionner votre civilité</span>');
+                }
+            });
+
+            // Valider tous les champs requis au submit pour donner un retour
+            // immédiat et éviter de perdre les fichiers déjà sélectionnés.
+            $('form.has-crosses').on('submit', function(e) {
+                // Le submit est bloqué UNIQUEMENT pour les champs dont une valeur vide
+                // empêcherait la sauvegarde serveur (NotBlank projectHolder) sans que
+                // l'utilisateur puisse facilement voir pourquoi.
+                // Pour les autres champs vides, on affiche les erreurs JS (feedback visuel)
+                // mais on laisse le serveur valider → sauvegarde partielle possible.
+                let blockSubmit = false;
+
+                // 1. Civilité — feedback visuel uniquement (pas bloquant)
+                const $civilityGroup = $('.civility-group');
+                $civilityGroup.find('.js-help-block').remove();
+                if ($('input[name*="civility"]:checked').length === 0) {
+                    $civilityGroup.addClass('has-error');
+                    $civilityGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Veuillez sélectionner votre civilité</span>');
+                } else {
+                    $civilityGroup.removeClass('has-error');
+                }
+
+                // 2. Champs requis — feedback visuel uniquement (pas bloquant)
+                $(this).find('input[required]:not([type="tel"]):not([type="radio"]):not([type="file"]), select[required], textarea[required]').each(function() {
+                    handleFieldValidation(this);
+                });
+
+                // 2b. Fichiers requis — BLOQUANT
+                // Si on laisse soumettre au serveur avec un fichier manquant, le serveur
+                // recharge la page et le navigateur vide tous les inputs file (sécurité
+                // navigateur), ce qui fait "disparaître" le fichier déjà sélectionné.
+                $('.required-files input[type="file"]').each(function() {
+                    const $input = $(this);
+                    const fileInfo = $input.closest('.file-infos');
+                    fileInfo.find('.js-help-block').remove();
+                    if (!this.files || this.files.length === 0) {
+                        fileInfo.addClass('has-error');
+                        fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Ce fichier est requis</span>');
+                        blockSubmit = true;
+                    } else {
+                        fileInfo.removeClass('has-error');
+                    }
+                });
+
+                // 3. Emojis dans les descriptions — BLOQUANT
+                const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u;
+                $(this).find('textarea').each(function() {
+                    const $ta = $(this);
+                    if (!/description/i.test($ta.attr('name') || '')) return;
+                    const formGroup = $ta.closest('.form-group');
+                    formGroup.find('.js-help-block').remove();
+                    formGroup.removeClass('has-error');
+                    if (emojiRegex.test($ta.val())) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le texte ne doit pas contenir d\'emojis</span>');
+                        blockSubmit = true;
+                    }
+                });
+
+                // 4. companyStatus vide — BLOQUANT
+                //    Le placeholder a remplacé l'ancienne valeur par défaut "SA".
+                //    Sans ce blocage JS, le serveur rejetterait silencieusement la sauvegarde.
+                const $companyStatus = $('select[name*="companyStatus"]');
+                if ($companyStatus.length) {
+                    handleFieldValidation($companyStatus.get(0));
+                    const csVal = $companyStatus.val();
+                    if (csVal === null || csVal === undefined || String(csVal).trim() === '') {
+                        blockSubmit = true;
+                    }
+                }
+
+                // 5. useType vide — BLOQUANT (évite de perdre les fichiers joints)
+                const $useType = $('#project_owner_useType');
+                if ($useType.length) {
+                    handleFieldValidation($useType.get(0));
+                    const utVal = $useType.val();
+                    if (utVal === null || utVal === undefined || String(utVal).trim() === '') {
+                        blockSubmit = true;
+                    }
+                }
+
+                // 6. preferredDepartments vide — BLOQUANT (même raison)
+                const $prefDept = $('#project_owner_preferredDepartments');
+                if ($prefDept.length) {
+                    const deptOuterGroup = $('#pu-dept-combobox').closest('.form-group');
+                    $('#pu-dept-combobox').nextAll('.js-help-block').remove();
+                    const deptVal = $prefDept.val();
+                    const deptEmpty = !deptVal || (Array.isArray(deptVal) ? deptVal.length === 0 : String(deptVal).trim() === '');
+                    if (deptEmpty) {
+                        deptOuterGroup.addClass('has-error');
+                        $('#pu-dept-combobox').after('<span class="help-block js-help-block" role="alert" aria-live="polite">Veuillez sélectionner au moins un département.</span>');
+                        blockSubmit = true;
+                    } else {
+                        deptOuterGroup.removeClass('has-error');
+                        $prefDept.closest('.form-group').removeClass('has-error');
+                    }
+                }
+
+                // 7. Bloquer et scroller vers la première erreur si nécessaire
+                if (blockSubmit) {
+                    e.preventDefault();
+                    const firstErrorEl = document.querySelector('.form-group.has-error .help-block, .file-infos.has-error .help-block');
+                    if (firstErrorEl) {
+                        const scrollTarget = firstErrorEl.closest('.form-group') || firstErrorEl.closest('.file-infos');
+                        if (scrollTarget) {
+                            scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                }
+            });
+            
+            // Gestion spéciale pour les fichiers
+            $('.file-infos input[type="file"]').on('change', function() {
+                const fileInfo = $(this).closest('.file-infos');
+                const file = this.files[0];
+                
+                // Supprimer les anciens messages d'erreur
+                fileInfo.find('.js-help-block').remove();
+                
+                if (file) {
+                    // Vérifier la taille du fichier (10Mo max)
+                    if (file.size > 10 * 1024 * 1024) {
+                        fileInfo.addClass('has-error');
+                        fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le fichier est trop volumineux (maximum 10Mo)</span>');
+                    } else {
+                        fileInfo.removeClass('has-error');
+                        
+                        // Mettre à jour la coche verte immédiatement après sélection d'un fichier valide
+                        updateDocumentCheckmark($(this));
+                    }
+                } else {
+                    // Si aucun fichier sélectionné et que le champ est requis
+                    if ($(this).closest('.required-files').length > 0) {
+                        fileInfo.addClass('has-error');
+                        fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Ce fichier est requis</span>');
+                        
+                        // Retirer la coche verte si le fichier est supprimé
+                        removeDocumentCheckmark($(this));
+                    } else {
+                        fileInfo.removeClass('has-error');
+                    }
+                }
+            });
+
+            function updateDocumentCheckmark($input) {
+                const $container = $input.closest('.required-files');
+                const $checkmark = $container.find('.fa-times');
+                if ($checkmark.length > 0) {
+                    $checkmark.removeClass('fa-times').addClass('fa-check');
+                }
+            }
+
+            function removeDocumentCheckmark($input) {
+                const $container = $input.closest('.required-files');
+                const $checkmark = $container.find('.fa-check');
+                if ($checkmark.length > 0) {
+                    $checkmark.removeClass('fa-check').addClass('fa-times');
+                }
+            }
+        });
+    </script>
+{% endblock %}

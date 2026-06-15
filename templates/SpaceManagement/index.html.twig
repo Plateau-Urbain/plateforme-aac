@@ -1,0 +1,151 @@
+{% extends "base.html.twig" %}
+
+{#  {% block breadcrumb_items %}
+   <li><a href="{{ path('security_profil') }}">Mon compte</a></li>
+    <li>
+        <span>Mes espaces</span>
+    </li>
+{% endblock %} #}
+
+{% block body %}
+<div class="white"> 
+        <div class="container"> 
+ <div class="row top-profil">
+        <!-- BEGIN MAIN CONTENT -->
+    <div class=" col-sm-12 ">
+        <div class="titre-page">
+            <h1>
+                {% if isAdmin is defined and isAdmin %}
+                    Gestion des espaces
+                    <small style="color: #bc1b38; font-size: 0.7em;">(Vue Admin)</small>
+                {% else %}
+                    Mes espaces
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+</div>
+
+<div id="listing-header" class="clearfix">
+  <div class="row">
+    <div class="col-sm-6 results-numbers">
+      <h6>
+        {% include 'SpaceManagement/Partials/results_numbers.html.twig' with {'pagination' : pagination, 'label' : 'espaces' } %}
+      </h6>
+    </div>
+
+    <div class="col-sm-6">
+      {{ form_start(filterForm, { 'attr': { 'data-submit': true } } ) }}
+
+      <div class="col-sm-4">
+        {{ form_widget(filterForm.status_filter) }}
+      </div>
+
+      <div class="col-sm-4">
+        {{ form_widget(filterForm.sort_field) }}
+      </div>
+
+      <div class="col-sm-4">
+        {{ form_widget(filterForm.sort_order) }}
+      </div>
+
+      {{ form_end(filterForm) }}
+    </div>
+  </div>
+</div>
+
+{% if pagination | length == 0 %}
+
+    <div class="no-results">
+      <p>Vous n'avez aucun espace à gérer :</p>
+      <a href="{{ path('space_manager_add') }}">Ajouter un espace</a>
+    </div>
+
+{% else %}
+
+<!-- BEGIN PROPERTY LISTING -->
+<div id="property-listing" class="list-style clearfix management-list">
+    <div class="row">
+    {% for space in pagination %}
+        {% include 'SpaceManagement/Partials/space.html.twig' with {'space' : space, 'context' : 'manage_list' } %}
+    {% endfor %}
+    </div>
+</div>
+<!-- END PROPERTY LISTING -->
+
+
+{{ knp_pagination_render(pagination) }}
+{% endif %}
+
+<div style="display: none;">
+    <div id="create_confirm">
+        <div class="colorBox-content">
+            <h4>Espace enregistré</h4>
+            <br />
+            <p>{% if app.user and is_granted('ROLE_ADMIN') %}L'espace a été enregistré. Vous pouvez le publier directement depuis la gestion des espaces.{% else %}Votre espace a été enregistré. Une fois complété, vous pourrez le soumettre pour validation par un administrateur.{% endif %}</p>
+        </div>
+    </div>
+    
+    <div id="submit_confirm">
+        <div class="colorBox-content">
+            <h4 style="color: #ff9800;">✓ Espace soumis pour validation</h4>
+            <br />
+            <p><strong>Votre espace a été soumis avec succès !</strong></p>
+            <p>Un administrateur examinera votre appel à candidatures dans les prochains jours.</p>
+            <p>Vous recevrez un email de confirmation dès que votre espace sera publié sur la plateforme.</p>
+            <br />
+            <p style="font-size: 0.9em; color: #666;">En attendant, vous pouvez consulter l'état de votre espace dans la rubrique "Mes espaces".</p>
+        </div>
+    </div>
+    
+    <div id="published_confirm">
+        <div class="colorBox-content">
+            <h4 style="color: #28a745;">✓ Espace publié avec succès</h4>
+            <br />
+            <p><strong>L'espace est maintenant visible par tous les candidats !</strong></p>
+            <p>Vous pouvez suivre les candidatures reçues depuis la rubrique "Gestion des espaces".</p>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+{% endblock body %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            // Manage sort field
+            $(function () {
+                $('.sort').on('click', 'label', function () {
+                    var $input = $(this).find('input');
+
+                    $('.sort').find('label').removeClass('checked');
+
+                    if ($input.is(':checked')) {
+                        $(this).addClass('checked');
+                    }
+                });
+            });
+
+            // Submit form
+            $('form[data-submit]').on('change', function () {
+                $(this).trigger('submit');
+            });
+
+            {% if app.request.get('create_confirm') == '1' %}
+                $.colorbox({width:"400px", html:$('#create_confirm').html()});
+            {% endif %}
+            
+            {% if app.request.get('submit_confirm') == '1' %}
+                $.colorbox({width:"500px", html:$('#submit_confirm').html()});
+            {% endif %}
+            
+            {% if app.request.get('published') == '1' %}
+                $.colorbox({width:"450px", html:$('#published_confirm').html()});
+            {% endif %}
+
+        });
+    </script>
+{% endblock %}

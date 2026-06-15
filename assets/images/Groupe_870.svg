@@ -1,0 +1,16 @@
+<svg id="Groupe_870" data-name="Groupe 870" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="81.535" height="85.116" viewBox="0 0 81.535 85.116">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_1117" data-name="Rectangle 1117" width="81.535" height="85.116" fill="none" stroke="#14151b" stroke-width="3"/>
+    </clipPath>
+  </defs>
+  <g id="Groupe_869" data-name="Groupe 869" transform="translate(0 0)" clip-path="url(#clip-path)">
+    <path id="Tracé_1310" data-name="Tracé 1310" d="M71.042,34.341V75.929H1V5.887H38.21" transform="translate(1.189 6.999)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Tracé_1311" data-name="Tracé 1311" d="M24.7,53.314,11.387,57.2a1.464,1.464,0,0,1-1.815-1.817L13.46,42.077a1.451,1.451,0,0,1,.37-.624L51.95,3.331a1.465,1.465,0,0,1,2.071,0l9.423,9.423a1.465,1.465,0,0,1,0,2.071L25.321,52.944A1.451,1.451,0,0,1,24.7,53.314Z" transform="translate(11.308 3.451)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Tracé_1312" data-name="Tracé 1312" d="M35.727,12.719,30.9,7.888l6.49-6.49a1.37,1.37,0,0,1,1.933,0l2.9,2.9a1.366,1.366,0,0,1,0,1.933Z" transform="translate(36.729 1.189)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Tracé_1313" data-name="Tracé 1313" d="M27.53,31.908,41.9,17.541a1.466,1.466,0,0,0,.429-1.059l-.14-8.029" transform="translate(32.728 10.049)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <line id="Ligne_247" data-name="Ligne 247" x2="10.631" y2="10.631" transform="translate(42.38 29.696)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <line id="Ligne_248" data-name="Ligne 248" x1="1.933" y2="1.933" transform="translate(20.15 59.658)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <line id="Ligne_249" data-name="Ligne 249" x2="11.861" y2="10.867" transform="translate(25.671 45.257)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+  </g>
+</svg>

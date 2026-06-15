@@ -1,0 +1,456 @@
+{% extends "base.html.twig" %}
+
+{# {% block breadcrumb_items %}
+{# {% block breadcrumb_items %}
+  <li><a href="{{ path('security_profil') }}">Mon compte</a></li>
+  <li><a href="{{ path('space_manager_list') }}">Liste de mes espaces</a></li>
+  <li><a href="{{ path('space_show', { 'id': application.space.id }) }}">{{ application.space.name }}</a></li>
+  <li><a href="{{ path('space_manager_candidates', { 'id': application.space.id }) }}">Liste des candidats</a></li>
+  <li><span>Fiche candidat</span></li>
+{% endblock %} #}
+
+{% block stylesheets %}
+  {{ parent() }}
+
+  <link rel="stylesheet" href="{{ asset('bundles/app/css/print.css') }}" type="text/css" media="print" />
+{% endblock %}
+
+{% block body %}
+<div class="white"> 
+        <div class="container"> 
+<div class="application-header left">
+  <div class="row">
+    <div class="col-sm-6">
+  <h3>{{ application.name }}</h3>
+  <h6>{{ application.projectHolder.company }}</h6>
+
+  {% if not application.isDraft %}
+    <p>Candidature envoyée le {{ application.created|date('d/m/Y') }}</p>
+  {% endif %}
+
+  </div>
+   <div class="col-sm-6 application-status right">
+      <div class="toggle-star">
+    <a href="{{ path('space_manager_toggle_selected_application', { 'id': application.id, '_token': csrf_token('toggle_selected_' ~ application.id) }) }}">
+      {% if application.selected %}
+        <i class="fa fa-star fa-lg"></i>
+      {% else %}
+        <i class="fa fa-star-o fa-lg"></i>
+      {% endif %}
+    </a>
+  </div>
+  <div class="status">
+    {% include 'Application/partials/_status_label.html.twig' %}
+  </div>
+</div>
+</div>
+</div>
+
+{% set space = application.space %}
+<div class="application-space space-card item" id="space-card">
+  <div class="item">
+    <div class="row row-flex">
+      <div class="col-xs-12 col-md-4">
+        <div class="image">
+          <div class="overlay">
+             {% if application.space.isClosed %}
+                          <div class="clos"><p> Appel à candidature cloturé</p></div>
+                        {% else %}
+                          <div class="encours"><p> Appel à candidature en cours</p></div>
+                        {% endif %}
+          </div>
+          <div class="image-wrapper">
+            <img src="{% if space.pics.0 is not null %}{{ vich_uploader_asset(space.pics.0, 'file') }}{% endif %}" alt="" />
+          </div>
+          <div class="availability-overlay">
+            <span class="availability-text">Période de disponibilité : {{ space.availability }}</span>
+          </div>
+        </div>
+      </div>
+
+            <div class="col-xs-12 col-md-8 box-info">
+              <div class="info">
+                <div class="row">
+                 <div class="col-sm-7">
+                  <p class="ville">{{ space.city }} ({{ space.zipCode|slice(0,2)}})</p>
+                  <h5>{{ application.space.name }}</h5>               
+                </div>
+                <div class="col-sm-5 right">
+                   <p><a href="{{ path('space_show', {'id': space.id}) }}"class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Voir l'annonce</a></p>         
+                </div>
+                </div>
+
+          <div class="row">
+            <ul>
+              <li>{{ space.type }}</li>
+              <li>
+                {% if space.priceText %}
+                  {{ space.priceText }}
+                {% else %}
+                  À partir de {{ space.price * 12 }} € / m<sup>2</sup> / an
+                {% endif %}
+              </li>
+              <li>
+                <strong>{{ space.nbSpaces }}</strong> espace(s) de {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup>
+              </li>
+                <li>Bailleur: {{ application.space.owner.company }}</li>
+              </ul>
+             </div>
+     </div> 
+            <div class="info-candidature">
+                     <div class="row">
+                       <div class="col-sm-6">
+                            <div class="calendar"></div>
+                            <div class="apply-date">
+                            <p class="apply-date-p">Date limite de candidature</p>
+                            <p class="apply-date-b">
+                  {{ space.limitAvailability | localizeddate("long", "none") }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
+                  </p>
+                      </div>
+            </div>
+
+           <div class="col-sm-6 right">
+              <a href="{{ path('space_manager_candidates', {'id' : space.id}) }}" class="btn btn-line-19 btn-grey">Voir les candidats</a>
+           
+              {% if not space.submitted and not space.enabled and not space.closed %}
+                <a href="{{ path('space_manager_edit', { 'id': space.id }) }}" class="btn btn-line-19 btn-grey">Modifier</a>
+              {% endif %}
+            
+              {% if space.isEnabled and not space.isClosed %}
+                {% if app.user and is_granted('ROLE_ADMIN') %}
+                  <form method="post" action="{{ path('space_manager_close', { 'id': space.id }) }}" style="display:inline;" onsubmit="return confirm('ADMIN : Êtes-vous sûr de vouloir clôturer cet espace ?\n\nCette action fermera définitivement l\'appel à candidatures.');">
+                    <button type="submit" class="btn btn-line-19 btn-grey">Clôturer</button>
+                  </form>
+                {% else %}
+                  <form method="post" action="{{ path('space_manager_close', { 'id': space.id }) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir clôturer cet espace ?');">
+                    <button type="submit" class="btn btn-line-19 btn-grey">Clôturer</button>
+                  </form>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="box-information">    
+      <div class="box-content">
+         <h3 class="box-title ">
+        Contact
+      </h3>
+        <table>
+          <tbody>
+            <tr><th>Candidat</th><td>{{ application.projectHolder.fullName }}</td></tr>
+            <tr><th>Date de naissance</th><td>{{ application.projectHolder.birthday|date('d/m/Y') }}</td></tr>
+            <tr><th>Téléphone</th><td>{{ application.projectHolder.phone }}</td></tr>
+            <tr><th>Email</th><td>{{ application.projectHolder.email }}</td></tr>
+            <tr><th>À propos</th><td>{{ application.projectHolder.description|nl2br }}</td></tr>
+           </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+ <div class="col-sm-12">
+    <div class="box-information">    
+      <div class="box-content">
+          <h3 class="box-title">
+        Structure
+      </h3>
+        <table>
+          <tbody>
+            <tr><th>Nom de la structure</th><td>{{ application.projectHolder.company }}</td></tr>
+            <tr><th>Statut</th><td>{{ application.projectHolder.companyStatus }}</td></tr>
+            <tr>
+              <th>Date de création</th>
+              <td>
+                {% if application.projectHolder.companyCreationDate %}
+                    {{ application.projectHolder.companyCreationDate|date("d/m/Y") }}
+                {% endif %}
+              </td>
+            </tr>
+            <tr><th>SIRET</th><td>{{ application.projectHolder.siret }}</td></tr>
+            <tr><th>Ville</th><td>{{ application.projectHolder.city }}</td></tr>
+            <tr><th>Code postal</th><td>{{ application.projectHolder.zipcode }}</td></tr>
+            <tr><th>Adresse</th><td>{{ application.projectHolder.address }}</td></tr>
+            <tr><th>Adresse (suite)</th><td>{{ application.projectHolder.addressSuite }}</td></tr>
+            <tr><th>Téléphone fixe</th><td>{{ application.projectHolder.companyPhone }}</td></tr>
+            <tr><th>Téléphone mobile</th><td>{{ application.projectHolder.companyMobile }}</td></tr>
+            <tr><th>Présentation</th><td>{{ application.projectHolder.companyDescription|nl2br }}</td></tr>
+            <tr><th>Nombre de personnes dans la structure</th><td>{{ application.projectHolder.companyEffective }}</td></tr>
+            <tr><th>Structure(s) d'accompagnement</th><td>{{ application.projectHolder.companyStructures|nl2br }}</td></tr>
+            <tr><th>Site web</th><td>{% set _site = application.projectHolder.companySite|safe_href %}{% if _site %}<a href="{{ _site }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companySite|length > 30 ? application.projectHolder.companySite|slice(0, 30) ~ '...' : application.projectHolder.companySite }}</a>{% else %}{{ application.projectHolder.companySite }}{% endif %}</td></tr>
+            <tr><th>Blog</th><td>{% set _blog = application.projectHolder.companyBlog|safe_href %}{% if _blog %}<a href="{{ _blog }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companyBlog|length > 30 ? application.projectHolder.companyBlog|slice(0, 30) ~ '...' : application.projectHolder.companyBlog }}</a>{% else %}{{ application.projectHolder.companyBlog }}{% endif %}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+<div class="col-sm-12">
+    <div class="box-information">
+      <div class="box-content">
+      <h3 class="box-title">
+        Projet pour cet espace
+      </h3>
+        <table>
+          <tbody>
+            <tr><th>Nom du projet</th><td>{{ application.name }}</td></tr>
+            <tr><th>Type d'usage</th><td>{{ application.projectHolder.useType }}</td></tr>
+            <tr><th>Type de projet</th><td>{{ application.category }}</td></tr>
+            <tr><th>Départements souhaités</th><td>{% if application.projectHolder.preferredDepartmentsLabels|length %}{{ application.projectHolder.preferredDepartmentsLabels|join(', ') }}{% else %}—{% endif %}</td></tr>
+            <tr><th>Statut juridique (profil)</th><td>{% if application.projectHolder.companyStatus %}{{ application.projectHolder.companyStatus }}{% else %}—{% endif %}</td></tr>
+            <tr><th>Statut juridique (candidature)</th><td>{% if application.companyStatus %}{{ application.companyStatus }}{% else %}—{% endif %}</td></tr>
+            <tr><th>Surface souhaitée (profil)</th><td>{% if application.projectHolder.wishedSize %}{{ application.projectHolder.wishedSize }}{% else %}—{% endif %} m<sup>2</sup></td></tr>
+            <tr><th>Surface souhaitée (candidature)</th><td>{% if application.wishedSize %}{{ application.wishedSize }}{% else %}—{% endif %} m<sup>2</sup></td></tr>
+            {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
+            {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
+            <tr>
+              <th>Durée d'occupation</th>
+              <td>
+                {% if _lengthValue %}
+                  {{ _lengthValue }}{% if _lengthType %} {{ _lengthType }}{% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+            </tr>
+            <tr><th>Budget mensuel total maximum</th><td>{% if application.projectHolder.monthlyBudgetMax %}{{ application.projectHolder.monthlyBudgetMax }} €{% else %}—{% endif %}</td></tr>
+            <tr><th>Date d'entrée souhaitée</th><td>{% if application.startOccupation %}{{ application.startOccupation|date('d/m/Y') }}{% else %}—{% endif %}</td></tr>
+            <tr><th>Présentation du projet</th><td>{% if application.description %}{{ application.description|nl2br }}{% else %}—{% endif %}</td></tr>
+            <tr><th>Quel sera l'usage du local ?</th><td>{% if application.localUsageDescription %}{{ application.localUsageDescription|nl2br }}{% else %}—{% endif %}</td></tr>
+            <tr><th>Ouvert(e) à un projet collectif</th><td>{{ application.openToGlobalProject ? 'Oui' : 'Non' }}</td></tr>
+            <tr><th>Quelles idées avez-vous pour participer au projet collectif ?</th><td>{{ application.contribution|nl2br }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<div class="col-sm-6">
+ <div class="box-information">     
+      <div class="box-content">
+         <h3 class="box-title">
+        Réseaux sociaux
+      </h3>
+        <table>
+          <tbody>
+            <tr><th><i class="fa-brands fa-facebook fa-lg"></i></th><td>{{ application.projectHolder.facebookUrl }}</td></tr>
+            <tr><th><i class="fa-brands fa-x-twitter fa-lg"></i></th><td>{{ application.projectHolder.twitterUrl }}</td></tr>
+            <tr><th><i class="fa-brands fa-instagram fa-lg"></i></th><td>{{ application.projectHolder.instagramUrl }}</td></tr>
+            <tr><th><i class="fa-brands fa-linkedin fa-lg"></i></th><td>{{ application.projectHolder.linkedinUrl }}</td></tr>
+            <tr><th><i class="fa-brands fa-bluesky fa-lg"></i></th><td>{{ application.projectHolder.googleUrl }}</td></tr>
+            <tr><th><i class="fa fa-link fa-lg" title="Autre URL"></i></th><td>{{ application.projectHolder.otherUrl }}</td></tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+</div>
+
+  <div class="col-sm-6">
+    <div class="box-information">
+      <div class="box-content">
+      <h3 class="box-title">
+        Documents disponibles
+      </h3>
+        <div class="files">
+
+          
+            <div class="file-infos">
+              <span>Pièce d'identité</span>
+              <div class="pull-right actions">
+                {% if application.projectHolder.hasDocuments('id') %}
+                {% set file =  application.projectHolder.getDocumentsType('id')[0] %}
+                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                {% endif %}
+              </div>
+            </div>
+        
+            <div class="file-infos">
+              <span>justificatif d'activité</span>
+              <div class="pull-right actions">
+                {% if application.projectHolder.hasDocuments('kbis') %}
+                {% set file =  application.projectHolder.getDocumentsType('kbis')[0] %}
+                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                {% endif %}
+              </div>
+            </div>
+       
+
+          {% for doc in application.projectHolder.getDocumentsType('') %}
+              <div class="file-infos">
+                <span>{{doc.fileName | slice(14, 100)}}</span>
+                <div class="pull-right actions">
+                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                </div>
+              </div>
+          {% endfor %}
+
+          {% for doc in application.files %}
+              <div class="file-infos">
+                <span>{{doc.fileName | slice(14, 100)}}</span>
+                <div class="pull-right actions">
+                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                </div>
+              </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="row application_buttons">
+  <div class="col-sm-12">
+     <div class="save-recap center">   
+     
+      <a href="javascript:print();" class="btn btn-line-19">
+        <i class="fa-solid fa-print fa-lg"></i>
+        Imprimer candidature
+      </a>
+        
+   
+    <a href="{{ path('space_manager_toggle_selected_application', { 'id': application.id, '_token': csrf_token('toggle_selected_' ~ application.id) }) }}" class="btn btn-line-19">
+      {% if application.selected %}
+        <i class="fa-solid fa-star"></i>
+        Retirer de ma sélection
+      {% else %}
+        <i class="fa-solid fa-star"></i>
+        Ajouter à ma sélection
+      {% endif %}
+    </a>
+   
+  
+  {% if application.status == constant('App\\Entity\\Application::WAIT_STATUS') or application.status == constant('App\\Entity\\Application::UNREAD_STATUS') %}
+  
+     
+      <a href="" class="btn btn-line-19 js-modalAction" data-type="accept" data-id="{{ application.id }}">
+        <i class="fa-solid fa-check"></i>
+        Accepter ce dossier
+      </a>
+    
+      
+      <a href="" class="btn btn-line-19 js-modalAction" data-type="refuse" data-id="{{ application.id }}">
+        <i class="fa-solid fa-times"></i>
+        Envoyer un refus
+      </a>
+    
+    </div>
+  {% endif %}
+</div>
+</div>
+  </div>
+  </div>
+  </div>
+<div class="pagination-wrapper">
+        <ul class="pagination">
+
+            <li>
+                {% if prevApplication %}
+                    <a href="{{ path('application_show', { 'id': prevApplication.id }) }}" aria-label="Prev" title="Candidature précédente" data-toggle="tooltip">
+                        <span aria-hidden="true"></span>
+                    </a>
+                {% else %}
+                    <span aria-label="Previous">
+                        <span aria-hidden="true"></span>
+                    </span>
+                {% endif %}
+            </li>
+
+            <li>
+                {% if nextApplication %}
+                <a href="{{ path('application_show', { 'id': nextApplication.id }) }}" aria-label="Next"  title="Candidature suivante" data-toggle="tooltip">
+                    <span aria-hidden="true"></span>
+                </a>
+                {% else %}
+                    <span aria-label="Next">
+                        <span aria-hidden="true"></span>
+                    </span>
+                {% endif %}
+            </li>
+
+        </ul>
+    </div>
+
+<div style="display: none;">
+    <div id="accept_content">
+        <form action="{{ path('space_manager_candidates', {'id' : space.id}) }}#accept_confirm" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('candidates_action') }}" />
+            <div class="colorBox-content">
+                <h4>Accepter cette candidature</h4>
+                <br />
+                <p class="text-left">Vous allez accepter ce dossier de candidature. Le candidat recevra le texte-type suivant :</p>
+
+                <p class="text-left"><i>
+                  Bonjour,<br>
+                  Votre candidature sur le site plateau-urbain pour l'espace {{space.name}} à {{space.city}} a été acceptée.
+                </i></p>
+
+                <p class="text-left">
+                  Souhaitez-vous compléter ce message ?
+                </p>
+
+                <textarea name="message" rows="5" class="form-control"></textarea>
+                <input type="submit" value="Accepter" class="btn btn-fullcolor">
+                <input type="hidden" name="action" value="accept" />
+                <input type="hidden" name="applications" value="" />
+            </div>
+        </form>
+    </div>
+    <div id="refuse_content">
+        <form action="{{ path('space_manager_candidates', {'id' : space.id}) }}#refuse_confirm" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('candidates_action') }}" />
+            <div class="colorBox-content">
+                <h4>Refuser cette candidature</h4>
+                <br />
+                <p class="text-left">Vous allez refuser cette candidature. Le candidat recevra le texte-type suivant :</p>
+
+                <p class="text-left"><i>
+                  Bonjour,<br>
+                  Votre candidature sur le site plateau-urbain pour l'espace {{space.name}} à {{space.city}} a été refusée.
+                </i></p>
+
+                <p class="text-left">
+                  Souhaitez-vous compléter ce message ?
+                </p>
+
+                <textarea name="message" rows="5" class="form-control"></textarea>
+                <input type="submit" value="Refuser" class="btn btn-fullcolor">
+                <input type="hidden" name="action" value="refuse" />
+                <input type="hidden" name="applications" value=""/>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+
+{% endblock body %}
+
+{% block javascript %}
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        $(".js-modalAction").click(function () {
+            var ids = '' + $(this).data('id');
+
+            $('input[name="applications"]').attr('value', ids);
+
+            $.colorbox({
+                width: "400px",
+                html: $('#' + $(this).data('type') + '_content').html()
+            });
+
+            return false;
+        });
+    });
+</script>
+{% endblock %}

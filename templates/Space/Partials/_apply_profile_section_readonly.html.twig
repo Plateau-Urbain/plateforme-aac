@@ -1,0 +1,45 @@
+{# Version "figée" de la section Mes informations (apply) - rendu "récap" (pas d'aspect formulaire) #}
+{% set userInfo = form.projectHolder.userInfo.vars.data %}
+{% set nextUrl = path('space_apply', { 'space': space.id }) %}
+{% set profileRole = 'candidat' %}
+
+<div class="pu-profile-recap">
+    <p class="pu-profile-recap__hint">
+        <i class="fa fa-info-circle"></i>
+        Ces informations proviennent de votre profil. Pour les modifier :
+        <a href="{{ path('security_profil_role', { 'role': profileRole, 'next': nextUrl, 'return_anchor': 'one' }) ~ '#one' }}">Mon profil</a>
+    </p>
+
+    <div class="pu-profile-recap__grid">
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Civilité</span>
+            <span class="pu-profile-recap__value">{{ userInfo.civility ? userInfo.civility : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Date de naissance</span>
+            <span class="pu-profile-recap__value">
+                {% if userInfo.birthday %}
+                    {{ userInfo.birthday|date('d/m/Y') }}
+                {% else %}
+                    -
+                {% endif %}
+            </span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Prénom</span>
+            <span class="pu-profile-recap__value">{{ userInfo.firstname ? userInfo.firstname : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Téléphone</span>
+            <span class="pu-profile-recap__value">{{ userInfo.phone ? userInfo.phone : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Nom</span>
+            <span class="pu-profile-recap__value">{{ userInfo.lastname ? userInfo.lastname : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Email</span>
+            <span class="pu-profile-recap__value">{{ userInfo.email ? userInfo.email : '-' }}</span>
+        </div>
+    </div>
+</div>

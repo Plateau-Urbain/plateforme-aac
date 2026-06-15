@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+
+    <!-- Page Title -->
+    <title>{% block title %}Trouver un local | Plateau Urbain{% endblock %}</title>
+
+    {% set _current_url = app.request.schemeAndHttpHost ~ app.request.requestUri %}
+
+    <meta name="keywords" content="{% block meta_keywords %}plateau, urbain{% endblock %}" />
+    <meta name="description" content="{% block meta_description %}Vous cherchez un espace de travail ou un atelier abordable ? Plateau Urbain met à votre disposition des bureaux dans des tiers-lieux vivants et créatifs{% endblock %}" />
+
+    <link rel="canonical" href="{% block canonical_url %}{{ _current_url }}{% endblock %}" />
+
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ _current_url }}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{{ block('title') }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ block('meta_description') }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}https://plateforme.plateau-urbain.com/bundles/app/images/plateau-urbain.jpg{% endblock %}">
+
+    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ block('og_title') }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ block('og_description') }}{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ block('og_image') }}{% endblock %}">
+    <!-- Mobile Meta Tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <!-- Fav and touch icons -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('/bundles/app/images/fav_touch_icons/favicon.ico') }}" />
+
+    <!-- IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Google-Fonts Embeded -->
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/Roboto.css') }}?family=Roboto:300,400,500,700" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/Ginka.css') }}?family=ginka:300,400,500,600,700" media="all" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" media="all" />
+
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/bootstrap.min.css') }}" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/icons.css') }}" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/cozy-real-estate-font.css') }}" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/owl.transitions.css') }}" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/colorbox.css') }}" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/rs-plugin/css/settings.css') }}" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/style.css') }}" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/cycle.css') }}" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/main.css') }}" media="all" />
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/trumbowyg.min.css') }}" media="all" />
+
+    {% block stylesheets %}{% endblock %}
+
+    <!-- Cookie-Consent -->
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/cookieconsent.min.css') }}" media="all" />
+    <script type="text/javascript" src="{{ asset('bundles/app/js/cookieconsent.min.js') }}"></script>
+    <script>
+        window.addEventListener("load", function(){
+            window.cookieconsent.initialise({
+                "palette": {
+                    "popup": {
+                        "background": "#f5f4f2",
+                        "text": "#1C244B"
+                    },
+                    "button": {
+                        "background": "#e9473c"
+                    }
+                },
+                "content": {
+                    "message": "Pour améliorer votre navigation, ce site utilise des cookies",
+                    "dismiss": "OK!",
+                    "link": "En savoir plus",
+                    "href": "/cgu"
+                }
+            })});
+    </script>
+
+    <!-- Modernizr -->
+    <script type="text/javascript" src="{{ asset('bundles/app/js/modernizr-2.8.1.min.js') }}"></script>
+
+</head>
+<body onload="if(typeof randomImg === 'function') randomImg()">
+    <!-- BEGIN WRAPPER -->
+    <div id="wrapper">
+
+        <!-- BEGIN HEADER -->
+        <header id="header">
+            <div id="nav-section">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <a href="https://www.plateau-urbain.com/" class="nav-logo"><img src="{{ asset('images/logo.png') }}" alt="Plateau Urbain" /></a>
+
+                            <!-- BEGIN MAIN MENU -->
+                            <nav class="navbar">
+                                <ul class="mobile"><li class="mobile-local"><a href="{{ path('search_index') }}"><span>Trouver un local</span></a></li></ul>
+                                <button id="nav-mobile-btn"></button>
+                                <!-- Ajout de Label dans KPN -->
+                                {{ knp_menu_render('mainMenu', {'allow_safe_labels': true}) | raw  }}
+                            </nav>
+                            <!-- END MAIN MENU -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- END HEADER -->
+
+        {% block prebody %} {% endblock %}
+
+        {% block body %}{% endblock %}
+
+        {% block footer %}
+        {% include '/Partials/footer.html.twig' %}
+        {% endblock %}
+
+    </div>
+    <!-- END WRAPPER -->
+
+    <!-- Libs -->
+    <script type="text/javascript" src="{{ asset('bundles/app/js/common.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/jquery.prettyPhoto.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/owl.carousel.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/chosen.jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/rs-plugin/js/jquery.themepunch.tools.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/rs-plugin/js/jquery.themepunch.revolution.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/jquery.colorbox.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/bootstrap-checkbox.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/variables.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/scripts.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/agencies.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/pu.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/js/trumbowyg.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/app/langs/fr.min.js') }}"></script>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/2.1.6/jquery.cycle2.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/2.1.6/jquery.cycle2.carousel.min.js"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/freewall/1.0.5/freewall.min.js"></script>
+
+    {% block javascript %}
+    {% endblock %}
+
+</body>
+</html>

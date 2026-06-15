@@ -1,0 +1,419 @@
+{% extends '@SonataAdmin/standard_layout.html.twig' %}
+
+{% block title %}Statistiques — Candidatures{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+
+    {# Fil d'Ariane #}
+    <ol class="breadcrumb">
+      <li><a href="{{ admin.generateUrl('list') }}"><i class="fa fa-list"></i> Candidatures</a></li>
+      <li class="active"><i class="fa fa-bar-chart"></i> Statistiques globales</li>
+    </ol>
+
+    {# Filtre par année #}
+    <div class="row" style="margin-bottom:16px;">
+      <div class="col-md-12">
+        <form method="get" class="form-inline" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <label style="font-weight:600;margin:0;"><i class="fa fa-calendar"></i> Période :</label>
+          <select name="year" class="form-control" onchange="this.form.submit()" style="width:auto;">
+            <option value="all" {% if selectedYear == 'all' %}selected{% endif %}>Toutes les années</option>
+            {% for yr in availableYears %}
+              <option value="{{ yr }}" {% if selectedYear == yr %}selected{% endif %}>{{ yr }}</option>
+            {% endfor %}
+          </select>
+          {% if selectedYear != 'all' %}
+            <a href="{{ admin.generateUrl('statistics') }}" class="btn btn-default btn-sm">
+              <i class="fa fa-times"></i> Réinitialiser
+            </a>
+          {% endif %}
+          <span class="text-muted" style="font-size:13px;">
+            {% if selectedYear != 'all' %}
+              Affichage : <strong>{{ selectedYear }}</strong>
+            {% else %}
+              Affichage : <strong>toutes les années</strong>
+            {% endif %}
+          </span>
+        </form>
+      </div>
+    </div>
+
+    {# Totaux #}
+    <div class="row" style="margin-bottom:20px;">
+      <div class="col-sm-3">
+        <div class="info-box">
+          <span class="info-box-icon bg-aqua"><i class="fa fa-file-text"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">Total candidatures</span>
+            <span class="info-box-number">{{ totals.total }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="info-box">
+          <span class="info-box-icon bg-yellow"><i class="fa fa-clock-o"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">En attente</span>
+            <span class="info-box-number">{{ totals.awaiting }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="info-box">
+          <span class="info-box-icon bg-green"><i class="fa fa-check"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">Acceptées</span>
+            <span class="info-box-number">{{ totals.accepted }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="info-box">
+          <span class="info-box-icon bg-red"><i class="fa fa-times"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">Refusées</span>
+            <span class="info-box-number">{{ totals.rejected }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Ligne 1 : Type d'usage (stacked) + Surface #}
+    <div class="row">
+      <div class="col-md-6">
+        <div class="box box-primary">
+          <div class="box-header with-border">
+            <h3 class="box-title"><i class="fa fa-bar-chart"></i> Candidatures par type d'usage — répartition par statut de traitement</h3>
+          </div>
+          <div class="box-body">
+            <div class="chart-legend" style="margin-bottom:10px;">
+              <span class="chart-legend-item"><span class="chart-legend-color" style="background:#FDB45C;display:inline-block;width:12px;height:12px;margin-right:4px;"></span> En attente</span>&nbsp;
+              <span class="chart-legend-item"><span class="chart-legend-color" style="background:#46BFBD;display:inline-block;width:12px;height:12px;margin-right:4px;"></span> Acceptée</span>&nbsp;
+              <span class="chart-legend-item"><span class="chart-legend-color" style="background:#F7464A;display:inline-block;width:12px;height:12px;margin-right:4px;"></span> Refusée</span>
+            </div>
+            <div id="stackedChart"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="box box-primary">
+          <div class="box-header with-border">
+            <h3 class="box-title"><i class="fa fa-arrows-alt"></i> Surface demandée par type d'usage (m²)</h3>
+          </div>
+          <div class="box-body">
+            <div id="surfaceChart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Ligne 2 : Type de projet + Statut juridique #}
+    <div class="row">
+      <div class="col-md-6">
+        <div class="box box-info">
+          <div class="box-header with-border">
+            <h3 class="box-title"><i class="fa fa-users"></i> Candidatures par type de projet</h3>
+          </div>
+          <div class="box-body">
+            <div id="usageChart"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="box box-info">
+          <div class="box-header with-border">
+            <h3 class="box-title"><i class="fa fa-building"></i> Candidatures par statut juridique</h3>
+          </div>
+          <div class="box-body">
+            <div id="companyStatusChart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Ligne 3 : Timeline #}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="box box-success">
+          <div class="box-header with-border">
+            <h3 class="box-title"><i class="fa fa-line-chart"></i> Candidatures reçues par jour</h3>
+          </div>
+          <div class="box-body">
+            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+              <div id="timelineChartContainer" style="position:relative;height:200px;min-width:600px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .horizontal-bar-item { margin-bottom: 10px; }
+  .bar-label { font-size: 13px; margin-bottom: 3px; color: #333; }
+  .bar-container { display: flex; align-items: center; gap: 8px; }
+  .simple-bar-bg { position: relative; flex: 1; height: 22px; background: #f0f0f0; border-radius: 3px; overflow: visible; }
+  .simple-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+  .simple-bar-value { position: absolute; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: bold; color: #333; white-space: nowrap; }
+  .stacked-bar { display: flex; height: 22px; border-radius: 3px; overflow: hidden; }
+  .stacked-segment { height: 100%; transition: width .4s; }
+  .bar-total-label { font-size: 12px; color: #555; white-space: nowrap; }
+  .archived-label { font-style: italic; color: #999; }
+</style>
+
+<script>
+$(document).ready(function() {
+
+    var colors = ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b','#858796','#5a5c69','#6f42c1'];
+    var statusColors = { awaiting: '#FDB45C', accepted: '#46BFBD', rejected: '#F7464A' };
+    var statusLabels = { awaiting: 'En attente', accepted: 'Acceptée(s)', rejected: 'Refusée(s)' };
+
+    // ======================================================
+    // GRAPHIQUE 1 : Barres empilées par type d'usage + statut
+    // ======================================================
+    var stackedData = [
+        {% for key, row in categoryRows %}
+        {
+            label: {{ (row.name ~ (row.isActive ? '' : ' (archivé)'))|json_encode|raw }},
+            awaiting: {{ row.awaiting }},
+            accepted: {{ row.accepted }},
+            rejected: {{ row.rejected }},
+            total: {{ row.total }},
+            color: colors[{{ key }} % 8]
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+        {% if noCategoryCount > 0 %}
+        ,{ label: 'Non renseigné', awaiting: 0, accepted: 0, rejected: 0, total: {{ noCategoryCount }}, color: '#ccc' }
+        {% endif %}
+    ];
+
+    var maxStacked = Math.max.apply(Math, stackedData.map(function(d) { return d.total; }));
+    if (maxStacked === 0) maxStacked = 1;
+
+    var stackedContainer = $('#stackedChart');
+    stackedContainer.empty();
+
+    stackedData.forEach(function(item) {
+        if (item.total === 0) return;
+        var totalPct = (item.total / maxStacked) * 100;
+        var segments = '';
+        ['awaiting', 'accepted', 'rejected'].forEach(function(s) {
+            var val = item[s];
+            if (val > 0) {
+                var segPct = (val / item.total) * 100;
+                segments += '<div class="stacked-segment" style="width:' + segPct + '%;background:' + statusColors[s] + ';" title="' + statusLabels[s] + ': ' + val + '"></div>';
+            }
+        });
+        var tooltip = 'Total : ' + item.total + '\nEn attente : ' + item.awaiting + '\nAcceptée(s) : ' + item.accepted + '\nRefusée(s) : ' + item.rejected;
+        var html = '<div class="horizontal-bar-item">' +
+            '<div class="bar-label">' + item.label + '</div>' +
+            '<div class="bar-container">' +
+            '<div class="simple-bar-bg" style="flex:1;"><div class="stacked-bar" style="width:' + totalPct + '%;">' + segments + '</div></div>' +
+            '<span class="bar-total-label" title="' + tooltip + '" style="cursor:help;">' + item.total + ' cand.</span>' +
+            '</div></div>';
+        stackedContainer.append(html);
+    });
+
+    // ======================================================
+    // GRAPHIQUE 1b : Surface demandée par type d'usage
+    // ======================================================
+    var surfaceData = [
+        {% for key, row in categoryRows %}
+        {% if row.totalSurface > 0 %}
+        {
+            label: {{ (row.name ~ (row.isActive ? '' : ' (archivé)'))|json_encode|raw }},
+            value: {{ row.totalSurface }},
+            countWithSurface: {{ row.countWithSurface }},
+            total: {{ row.total }},
+            avg: {% if row.countWithSurface > 0 %}{{ (row.totalSurface / row.countWithSurface)|number_format(1, '.', '') }}{% else %}0{% endif %},
+            color: colors[{{ key }} % 8]
+        },
+        {% endif %}
+        {% endfor %}
+    ].filter(function(d) { return d !== null && d !== undefined; });
+    // Nettoyer les éventuelles virgules orphelines via filter
+    surfaceData = surfaceData.filter(function(d) { return d !== null && d !== undefined; });
+
+    var maxSurface = Math.max.apply(Math, surfaceData.map(function(d) { return d.value; }));
+    if (maxSurface === 0 || isNaN(maxSurface)) maxSurface = 1;
+
+    var surfaceContainer = $('#surfaceChart');
+    surfaceContainer.empty();
+
+    if (surfaceData.length === 0) {
+        surfaceContainer.html('<p class="text-muted">Aucune donnée de surface disponible.</p>');
+    } else {
+        surfaceData.forEach(function(item) {
+            var pct = (item.value / maxSurface) * 100;
+            var valuePos = pct < 30 ? 'left:' + (pct + 2) + '%;' : 'left:' + pct + '%;transform:translateX(-100%) translateY(-50%);';
+            if (pct < 30) valuePos += 'transform:translateY(-50%);';
+            var avgTooltip = 'Moyenne calculée sur ' + item.countWithSurface + ' candidature(s) ayant renseigné une surface\n(sur ' + item.total + ' candidatures au total pour ce type)';
+            var html = '<div class="horizontal-bar-item">' +
+                '<div class="bar-label">' + item.label + '</div>' +
+                '<div class="bar-container">' +
+                '<div class="simple-bar-bg"><div class="simple-bar-fill" style="background:' + item.color + ';width:' + pct + '%;"></div>' +
+                '<span class="simple-bar-value" style="' + valuePos + 'top:50%;">' + item.value + ' m²</span>' +
+                '</div>' +
+                '<span class="bar-total-label" title="' + avgTooltip + '" style="cursor:help;">Moy. ' + item.avg + ' m² <small style="color:#aaa;">(' + item.countWithSurface + '/' + item.total + ')</small></span>' +
+                '</div></div>';
+            surfaceContainer.append(html);
+        });
+    }
+
+    // ======================================================
+    // GRAPHIQUE 3 : Par type de projet (UseType)
+    // ======================================================
+    var usageColors = ['#5B9BD5','#ED7D31','#A5A5A5','#FFC000','#4472C4','#70AD47','#264478','#9B59B6'];
+    var usageData = [
+        {% for key, row in useTypeRows %}
+        {
+            label: {{ (row.name ~ (row.isActive ? '' : ' (archivé)'))|json_encode|raw }},
+            value: {{ row.total }},
+            color: usageColors[{{ key }} % 8]
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    var maxUsage = Math.max.apply(Math, usageData.map(function(d) { return d.value; }));
+    if (maxUsage === 0) maxUsage = 1;
+
+    var usageContainer = $('#usageChart');
+    usageContainer.empty();
+
+    if (usageData.length === 0) {
+        usageContainer.html('<p class="text-muted">Aucune donnée disponible.</p>');
+    } else {
+        usageData.forEach(function(item) {
+            if (item.value === 0) return;
+            var pct = (item.value / maxUsage) * 100;
+            var valuePos = pct < 30 ? 'left:' + (pct + 2) + '%;' : 'left:' + pct + '%;transform:translateX(-100%) translateY(-50%);';
+            if (pct < 30) valuePos += 'transform:translateY(-50%);';
+            var html = '<div class="horizontal-bar-item">' +
+                '<div class="bar-label">' + item.label + '</div>' +
+                '<div class="bar-container">' +
+                '<div class="simple-bar-bg"><div class="simple-bar-fill" style="background:' + item.color + ';width:' + pct + '%;"></div>' +
+                '<span class="simple-bar-value" style="' + valuePos + 'top:50%;">' + item.value + ' cand.</span>' +
+                '</div></div></div>';
+            usageContainer.append(html);
+        });
+    }
+
+    // ======================================================
+    // GRAPHIQUE 5 : Par statut juridique (candidature)
+    // ======================================================
+    var csColors = ['#4472C4','#ED7D31','#A5A5A5','#FFC000'];
+    var companyStatusData = [
+        {% for key, row in companyStatusRows %}
+        { label: {{ row.companyStatus|json_encode|raw }}, value: {{ row.total }}, color: csColors[{{ key }} % 4] }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    var maxCs = Math.max.apply(Math, companyStatusData.map(function(d) { return d.value; }));
+    if (maxCs === 0) maxCs = 1;
+
+    var csContainer = $('#companyStatusChart');
+    csContainer.empty();
+
+    if (companyStatusData.length === 0) {
+        csContainer.html('<p class="text-muted">Aucun statut juridique renseigné.</p>');
+    } else {
+        companyStatusData.forEach(function(item) {
+            var pct = (item.value / maxCs) * 100;
+            var valuePos = pct < 30 ? 'left:' + (pct + 2) + '%;' : 'left:' + pct + '%;transform:translateX(-100%) translateY(-50%);';
+            if (pct < 30) valuePos += 'transform:translateY(-50%);';
+            var html = '<div class="horizontal-bar-item">' +
+                '<div class="bar-label">' + item.label + '</div>' +
+                '<div class="bar-container">' +
+                '<div class="simple-bar-bg"><div class="simple-bar-fill" style="background:' + item.color + ';width:' + pct + '%;"></div>' +
+                '<span class="simple-bar-value" style="' + valuePos + 'top:50%;">' + item.value + ' cand.</span>' +
+                '</div></div></div>';
+            csContainer.append(html);
+        });
+    }
+
+    // ======================================================
+    // GRAPHIQUE 4 : Timeline — candidatures par jour
+    // ======================================================
+    var timelineData = {
+        {% for row in timelineRows %}
+        {{ row.day|json_encode|raw }}: {{ row.total }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    var tlContainer = $('#timelineChartContainer');
+    tlContainer.empty();
+
+    var days = Object.keys(timelineData).sort();
+    if (days.length === 0) {
+        tlContainer.html('<p class="text-muted">Aucune donnée de timeline.</p>');
+    } else {
+        var maxTl = Math.max.apply(Math, days.map(function(d) { return timelineData[d]; }));
+        if (maxTl === 0) maxTl = 1;
+
+        // Largeur minimale de 12px par jour pour que les points soient lisibles,
+        // au minimum la largeur du conteneur pour éviter les espaces vides.
+        var minW = tlContainer.width() || 700;
+        var svgW = Math.max(minW, days.length * 12);
+        tlContainer.css('width', svgW + 'px');
+        var svgH = 180;
+        var padL = 35, padR = 15, padT = 10, padB = 30;
+        var plotW = svgW - padL - padR;
+        var plotH = svgH - padT - padB;
+        var step = plotW / Math.max(days.length - 1, 1);
+
+        var points = days.map(function(d, i) {
+            return { x: padL + i * step, y: padT + plotH - (timelineData[d] / maxTl) * plotH, v: timelineData[d], d: d };
+        });
+
+        var polyline = points.map(function(p) { return p.x + ',' + p.y; }).join(' ');
+        var areaPath = 'M ' + points[0].x + ' ' + (padT + plotH) +
+            ' L ' + points.map(function(p) { return p.x + ' ' + p.y; }).join(' L ') +
+            ' L ' + points[points.length - 1].x + ' ' + (padT + plotH) + ' Z';
+
+        var circles = points.map(function(p) {
+            return '<circle cx="' + p.x + '" cy="' + p.y + '" r="5" fill="#1cc88a" stroke="#fff" stroke-width="2"' +
+                ' data-date="' + p.d + '" data-count="' + p.v + '" class="tl-dot" style="cursor:pointer;"></circle>';
+        }).join('');
+
+        var xLabels = '';
+        var step2 = Math.max(1, Math.floor(days.length / 8));
+        points.forEach(function(p, i) {
+            if (i % step2 === 0 || i === days.length - 1) {
+                xLabels += '<text x="' + p.x + '" y="' + (padT + plotH + 18) + '" text-anchor="middle" font-size="10" fill="#666">' + p.d.substring(5) + '</text>';
+            }
+        });
+
+        var yLabel = '<text x="' + (padL - 5) + '" y="' + (padT + plotH / 2) + '" text-anchor="end" font-size="10" fill="#666">' + maxTl + '</text>' +
+            '<text x="' + (padL - 5) + '" y="' + (padT + plotH) + '" text-anchor="end" font-size="10" fill="#666">0</text>';
+
+        var svg = '<svg width="100%" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '" style="overflow:visible;">' +
+            '<defs><linearGradient id="tlGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1cc88a" stop-opacity="0.3"/><stop offset="100%" stop-color="#1cc88a" stop-opacity="0"/></linearGradient></defs>' +
+            '<path d="' + areaPath + '" fill="url(#tlGrad)"/>' +
+            '<polyline points="' + polyline + '" fill="none" stroke="#1cc88a" stroke-width="2"/>' +
+            circles + xLabels + yLabel +
+            '</svg>';
+
+        tlContainer.html(svg);
+
+        // Tooltip JS pour les points de la timeline
+        var $tlTooltip = $('<div id="tl-tooltip" style="position:fixed;background:#333;color:#fff;padding:5px 10px;border-radius:4px;font-size:12px;pointer-events:none;display:none;z-index:9999;white-space:nowrap;"></div>').appendTo('body');
+
+        tlContainer.on('mouseenter', '.tl-dot', function(e) {
+            var date = $(this).data('date');
+            var count = $(this).data('count');
+            $tlTooltip.text(date + ' : ' + count + ' candidature(s)').show();
+        }).on('mousemove', '.tl-dot', function(e) {
+            $tlTooltip.css({ left: e.clientX + 12, top: e.clientY - 28 });
+        }).on('mouseleave', '.tl-dot', function() {
+            $tlTooltip.hide();
+        });
+    }
+
+});
+</script>
+{% endblock %}

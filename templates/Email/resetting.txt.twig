@@ -1,0 +1,9 @@
+Bonjour,
+
+Vous avez demandé la réinitialisation du mot de passe de votre compte Plateau Urbain{% if user.email %} ({{ user.email }}){% endif %}.
+
+Cliquez sur le lien ci-dessous pour choisir un nouveau mot de passe (lien valable {{ tokenLifetimeHours }} heures) :
+
+{{ resetUrl }}
+
+Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.

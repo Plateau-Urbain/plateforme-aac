@@ -1,0 +1,79 @@
+{# Version "figée" de la section Ma structure (apply) - rendu "récap" (pas d'aspect formulaire) #}
+{% set companyInfo = form.projectHolder.companyInfo.vars.data %}
+{% set nextUrl = path('space_apply', { 'space': space.id }) %}
+{% set profileRole = 'candidat' %}
+
+<div class="pu-profile-recap">
+    <p class="pu-profile-recap__hint">
+        <i class="fa fa-info-circle"></i>
+        Ces informations proviennent de votre profil. Pour les modifier :
+        <a href="{{ path('security_profil_role', { 'role': profileRole, 'next': nextUrl, 'return_anchor': 'two' }) ~ '#two' }}">Mon profil</a>
+    </p>
+
+    <div class="pu-profile-recap__grid">
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Structure</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.company ? companyInfo.company : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Statut</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.companyStatus ? companyInfo.companyStatus : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Date de création</span>
+            <span class="pu-profile-recap__value">
+                {% if companyInfo.companyCreationDate %}
+                    {{ companyInfo.companyCreationDate|date('d/m/Y') }}
+                {% else %}
+                    -
+                {% endif %}
+            </span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">SIRET</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.siret ? companyInfo.siret : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Adresse</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.address ? companyInfo.address : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Code postal / Ville</span>
+            <span class="pu-profile-recap__value">
+                {% set zip = companyInfo.zipcode ? companyInfo.zipcode : '' %}
+                {% set city = companyInfo.city ? companyInfo.city : '' %}
+                {% if zip or city %}
+                    {{ (zip ~ ' ' ~ city)|trim }}
+                {% else %}
+                    -
+                {% endif %}
+            </span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Téléphone</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.companyPhone ? companyInfo.companyPhone : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Mobile</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.companyMobile ? companyInfo.companyMobile : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Effectif</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.companyEffective ? companyInfo.companyEffective : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Structures</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.companyStructures ? companyInfo.companyStructures : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Site</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.companySite ? companyInfo.companySite : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Description</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.companyDescription ? companyInfo.companyDescription : '-' }}</span>
+        </div>
+        
+    </div>
+    
+</div>

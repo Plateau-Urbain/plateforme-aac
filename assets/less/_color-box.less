@@ -1,0 +1,90 @@
+#cboxOverlay{
+  background: black;
+  opacity: .5 !important;
+}
+
+#cboxClose{
+  top: 20px;
+  right: 20px;
+  width: 11px;
+  height: 11px;
+  background: url('/bundles/app/images/close.png') no-repeat;
+  &:hover{
+    background-position: initial;
+  }
+}
+
+#cboxTopLeft,
+#cboxTopCenter,
+#cboxTopRight,
+#cboxMiddleLeft,
+#cboxMiddleRight,
+#cboxBottomLeft,
+#cboxBottomCenter,
+#cboxBottomRight{
+  display: none;
+}
+
+#cboxLoadedContent{
+  height: auto !important;
+  margin-bottom: 0;
+}
+
+#cboxContent{
+  height: auto !important;
+  padding: 20px;
+  border-radius: 5px;
+
+  p{
+    margin: 10px 0;
+
+  }
+
+  .registration{
+    img.icon{
+      margin-bottom: 10px;
+      display: inline-block;
+      width: auto;
+      height: auto;
+    }
+
+    h4{
+      color: #333;
+      font-family: 'Open Sans';
+      font-weight: normal;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .inline-field{
+      label, input{
+        display: inline-block;
+      }
+      input{
+        width: 100px;
+      }
+      label{
+        font-weight: normal;
+      }
+    }
+
+    .forgotten{
+      text-align:left;
+      a{
+        color: #74777c;
+        &:hover{
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .text-left{
+      color: #74777c;
+    }
+  }
+
+  input[type=submit]{
+    display: block;
+    width: 100%;
+  }
+}

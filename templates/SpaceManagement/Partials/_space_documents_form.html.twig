@@ -1,0 +1,30 @@
+
+
+
+
+<h6 >
+  Nom de la pièce à joindre à la candidature
+</h6>
+
+<p>&nbsp;</p>
+
+<div class="row">
+   <div class="col-sm-7">
+    {{form_widget(form.name, {'attr': {'placeholder': 'Nom de la pièce'}})}}
+  </div>
+
+  <div class="col-sm-5">
+    <button type="submit" name="add_document" value="1" class="btn btn-block form-control no-ajax">Ajouter</button>
+  </div>
+
+
+</div>
+
+<ul class="list-dotted">
+  {% for document in documents %}
+    <li class="li-icon check">
+      {{document.name}}
+      <a href="{{ path('space_manager_removedocument', { 'id': document.id, 'token': csrf_token('remove_document') }) }}" class="pull-right"><i class="fa fa-trash"></i></a>
+    </li>
+  {% endfor %}
+</ul>

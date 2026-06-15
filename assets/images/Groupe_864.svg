@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="78.246" height="63.004" viewBox="0 0 78.246 63.004">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_1112" data-name="Rectangle 1112" width="78.246" height="63.004" fill="none" stroke="#14151b" stroke-width="3"/>
+    </clipPath>
+  </defs>
+  <g id="Groupe_864" data-name="Groupe 864" transform="translate(0 0)">
+    <g id="Groupe_863" data-name="Groupe 863" transform="translate(0 0)" clip-path="url(#clip-path)">
+      <path id="Tracé_1294" data-name="Tracé 1294" d="M75.921,4.323V52.531a5.948,5.948,0,0,1-5.949,5.948H2.662A1.662,1.662,0,0,1,1,56.817V5.985A1.663,1.663,0,0,1,2.662,4.323H68.213" transform="translate(0.662 2.863)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <path id="Tracé_1295" data-name="Tracé 1295" d="M49.142,54.343l-1.416-1.6a8.4,8.4,0,0,0-6.292-2.758V1H43.08a6.063,6.063,0,0,1,6.062,6.064Z" transform="translate(27.442 0.662)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <path id="Tracé_1296" data-name="Tracé 1296" d="M11.242,34.413V10.707H44.28V43.745H11.242" transform="translate(7.446 7.091)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <path id="Tracé_1297" data-name="Tracé 1297" d="M11.242,22.367H22.67V18.045" transform="translate(7.446 11.95)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <line id="Ligne_235" data-name="Ligne 235" y2="4.631" transform="translate(30.116 17.887)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <line id="Ligne_236" data-name="Ligne 236" y1="5.609" transform="translate(36.765 45.157)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <line id="Ligne_237" data-name="Ligne 237" x2="14.961" transform="translate(36.765 34.317)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <line id="Ligne_238" data-name="Ligne 238" y2="8.235" transform="translate(36.765 29.995)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <line id="Ligne_239" data-name="Ligne 239" y2="4.721" transform="translate(36.765 17.798)" fill="none" stroke="#14151b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    </g>
+  </g>
+</svg>

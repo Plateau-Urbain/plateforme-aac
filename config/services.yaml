@@ -1,0 +1,153 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    mail_confirmation_from: '%env(MAIL_CONFIRMATION_FROM)%'
+    mail_confirmation_to: '%env(MAIL_CONFIRMATION_TO)%'
+    base_url: '%env(APP_BASE_URL)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Admin/'
+            - '../src/Controller/Admin/'
+    # Injection des paramètres scalaires (non autowirables)
+    App\Command\ImportUserCommand:
+        arguments:
+            $mailConfirmationFrom: '%mail_confirmation_from%'
+            $baseUrl: '%base_url%'
+
+    App\Controller\RegistrationController:
+        arguments:
+            $mailConfirmationFrom: '%mail_confirmation_from%'
+            $baseUrl: '%base_url%'
+
+    App\Controller\PasswordResetController:
+        arguments:
+            $mailConfirmationFrom: '%mail_confirmation_from%'
+            $baseUrl: '%base_url%'
+
+    App\Menu\Builder: ~
+
+    # -------------------------------------------------------------------------
+    # Sonata Admin — 19 classes d'administration
+    # -------------------------------------------------------------------------
+    app.admin.space:
+        class: App\Admin\SpaceAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Space, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Espaces }
+
+    app.admin.parcel:
+        class: App\Admin\ParcelAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Parcel, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Parcelles }
+
+    app.admin.floor:
+        class: App\Admin\FloorAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Floor, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Étages }
+
+    app.admin.application:
+        class: App\Admin\ApplicationAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Application, manager_type: orm, group: plateau_urbain.admin.group.applications, label: Candidatures, controller: App\Controller\Admin\ApplicationAdminController }
+
+    App\Controller\Admin\ApplicationAdminController:
+        public: true
+        tags: ['controller.service_arguments']
+
+    app.admin.application_file:
+        class: App\Admin\ApplicationFileAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\ApplicationFile, manager_type: orm, group: plateau_urbain.admin.group.applications, label: Fichiers candidatures }
+
+    app.admin.user:
+        class: App\Admin\UserAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\User, manager_type: orm, group: plateau_urbain.admin.group.users, label: Utilisateurs, default: true }
+
+    app.admin.user_document:
+        class: App\Admin\UserDocumentAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\UserDocument, manager_type: orm, group: plateau_urbain.admin.group.users, label: Documents utilisateur }
+
+    app.admin.actuality:
+        class: App\Admin\ActualityAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Actuality, manager_type: orm, group: plateau_urbain.admin.group.content, label: Actualités }
+
+    app.admin.category:
+        class: App\Admin\CategoryAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Category, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Catégories }
+
+    app.admin.attribute:
+        class: App\Admin\AttributeAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Attribute, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Attributs }
+
+    app.admin.space_type:
+        class: App\Admin\SpaceTypeAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\SpaceType, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Types d'espace }
+
+    app.admin.use_type:
+        class: App\Admin\UseTypeAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\UseType, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Types d'usage }
+
+    app.admin.local_type:
+        class: App\Admin\LocalTypeAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\LocalType, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Types de local }
+
+    app.admin.space_attribute:
+        class: App\Admin\SpaceAttributeAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\SpaceAttribute, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Attributs espaces }
+
+    app.admin.space_document:
+        class: App\Admin\SpaceDocumentAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\SpaceDocument, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Documents espaces, default: true }
+
+    app.admin.space_image:
+        class: App\Admin\SpaceImageAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\SpaceImage, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Images espaces }
+
+    app.admin.owner:
+        class: App\Admin\OwnerAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\User, manager_type: orm, group: plateau_urbain.admin.group.users, label: Propriétaires }
+
+    app.admin.project_holder:
+        class: App\Admin\ProjectHolderAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\User, manager_type: orm, group: plateau_urbain.admin.group.users, label: Porteurs de projet }
+
+    app.admin.file:
+        class: App\Admin\FileAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\SpaceDocument, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Fichiers }
+
+    mainMenu:
+        class: Knp\Menu\MenuItem
+        factory: ['@App\Menu\Builder', 'mainMenu']
+        arguments: ['@knp_menu.factory', []]
+        tags:
+            - { name: knp_menu.menu, alias: mainMenu }
+    # please note that last definitions always *replace* previous ones

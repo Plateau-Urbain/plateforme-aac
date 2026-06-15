@@ -1,0 +1,43 @@
+.pagination-wrapper{
+  margin-top: 50px;
+  padding-top: 35px;
+  border-color: fade(@brown-text, 50%);
+}
+
+.pagination{
+  li{
+    display: inline-block;
+    margin: -2px;
+
+    &.active > span{
+      border-color: #eee8e1 !important;
+    }
+
+    &.disabled > span{
+      background-color: #eee8e1 !important;
+    }
+
+    &:first-child > span > span:before,
+    &:first-child > a > span:before{
+      content: "\f053";
+      font-family: "FontAwesome";
+    }
+
+    &:last-child > span > span:before,
+    &:last-child > a > span:before{
+      content: "\f054";
+      font-family: "FontAwesome";
+    }
+
+    & > span, & > a{
+      padding: 10px 20px;
+      cursor: pointer;
+      background: @black;
+      color: @white !important;
+
+      &:hover{
+        background: @red !important;
+      }
+    }
+  }
+}

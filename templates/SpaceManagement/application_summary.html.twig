@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Récapitulatif de candidature - {{ application.projectHolder.fullName }}</title>
+    <style>
+        :root{
+            --brand-primary:#2D74BA;
+            --brand-accent:#F2BE6A;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --line:#e5e7eb;
+            --bg:#ffffff;
+            --card:#f8fafc;
+        }
+        *{box-sizing:border-box}
+        body{
+            font-family: Arial, sans-serif;
+            line-height: 1.35;
+            margin: 14px;
+            color: var(--text);
+            background: var(--bg);
+            font-size: 12px;
+        }
+        .actions-bar{
+            display:flex;
+            gap:10px;
+            justify-content:flex-end;
+            align-items:center;
+            margin: 0 0 10px 0;
+        }
+        .btn{
+            appearance:none;
+            border:1px solid var(--brand-primary);
+            background: var(--brand-primary);
+            color:#fff;
+            padding:6px 10px;
+            border-radius:4px;
+            font-weight:bold;
+            cursor:pointer;
+            font-size: 12px;
+        }
+        .hint{color:var(--muted);font-size:11px}
+        .header{
+            display:flex;
+            justify-content:space-between;
+            gap:12px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--brand-primary);
+            border-radius: 6px;
+            background: var(--card);
+            margin-bottom: 10px;
+        }
+        .header h1{
+            margin:0;
+            font-size: 16px;
+            letter-spacing: .2px;
+        }
+        .meta{
+            color: var(--muted);
+            font-size: 11px;
+            text-align:right;
+            white-space:nowrap;
+        }
+        .grid{
+            display:grid;
+            grid-template-columns: 1fr;
+            gap:10px;
+        }
+        .section{
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .section-title{
+            padding: 8px 10px;
+            background: #eef6ff;
+            border-bottom: 1px solid var(--line);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+        }
+        .section-title h2{
+            margin:0;
+            font-size: 12px;
+            color: #0f3f6b;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+        .kv{
+            width:100%;
+            border-collapse: collapse;
+        }
+        .kv tr{border-bottom:1px solid var(--line)}
+        .kv tr:last-child{border-bottom:none}
+        .kv th, .kv td{
+            padding:6px 10px;
+            vertical-align: top;
+        }
+        .kv th{
+            width: 38%;
+            color: #0b2239;
+            font-weight: 700;
+            text-align:left;
+            background: #fbfdff;
+        }
+        .kv td{color: var(--text)}
+        .empty{color: var(--muted); font-style: italic}
+
+        @media (min-width: 900px){
+            body{margin: 16px;}
+            .grid{grid-template-columns: 1fr 1fr;}
+        }
+        @media print{
+            body{margin:0; font-size:11px;}
+            .no-print{display:none !important;}
+            .grid{grid-template-columns: 1fr 1fr;}
+            .section{break-inside: avoid; page-break-inside: avoid;}
+        }
+    </style>
+</head>
+<body>
+    <div class="actions-bar no-print">
+        <button type="button" class="btn" onclick="window.print()">Imprimer</button>
+        <span class="hint">Astuce : dans la fenêtre d’impression, choisissez “Enregistrer en PDF”.</span>
+    </div>
+
+    <div class="header">
+        <div>
+            <h1>Récapitulatif de candidature</h1>
+            <div style="margin-top:4px;color:var(--muted);">
+                <strong style="color:var(--text);">{{ application.name }}</strong>
+                — {{ application.projectHolder.fullName }}
+            </div>
+        </div>
+        <div class="meta">
+            <div><strong style="color:var(--text);">Espace</strong> : {{ application.space.name }}</div>
+            <div><strong style="color:var(--text);">Export</strong> : {{ "now"|date("d/m/Y H:i") }}</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        {% for category, rows in recapByCategory|default({}) %}
+            <div class="section">
+                <div class="section-title">
+                    <h2>{{ category }}</h2>
+                </div>
+                <table class="kv">
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                <th>{{ row.label }}</th>
+                                <td>
+                                    {% if row.value is same as('') %}
+                                        <span class="empty">—</span>
+                                    {% else %}
+                                        {{ row.value|nl2br }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

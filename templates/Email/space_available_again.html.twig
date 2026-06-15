@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Espace à nouveau disponible</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #bc1b38;">🎉 Bonne nouvelle !</h2>
+        
+        <p>Bonjour,</p>
+        
+        <p>L'espace <strong>{{ space.name }}</strong> à <strong>{{ space.city }}</strong> est à nouveau disponible pour les candidatures !</p>
+        
+        <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #bc1b38; margin: 20px 0;">
+            <h3 style="margin-top: 0;">📋 Détails de l'espace :</h3>
+            <ul style="margin: 10px 0;">
+                <li><strong>Type :</strong> {{ space.type }}</li>
+                <li><strong>Prix :</strong> À partir de {{ space.price }}€/m²/mois</li>
+                <li><strong>Surface :</strong> De {{ space.minSpace }} à {{ space.maxSpace }} m²</li>
+                <li><strong>Date limite :</strong> {{ space.limitAvailability|date('d/m/Y') }}</li>
+            </ul>
+        </div>
+        
+        <p>Vous aviez commencé une candidature pour cet espace qui a été sauvegardée en brouillon. Vous pouvez maintenant :</p>
+        
+        <ul>
+            <li>✅ <strong>Finaliser votre candidature</strong> en vous connectant à votre espace personnel</li>
+            <li>✅ <strong>Modifier vos informations</strong> si nécessaire</li>
+            <li>✅ <strong>Soumettre votre dossier</strong> au propriétaire</li>
+        </ul>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ url('space_apply', {'space': space.id}) }}" style="background: #bc1b38; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                📝 Finaliser ma candidature
+            </a>
+        </div>
+        
+        <p><em>N'hésitez pas à nous contacter si vous avez des questions !</em></p>
+        
+        <p>Cordialement,<br>
+        L'équipe Plateau Urbain</p>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+        <p style="font-size: 12px; color: #666;">
+            Cet email a été envoyé automatiquement. Si vous ne souhaitez plus recevoir ces notifications, 
+            vous pouvez modifier vos préférences dans votre espace personnel.
+        </p>
+    </div>
+</body>
+</html>

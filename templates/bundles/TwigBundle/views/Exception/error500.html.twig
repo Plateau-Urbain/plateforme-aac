@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row-flexe page-404">
+<div class="col5">
+    <div class="col1 col-xs-6 col-md-5">
+            <div class="contener-img1">
+                <div class="img1"><img src="{{ asset('/bundles/app/images/opale-1.jpg') }}" alt="Plateau Urbain" /></div>
+            </div>
+            <div class="contener-img2">
+                <div class="img2"><img src="{{ asset('/bundles/app/images/amelot.jpg') }}" alt="Plateau Urbain" /></div>
+            </div>
+    </div>
+    <div class="col-xs-6 col-md-7">
+            <div class="contener-img3">
+                <div class="img3"><img src="{{ asset('/bundles/app/images/opale.jpg') }}" alt="Plateau Urbain" /></div>
+            </div>
+            <div class="contener-img4">
+                <div class="img4"><img src="{{ asset('/bundles/app/images/asnieres.jpg') }}" alt="Plateau Urbain" /></div>
+             </div>
+    </div>
+</div>
+    <div class="col3 col-xs-12 col-md-5 sans-marge">
+            <h1>500</h1>
+            <h6>Cette page est temporairement indisponible.</h6>
+            <a href="{{ path('homepage') }}" class="btn btn-line"><span>Retour à l'accueil</span></a>
+    </div>
+</div>
+{% endblock %}

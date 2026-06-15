@@ -1,0 +1,181 @@
+.property-title{
+  font-size: 30px;
+  color: black;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin: 15px 0;
+
+  small{
+    font-weight: bold;
+    font-style: normal;
+    font-size: 18px;
+    color: @brown-dark;
+  }
+}
+
+
+.sidebar{
+  background: @cream;
+
+  &.no-padding{
+    padding: 0;
+  }
+
+  hr{
+    border-top-color: @brown-light;
+    margin: 0;
+    opacity: .5
+  }
+
+  .content{
+    background: @cream;
+    padding: 20px;
+  }
+
+  .pu-label{
+    font-size: 12px;
+    text-transform: uppercase;
+    color: @brown-text;
+  }
+
+  .pu-price-zone{
+    border: none;
+    color: @black;
+
+    dt{
+      width: 50px;
+      text-align: center;
+    }
+    dd{
+      margin-left: 50px;
+
+      .pu-label{
+        line-height: 40px;
+      }
+      .pu-title{
+        font-weight: bold;
+        line-height: 40px;
+
+        strong{
+          font-size: 22px;
+        }
+      }
+    }
+  }
+
+  .pu-apply-zone{
+    h4{
+      color: @brown-text;
+      margin: 30px 0 5px;
+    }
+
+    .apply-date{
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .apply{
+      margin-bottom: 20px;
+    }
+  }
+}
+
+.pu-col-container.content-block{
+  padding-top: 0;
+  margin-bottom: 80px;
+
+  p,
+  .content,
+  .property-amenities-list,
+  .pu-table-wrapper{
+    color: @brown-text-dark;
+    padding-left: 35px;
+  }
+
+  .property-amenities-list li {
+    margin-left: 0;
+    &:before{
+      color: @red;
+    }
+  }
+
+  &.desc-mention {
+    hr{
+      border-top-color: @brown-text;
+      opacity: .5;
+    }
+
+    p{
+      color: @brown-text;
+      font-size: 12px;
+    }
+  }
+
+}
+
+
+.pu-parcels-table{
+  td, th{
+    &:not(:last-child){
+      border-right: solid 1px @grey;
+    }
+  }
+
+  thead th{
+    background: @brown-ligther;
+  }
+  tbody tr{
+    color: @black;
+    background: #F6EFE7;
+
+    &:nth-child(odd){
+      background: #E9E2DA;
+    }
+  }
+}
+
+
+.candidate-application{
+  position: relative;
+  background: @white;
+  padding-top: 40px;
+  padding-bottom: 40px;
+
+  .top{
+    background: url('/bundles/app/images/white_top.png') no-repeat bottom;
+    background-size: contain;
+    height: 40px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -40px;
+    z-index: 100;
+  }
+
+  h3{
+    font-size: 30px;
+  }
+
+  form{
+    margin-top: 30px;
+  }
+
+  p.tip{
+    margin-top: 30px;
+  }
+
+  .files{
+    margin-bottom: 20px;
+
+    .files-list{
+      color: @black;
+      margin-top: 10px;
+      margin-bottom: 20px;
+
+      i{
+        margin-right: 5px;
+        color: @red;
+      }
+    }
+  }
+}

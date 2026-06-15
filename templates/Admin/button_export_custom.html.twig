@@ -1,0 +1,5 @@
+{% if is_granted('EXPORT', admin.class) or is_granted('ROLE_ADMIN') %}
+    <a class="btn btn-success" href="{{ admin.generateUrl('select_export_fields', admin.filterParameters is not empty ? {filter: admin.filterParameters} : {}) }}" title="Exporter avec sélection des colonnes">
+        <i class="fa fa-table"></i> Export personnalisé
+    </a>
+{% endif %}

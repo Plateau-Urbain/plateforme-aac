@@ -1,0 +1,341 @@
+{% extends "base.html.twig" %}
+
+{# {% block breadcrumb %}{% endblock %} #}
+
+{% block prebody %}
+
+{% endblock %}
+
+{#{% block containerbkg %}
+  <div class="top"></div>
+{% endblock %}#}
+
+{#{% block prebody %}
+#}{#    {% include "Search/_map.html.twig" with {'form' : form } %} #}{#
+    {% include "Search/_search_form.html.twig" with {'form' : form } %}
+{% endblock %}#}
+
+
+{% block body %}
+    </div>
+</div>
+
+<div class="content beige">
+        <div class="container">
+    <section class='row pu-home-content accroche'>
+        <div class='col-sm-12 '>
+            <div class="image-home"></div>
+            <h1 class="center">Vous cherchez un espace de travail abordable dans un tiers-lieu vivant et <span class="nowrap">créatif ?</h1>
+            <p class="center p-30 space-ss ">Consultez nos appels à candidatures en cours et inscrivez-vous pour être informé·es <span class="nowrap">dès qu’il y en a de nouveaux !</span></p>
+            <div class="center">
+                <a href='https://plateforme.plateau-urbain.com/register/' target="" class='btn btn-line'><span>Je m'inscris</span></a>
+            </div>
+        </div>
+    </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content separateur">
+        <div class="container">
+                    <div class="row pu-home-content">         
+        <div class='col-sm-12 left'>
+            <div class="btn-ancre-wrapper">
+            <a href='https://www.plateau-urbain.com/recherche/#proprio' target="_blank" class='btn-ancre'><i class="btn-ancre-icone"></i><h6>Vous êtes propriétaire d'un bâtiment ?</h6></a>
+            </div>
+            <div class="btn-ancre-wrapper">
+           <a href='https://www.plateau-urbain.com/recherche/#faq' target="_blank" class='btn-ancre'> <i class="btn-ancre-icone"></i><h6>Vous avez des questions ? Consultez la FAQ</h6></a>
+            </div>
+        </div>
+</section>
+        </div>
+    </div>
+</div>
+<div id="aac" class="aac"></div>
+<div class="content white">
+        <div class="container">
+                    <div class="row pu-home-content">
+                        <div class="col-sm-12 center">
+        <div class="candidature">
+
+   {% if app.user %}
+    {% if app.user.isProprio() %}
+        <p>Bonjour <span class="mailto">{{ app.user.firstname }}</span>,</p>
+    {% elseif app.user.isProfileComplete() %}
+        <p>Bonjour <span class="mailto">{{ app.user.firstname }}</span>,</p>
+    {% else %}
+        <div style="margin: 20px 0; padding: 20px; font-size: 20px; color: #333;">
+            <i class="fa fa-exclamation-triangle" style="margin-right: 8px; color: #e9473c;"></i>
+            <strong>Votre profil est incomplet :</strong> Votre profil doit être complet pour pouvoir candidater. 
+            <a href="{{ path('security_profil') }}" class="mailto" style="color: #e9473c; font-weight: bold;">Complétez votre profil dès maintenant</a> pour simplifier vos candidatures futures.
+        </div>
+    {% endif %}
+
+{% endif %}
+                <h2>
+                    Les derniers appels à candidatures
+                    {% if isAdmin is defined and isAdmin %}
+                        <small style="color: #e9473c; font-size: 0.7em;">Vue Admin </small>
+                    {% endif %}
+                </h2>
+        </div>
+    </div>
+
+
+
+
+<!-- BEGIN PROPERTY LISTING -->
+    <div class="row last-space row-flex" id="js-results">
+
+
+{#        <h2 class="section-title animate-from-bottom animation-from-bottom" data-animation-direction="from-bottom" data-animation-delay="50">Les espaces disponibles</h2>#}
+
+        {% if latest|length %}
+            {% for space in latest %}
+                <div class="item col-xs-12 col-md-6 col-lg-4">
+                     <div class="space_item{{ space.isProposedByAdmin ? ' space-card--by-admin' : ' space-card--by-proprio' }}">
+                    <!-- Set width to 4 columns for grid view mode only -->
+                    <a href="{{ path('space_show', {'id' : space.id}) }}" >
+                        <div class="image">
+                            <img src="{% if space.pics.0 is defined %}{{ vich_uploader_asset(space.pics.0, 'file') }}{% endif %}" alt="" />
+                            <div class="availability-overlay">
+                                <span class="availability-text">Période de disponibilité : {{ space.availability }}</span>
+                            </div>
+                            {% if isAdmin is defined and isAdmin %}
+                                {% if not space.enabled %}
+                                    <div class="admin-status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(255, 165, 0, 0.9); color: white; padding: 3px 8px; border-radius: 3px; font-size: 10px; font-weight: bold;">
+                                        DÉSACTIVÉ
+                                    </div>
+                                {% elseif space.closed %}
+                                    <div class="admin-status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.9); color: white; padding: 3px 8px; border-radius: 3px; font-size: 10px; font-weight: bold;">
+                                        FERMÉ
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+{#                        <div class="price_contener">
+                            <span class="top">à partir de</span><br />
+                            <span class="price">{{ space.price }}€</span><span> /M<sup>2</sup>/MOIS</span>
+                        </div>#}
+                        <div class="foot">
+                            <p class="ville">{{ space.city }} ({{ space.depCode }})</p>
+                            <h3 class="h3-21">{{ space.name }}</h3>
+                            <ul>
+                            <li>{{ space.type }}</li>
+                            <!-- AJOUT OLIVIER -->
+                            <li>
+                                {% if space.priceText %}
+                                    {{ space.priceText }}
+                                {% else %}
+                                    À partir de {{ space.price * 12 }} € / m<sup>2</sup> / an
+                                {% endif %}
+                            </li>
+                            <li>
+                                <strong>{{ space.nbSpaces }}</strong> espace(s) de {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup>
+                            </li>
+                        </ul>
+                        <div class="calendar"></div>
+                            <div class="apply-date">
+                            <p class="apply-date-p">Date limite de candidature</p>
+                            <p class="apply-date-b">
+                                {{ space.limitAvailability|date('d/m/Y') }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
+                            </p>
+                            </div>
+                            <!-- FIN AJOUT OLIVIER -->
+                        </div>
+                    </a>
+                </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-xs-12"> <p class="h3-21">Il n'y a aucun espace disponible actuellement.</p><p class="info-inscription"> Vous souhaitez être maintenu informé·es des appels à candidatures en cours, <a class="red" href="https://plateforme.plateau-urbain.com/register/">inscrivez-vous.</a></p></h3></div>
+        {% endif %}
+
+{#        <h2 class="section-title animate-from-bottom animation-from-bottom" data-animation-direction="from-bottom" data-animation-delay="50">Les espaces occupés</h2>#}
+
+        {% for space in unavailableSpaces %}
+            <div class="item col-xs-12 col-md-6 col-lg-4">
+                <div class="space_item_unavailable{{ space.isProposedByAdmin ? ' space-card--by-admin' : ' space-card--by-proprio' }}">
+                <div class="image">
+                    <img src="{% if space.pics.0 is defined %}{{ vich_uploader_asset(space.pics.0, 'file') }}{% endif %}" alt="" />
+                    <div class="availability-overlay">
+                        <span class="availability-text">Période de disponibilité : {{ space.availability }}</span>
+                    </div>
+                    {% if isAdmin is defined and isAdmin %}
+                        {% if not space.enabled %}
+                            <div class="admin-status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(255, 165, 0, 0.9); color: white; padding: 3px 8px; border-radius: 3px; font-size: 10px; font-weight: bold;">
+                                DÉSACTIVÉ
+                            </div>
+                        {% elseif space.closed %}
+                            <div class="admin-status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.9); color: white; padding: 3px 8px; border-radius: 3px; font-size: 10px; font-weight: bold;">
+                                FERMÉ
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                {# <div class="price_contener">
+                    <span class="top">à partir de</span><br />
+                    <span class="price">{{ space.price }}€</span><span> /M<sup>2</sup>/MOIS</span>
+                </div> #}
+                <div class="foot-unavailable">
+                    <p class="ville">{{ space.city }} ({{ space.depCode }})</p>
+                    <h3 class="h3-21">{{ space.name }}</h3>
+                    <ul>
+                    <li>{{ space.type }}</li>
+                    <!-- AJOUT OLIVIER -->
+                    <li>
+                        {% if space.priceText %}
+                            {{ space.priceText }}
+                        {% else %}
+                            À partir de {{ space.price * 12 }} € / m<sup>2</sup> / an
+                        {% endif %}
+                    </li>
+                    <li>
+                        <strong>{{ space.nbSpaces }}</strong> espaces de {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup>
+                    </li>
+                </ul>
+                <div class="calendar"></div>
+                            <div class="apply-date">
+                            <p class="apply-date-p">Date limite de candidature</p>
+                            <p class="apply-date-b">Terminé</p>
+                            </div>
+<!-- FIN AJOUT OLIVIER -->           
+                </div>
+                 <div id="overlay"></div>
+            </div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+   <section class='row pu-home-content inscription '>
+       <div class="col-xs-12 col-md-2 col-lg-1 ">
+                <div class="bat"></div>
+            </div>
+            <div class="col-xs-12 col-md-6 col-lg-7 ">
+                <p class="p-30">Inscrivez-vous pour recevoir en avant-première les nouveaux appels à candidatures</p>
+            </div>
+            <div class="col-xs-12 col-md-4 col-lg-4 btn-right">
+                <a href='https://plateforme.plateau-urbain.com/register/' target="_blank" class='btn btn-line'><span>Je m'inscris</span></a>
+            </div>
+       
+    </section>
+
+    </div>
+</div>
+</div>
+</div>
+
+
+   
+<div id="faq"></div>
+<div class="content orange">
+    <div class="container">
+        <div class="row pu-home-content faq">
+            <h2 class="titre">Candidater, comment ça marche ?</h2>
+            <div class="col-xs-12 col-md-6 col-lg-6">
+                
+                <div class="un"></div>
+                <div class="faq-txt">
+                    <p class="p-56">1 .</p>
+                    <p class="expliq p-24">Je consulte les appels à candidatures en cours</p>
+                </div>
+
+                <div class="deux"></div>
+                <div class="faq-txt">
+                    <p class="p-56">2 .</p>
+                    <p class="expliq p-24">Je candidate en précisant mon projet et mes besoins</p> 
+                    <p><strong>Important :</strong> Votre profil doit être complet pour pouvoir candidater. Complétez-le dès maintenant pour faciliter vos candidatures.</p>
+                    <p>Je reçois ensuite un mail de confirmation de dépôt de candidature (vérifier les spams)</p>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-6 col-lg-6">
+                <div class="trois"></div>
+                <div class="faq-txt">
+                    <p class="p-56">3 .</p>
+                    <p class="expliq p-24">Je prends rendez-vous pour une visite de site</p>
+                </div>
+
+                <div class="quatre"></div>
+                <div class="faq-txt">
+                    <p class="p-56">4 .</p>
+                    <p class="expliq p-24">À l'issue de la visite, je confirme ma candidature et précise les lots visés</h5>
+                </div>
+            </div>
+            </div>
+
+        
+         </div>
+    </div>
+</div>
+ <div id="proprio"></div>
+    <div class="content beige">
+        <div class="container">
+                    <div class="row pu-home-content espace ">
+                       
+        <div class="col-sm-12 col-md-6 col-lg-4">        
+            <div class="img-espace"><img src="{{ asset('/bundles/app/images/Groupe-1050.png') }}" alt="Plateau Urbain" /></div>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-5">
+        <h2>Proposer un espace</h2>
+            <p class="p-21-regular">Vous êtes PROPRIÉTAIRE ou GÉRANT•E et souhaitez redonner une utilité à un espace vacant ? Vous pouvez proposer la gestion de votre bâtiment à Plateau Urbain ou bien diffuser sur notre plateforme votre appel à candidatures auprès de 12 000 inscrit·es et ainsi valoriser votre patrimoine inutilisé tout en ayant un impact positif sur le plan sociétal.</p>
+        </div>
+        <div class="col-sm-12 col-md-offset-6 col-md-6 col-lg-offset-0 col-lg-3 espace btn-espace">
+            <a href='https://www.plateau-urbain.com/notre-accompagnement/montage-et-gestion/' class='btn btn-line-2'><span>Découvrir notre offre</span></a>
+        </div>
+                    </div>
+        </div>
+    </div>
+
+<div class="content plusinfos">
+    <div class="container">
+        <div class="row pu-home-content info">
+
+            <div class="col-xs-12 col-md-8 col-lg-8">
+                <p class="p-30 blanc">Vous souhaitez obtenir plus d'informations</p>
+            </div>
+            <div class="col-xs-12 col-md-4 col-lg-4  btn-right">
+                <a href='https://www.plateau-urbain.com/contactez-nous/' class='btn btn-line'><span>Contactez-nous</span></a>
+            </div>
+
+    </div>
+</div>
+</div>
+{% endblock %}
+
+
+
+{#{% block javascript %}
+    {{ parent() }}
+
+    {% include "Search/_map_js.html.twig" with {'departements' : departements} %}
+
+{% endblock %}#}
+{% block javascript %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Vérifier si l'élément avec la classe "connectMenured" est présent dans le DOM
+      const connectMenured = document.querySelector('.connectMenured');
+      if (connectMenured) { // Si .connectMenured est chargé
+        // Cacher la section avec la classe "beige"
+        const beige = document.querySelector('.beige');
+        if (beige) {
+          beige.style.display = 'none'; // Cache la section beige
+        }
+
+        // Cacher le conteneur avec la classe "separateur"
+        const separateur = document.querySelector('.separateur');
+        if (separateur) {
+          separateur.style.display = 'none'; // Cache le conteneur separateur
+        }
+
+        // Cacher le conteneur avec la classe "info-inscription"
+        const infoInscription = document.querySelector('.info-inscription');
+        if (infoInscription) {
+          infoInscription.style.display = 'none'; // Cache le conteneur info-inscription
+        }
+      }
+    });
+  </script>
+{% endblock %}
