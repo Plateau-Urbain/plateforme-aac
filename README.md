@@ -8,6 +8,7 @@ Application web Symfony pour la gestion d'occupations temporaires, de candidatur
 - [Composer](https://getcomposer.org/) 2
 - MySQL ou MariaDB
 - Extensions PHP requises : voir `composer.json` (`ctype`, `iconv`, `pdo_mysql`, `intl`, `mbstring`, …)
+- [Less](http://lesscss.org/) (`lessc`) pour compiler les feuilles de style — ex. `brew install lessc` sur macOS
 
 ## Installation
 
@@ -25,11 +26,34 @@ symfony server:start
 # ou nginx + php-fpm avec la racine web pointant vers public/
 ```
 
-Les assets front legacy sont servis sous `/bundles/app/`. Ils sont régénérés automatiquement après `composer install` ; pour forcer une reconstruction :
+## Assets front (CSS, images, JS)
+
+Les sources sont dans `assets/` (Less, CSS, images, JS). Elles sont exposées sous `/bundles/app/` via `public/bundles/app/` (généré, non versionné).
+
+| Répertoire | Rôle |
+|------------|------|
+| `assets/less/main.less` | Source Less principale |
+| `assets/css/` | CSS compilés et librairies |
+| `assets/images/` | Images statiques du thème |
+| `public/images/` | Images legacy (logos, etc.) |
+| `public/uploads/` | Fichiers déposés par l'application (Vich Uploader) |
+
+Après modification des styles ou ajout d'images statiques :
 
 ```bash
+make          # compile main.less → main.css, puis reconstruit public/bundles/app/
+make css      # compilation Less uniquement
+make bundles  # reconstruction de public/bundles/app/ uniquement
+```
+
+Équivalent manuel :
+
+```bash
+lessc assets/less/main.less assets/css/main.css
 python3 scripts/rebuild_bundle_app_assets.py
 ```
+
+`composer install` relance aussi la reconstruction des bundles via les scripts post-install.
 
 ## Tests
 
