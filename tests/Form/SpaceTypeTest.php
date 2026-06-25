@@ -5,6 +5,8 @@ namespace App\Tests\Form;
 use App\Entity\Space;
 use App\Entity\SpaceImage;
 use App\Form\SpaceType;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 
 class SpaceTypeTest extends AbstractFormTestCase
 {
@@ -47,5 +49,39 @@ class SpaceTypeTest extends AbstractFormTestCase
         $this->assertFalse($form->has('doc_aac'));
         $this->assertFalse($form->has('doc_plan'));
         $this->assertFalse($form->has('doc_faq'));
+    }
+
+    public function testAddPhotoSubmissionBindsUploadedFileToPicsField(): void
+    {
+        $space = new Space();
+        $form = $this->formFactory->create(SpaceType::class, $space, [
+            'csrf_protection' => false,
+        ]);
+
+        $tmp = tempnam(sys_get_temp_dir(), 'space_photo_');
+        copy(__DIR__ . '/../../public/images/groupe_ajouter_espace.png', $tmp);
+        $uploaded = new UploadedFile($tmp, 'test.png', 'image/png', null, true);
+
+        $request = Request::create('/', 'POST', [
+            'appbundle_space' => [
+                'name' => 'Espace test',
+            ],
+            'add_photo' => '1',
+        ], [], [
+            'appbundle_space' => [
+                'pics' => [
+                    'file' => [
+                        'file' => $uploaded,
+                    ],
+                ],
+            ],
+        ]);
+
+        $form->handleRequest($request);
+
+        $this->assertTrue($form->isSubmitted());
+        $newImage = $form->get('pics')->getData();
+        $this->assertInstanceOf(SpaceImage::class, $newImage);
+        $this->assertNotNull($newImage->getFile());
     }
 }

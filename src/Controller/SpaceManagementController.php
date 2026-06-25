@@ -18,6 +18,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -2295,7 +2297,7 @@ class SpaceManagementController extends AbstractController
         }
 
         if ($request->request->has('add_photo')) {
-            return $this->handleAddPhotoSubmission($form, $space);
+            return $this->handleAddPhotoSubmission($request, $form, $space);
         }
 
         return null;
@@ -2352,23 +2354,72 @@ class SpaceManagementController extends AbstractController
         return $this->persistSpaceAndRedirectToEdit($space, 'La pièce demandée a été ajoutée.');
     }
 
-    private function handleAddPhotoSubmission(FormInterface $form, Space $space): Response
+    private function handleAddPhotoSubmission(Request $request, FormInterface $form, Space $space): Response
     {
         if (!$form->has('pics')) {
             return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire photo indisponible.');
         }
 
-        $newImage = $form->get('pics')->getData();
-        if (!$newImage instanceof SpaceImage || $newImage->getFile() === null) {
+        $newImage = $this->extractSpaceImageFromPhotoForm($form, $request);
+        if ($newImage === null || $newImage->getFile() === null) {
             return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez sélectionner une photo à ajouter.');
         }
 
-        if (!$space->getPics()->contains($newImage)) {
-            $newImage->setPosition(count($space->getPics()));
+        if (!\in_array($newImage, $space->getPics(), true)) {
+            $newImage->setPosition(\count($space->getPics()));
             $space->addPic($newImage);
         }
 
         return $this->persistSpaceAndRedirectToEdit($space, 'La photo a été ajoutée.');
+    }
+
+    private function extractSpaceImageFromPhotoForm(FormInterface $form, Request $request): ?SpaceImage
+    {
+        if (!$form->has('pics')) {
+            return null;
+        }
+
+        $picsForm = $form->get('pics');
+        $image = $picsForm->getData();
+        if (!$image instanceof SpaceImage) {
+            $image = new SpaceImage();
+        }
+
+        if ($image->getFile() !== null) {
+            return $image;
+        }
+
+        if ($picsForm->has('file')) {
+            $fileField = $picsForm->get('file');
+            $uploaded = $fileField->has('file')
+                ? $fileField->get('file')->getData()
+                : $fileField->getData();
+
+            if ($uploaded instanceof File) {
+                $image->setFile($uploaded);
+
+                return $image;
+            }
+        }
+
+        $spaceFiles = $request->files->get('appbundle_space');
+        if (!\is_array($spaceFiles)) {
+            return null;
+        }
+
+        $picsFiles = $spaceFiles['pics'] ?? null;
+        if (!\is_array($picsFiles)) {
+            return null;
+        }
+
+        $uploaded = $picsFiles['file']['file'] ?? $picsFiles['file'] ?? null;
+        if ($uploaded instanceof UploadedFile) {
+            $image->setFile($uploaded);
+
+            return $image;
+        }
+
+        return null;
     }
 
     private function redirectAfterSpaceFormAction(Space $space, string $label, string $message): Response

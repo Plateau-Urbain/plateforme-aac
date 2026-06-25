@@ -91,6 +91,7 @@ class SpaceType extends AbstractType
                 [
                 'label' => 'Ajouter une photo',
                 'mapped' => false,
+                'data' => new SpaceImage(),
                 'required' => false,
                 'error_bubbling' => false
             ]
@@ -101,6 +102,7 @@ class SpaceType extends AbstractType
                 [
                 'label'     => 'Ajouter un document',
                 'mapped' => false,
+                'data' => new SpaceDocument(),
                 'required' => false
             ]
             )
@@ -110,6 +112,7 @@ class SpaceType extends AbstractType
                 [
                 'label'            => 'Ajouter une visite',
                 'mapped'           => false,
+                'data'             => new SpaceVisit(),
                 'required'         => false,
                 'validation_groups' => false,
             ]
@@ -119,6 +122,7 @@ class SpaceType extends AbstractType
             $builder->add('doc_aac', SpaceDocType::class, [
                     'label' => "Document d'appel à candidature",
                     'mapped' => false,
+                    'data' => new SpaceImage(),
                     'required' => false,
                     'error_bubbling' => false,
                     'file_type' => SpaceImage::FILETYPE_DOCUMENT_AAC,
@@ -129,6 +133,7 @@ class SpaceType extends AbstractType
             $builder->add('doc_plan', SpaceDocType::class, [
                     'label' => "Répartition des espaces",
                     'mapped' => false,
+                    'data' => new SpaceImage(),
                     'required' => false,
                     'error_bubbling' => false,
                     'file_type' => SpaceImage::FILETYPE_DOCUMENT_PLAN,
@@ -139,6 +144,7 @@ class SpaceType extends AbstractType
             $builder->add('doc_faq', SpaceDocType::class, [
                     'label' => "F.A.Q",
                     'mapped' => false,
+                    'data' => new SpaceImage(),
                     'required' => false,
                     'error_bubbling' => false,
                     'file_type' => SpaceImage::FILETYPE_DOCUMENT_FAQ,
