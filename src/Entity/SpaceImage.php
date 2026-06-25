@@ -5,7 +5,6 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -13,7 +12,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  * SpaceImage
  *
  */
-#[ORM\Entity(repositoryClass: \Gedmo\Sortable\Entity\Repository\SortableRepository::class)]
+#[ORM\Entity(repositoryClass: \App\Repository\SpaceImageRepository::class)]
 #[ORM\Table(name: 'space_image')]
 #[Vich\Uploadable]
 class SpaceImage
@@ -43,23 +42,17 @@ class SpaceImage
     #[ORM\Column(name: 'file_type', type: 'string')]
     protected $fileType;
 
-    /**
-     * @Gedmo\SortableGroup
-     */
     #[ORM\ManyToOne(targetEntity: \App\Entity\Space::class, inversedBy: 'pics')]
     #[ORM\JoinColumn(name: 'space_id', referencedColumnName: 'id')]
     protected $space;
 
     /**
      * @var int
-     *
-     * @Gedmo\SortablePosition
      */
     #[ORM\Column(name: 'position', type: 'smallint')]
     protected $position;
 
     /**
-     * @Gedmo\Timestampable(on="update")
      * @var \DateTime
      */
     #[ORM\Column(name: 'updatedAt', type: 'datetime')]
