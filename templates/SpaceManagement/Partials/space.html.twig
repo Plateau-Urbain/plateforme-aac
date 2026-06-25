@@ -1,9 +1,15 @@
 <div class="col-sm-12">
   <div class="item application-space space-card list-aac{{ space.isProposedByAdmin ? ' space-card--by-admin' : ' space-card--by-proprio' }}">
+    
 
     <div class="row row-flex">
       <div class="col-xs-12 col-md-4">
         <div class="image">
+          {% if space.isProposedByAdmin %}
+            <span class="pu-managed-badge"><i class="fa fa-shield"></i> Géré par Plateau Urbain</span>
+          {% elseif space.owner and space.owner.company %}
+            <span class="pu-owner-badge"><i class="fa fa-building"></i> Géré par {{ space.owner.company }}</span>
+          {% endif %}
           <div class="overlay">
             {% if space.isClosed %}
               <div class="clos"><p> Appel à candidature cloturé</p></div>
@@ -101,7 +107,7 @@
                             <div class="apply-date">
                             <p class="apply-date-p">Date limite de candidature</p>
                             <p class="apply-date-b">
-                  {{ space.limitAvailability | localizeddate("long", "none") }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
+                  {{ space.limitAvailability | localizeddate("long", "none", "fr") }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
                   </p>
                       </div>
 

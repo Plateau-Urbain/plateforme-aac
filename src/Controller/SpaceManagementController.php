@@ -607,8 +607,10 @@ class SpaceManagementController extends AbstractController
                 'Facebook' => 'projectHolder.facebookUrl',
                 'Twitter' => 'projectHolder.twitterUrl',
                 'Instagram' => 'projectHolder.instagramUrl',
-                'Google+' => 'projectHolder.googleUrl',
                 'Linkedin' => 'projectHolder.linkedinUrl',
+                'YouTube' => 'projectHolder.youtubeUrl',
+                'TikTok' => 'projectHolder.tiktokUrl',
+                'Bluesky' => 'projectHolder.googleUrl',
                 'Autre' => 'projectHolder.otherUrl',
                 'Présentation du projet' => 'description',
                 'Quel sera l\'usage du local ?' => 'localUsageDescription',
@@ -1181,7 +1183,7 @@ class SpaceManagementController extends AbstractController
                 'category' => 'Profil - Réseaux sociaux'
             ],
             'projectHolder_googleUrl' => [
-                'label' => '[Profil] Google+',
+                'label' => '[Profil] Bluesky',
                 'property' => 'projectHolder.googleUrl',
                 'category' => 'Profil - Réseaux sociaux'
             ],
@@ -1870,8 +1872,16 @@ class SpaceManagementController extends AbstractController
         $spaceId = $image->getSpace()?->getId() ?? 0;
 
         $em = $this->em;
-        $em->remove($image);
-        $em->flush();
+        try {
+            $em->remove($image);
+            $em->flush();
+        } catch (\Throwable $e) {
+            return new \Symfony\Component\HttpFoundation\Response(
+                'Erreur lors de la suppression: ' . get_class($e) . ': ' . $e->getMessage() . "\n\n" . $e->getTraceAsString(),
+                500,
+                ['Content-Type' => 'text/plain']
+            );
+        }
 
         $this->addFlash('success', 'La photo a été supprimée.');
 
@@ -1885,7 +1895,7 @@ class SpaceManagementController extends AbstractController
      * @return RedirectResponse
      */
      #[Route("/photo/{id}/move/{position}", name:"space_manager_movepicture", methods:["post"])]
-    public function movePictureAction(Request $request, SpaceImage $image)
+    public function movePictureAction(Request $request, SpaceImage $image, int $position)
     {
         $imgSpaceCheck = $image->getSpace();
         if (!($imgSpaceCheck instanceof Space && $imgSpaceCheck->isOwner($this->getUser())) && !$this->isGranted('ROLE_ADMIN')) {
@@ -1898,8 +1908,6 @@ class SpaceManagementController extends AbstractController
         }
 
         $spaceId = $image->getSpace()?->getId() ?? 0;
-
-        $position = $request->query->getInt('position');
         $em = $this->em;
         $image->setPosition($position);
         $em->flush();

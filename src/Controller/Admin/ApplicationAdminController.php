@@ -506,13 +506,23 @@ class ApplicationAdminController extends CRUDController
                 'category' => 'Profil - Réseaux sociaux'
             ],
             'projectHolder_googleUrl' => [
-                'label' => '[Profil] Google+',
+                'label' => '[Profil] Bluesky',
                 'property' => 'projectHolder.googleUrl',
                 'category' => 'Profil - Réseaux sociaux'
             ],
             'projectHolder_linkedinUrl' => [
                 'label' => '[Profil] LinkedIn',
                 'property' => 'projectHolder.linkedinUrl',
+                'category' => 'Profil - Réseaux sociaux'
+            ],
+            'projectHolder_youtubeUrl' => [
+                'label' => '[Profil] YouTube',
+                'property' => 'projectHolder.youtubeUrl',
+                'category' => 'Profil - Réseaux sociaux'
+            ],
+            'projectHolder_tiktokUrl' => [
+                'label' => '[Profil] TikTok',
+                'property' => 'projectHolder.tiktokUrl',
                 'category' => 'Profil - Réseaux sociaux'
             ],
             'projectHolder_otherUrl' => [
@@ -736,7 +746,7 @@ class ApplicationAdminController extends CRUDController
         // Récupérer les années disponibles pour le filtre
         $yearsRaw = $em->createQuery(
             'SELECT DISTINCT SUBSTRING(a.created, 1, 4) AS yr
-             FROM AppBundle:Application a
+             FROM App\\Entity\\Application a
              WHERE a.status != :draft
              ORDER BY yr ASC'
         )->setParameter('draft', \App\Entity\Application::DRAFT_STATUS)->getResult();
@@ -772,7 +782,7 @@ class ApplicationAdminController extends CRUDController
                     COUNT(a.id) AS total,
                     SUM(CASE WHEN a.wishedSize > 0 THEN a.wishedSize ELSE 0 END) AS totalSurface,
                     SUM(CASE WHEN a.wishedSize > 0 THEN 1 ELSE 0 END) AS countWithSurface
-             FROM AppBundle:Application a
+             FROM App\\Entity\\Application a
              JOIN a.category c
              WHERE a.status != :draft' . $yearFilter . '
              GROUP BY c.id
@@ -781,14 +791,14 @@ class ApplicationAdminController extends CRUDController
 
         // Candidatures sans catégorie
         $noCategoryCount = (int) $em->createQuery(
-            'SELECT COUNT(a.id) FROM AppBundle:Application a
+            'SELECT COUNT(a.id) FROM App\\Entity\\Application a
              WHERE a.category IS NULL AND a.status != :draft' . $yearFilter
         )->setParameters(array_intersect_key($baseParams, ['draft' => true, 'year' => true]))->getSingleScalarResult();
 
         // --- Données par type de projet (UseType) ---
         $useTypeRows = $em->createQuery(
             'SELECT u.id, u.name, u.isActive, COUNT(a.id) AS total
-             FROM AppBundle:Application a
+             FROM App\\Entity\\Application a
              JOIN a.projectHolder ph
              JOIN ph.useType u
              WHERE a.status != :draft' . $yearFilter . '
@@ -799,7 +809,7 @@ class ApplicationAdminController extends CRUDController
         // --- Données par statut juridique (candidature) ---
         $companyStatusRows = $em->createQuery(
             'SELECT a.companyStatus, COUNT(a.id) AS total
-             FROM AppBundle:Application a
+             FROM App\\Entity\\Application a
              WHERE a.status != :draft AND a.companyStatus IS NOT NULL' . $yearFilter . '
              GROUP BY a.companyStatus
              ORDER BY a.companyStatus ASC'
@@ -808,7 +818,7 @@ class ApplicationAdminController extends CRUDController
         // --- Timeline : candidatures par jour ---
         $timelineRows = $em->createQuery(
             'SELECT SUBSTRING(a.created, 1, 10) AS day, COUNT(a.id) AS total
-             FROM AppBundle:Application a
+             FROM App\\Entity\\Application a
              WHERE a.status != :draft' . $yearFilter . '
              GROUP BY day
              ORDER BY day ASC'
@@ -820,7 +830,7 @@ class ApplicationAdminController extends CRUDController
                     SUM(CASE WHEN a.status = :wait     THEN 1 ELSE 0 END) AS awaiting,
                     SUM(CASE WHEN a.status = :accepted THEN 1 ELSE 0 END) AS accepted,
                     SUM(CASE WHEN a.status = :rejected THEN 1 ELSE 0 END) AS rejected
-             FROM AppBundle:Application a WHERE a.status != :draft' . $yearFilter
+             FROM App\\Entity\\Application a WHERE a.status != :draft' . $yearFilter
         )->setParameters($baseParams)->getSingleResult();
 
         return $this->renderWithExtraParams('Admin/Application/statistics.html.twig', [

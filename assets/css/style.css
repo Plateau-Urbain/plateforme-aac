@@ -11454,16 +11454,16 @@ form .main .section-title {
 
 /* Différenciation AAC proposés par l'admin vs par un proprio */
 #property-listing.management-list .space-card.space-card--by-admin {
-  background-color: rgba(233, 71, 60, 0.2) !important;
+  background-color: rgba(45, 116, 186, 1) !important;
 }
 
 #property-listing.management-list .space-card.space-card--by-proprio {
-  background-color: rgba(242, 190, 106, 0.2) !important;
+  background-color: rgba(242, 190, 106, 1) !important;
 }
 
 /* Différenciation AAC proposés par l'admin vs par un proprio */
 #property-listing.management-list .space-card.space-card--by-admin:hover {
-  background-color: rgba(233, 71, 60, 0.6) !important;
+  background-color: rgba(45, 116, 186, 0.6) !important;
 }
 
 #property-listing.management-list .space-card.space-card--by-proprio:hover {
@@ -11473,69 +11473,69 @@ form .main .section-title {
 /* Différenciation AAC sur la page d'accueil (espaces disponibles et occupés) */
 #js-results .space_item.space-card--by-admin,
 #js-results .space_item_unavailable.space-card--by-admin {
-  background-color: rgba(233, 71, 60, 0.4) !important;
+  background-color: rgba(45, 116, 186, 1) !important;
 }
 
 #js-results .space_item.space-card--by-proprio,
 #js-results .space_item_unavailable.space-card--by-proprio {
-  background-color: rgba(242, 190, 106, 0.4) !important;
+  background-color: rgba(242, 190, 106, 1) !important;
 }
 
 #js-results .space_item_unavailable.space-card--by-proprio .availability-overlay,
 #js-results .space_item.space-card--by-proprio .availability-overlay {
-  background-color: rgba(242, 190, 106, 1) !important;
+  background-color: rgba(242, 190, 106, 0.8) !important;
 }
 
 #js-results .space_item_unavailable.space-card--by-admin .availability-overlay,
 #js-results .space_item.space-card--by-admin .availability-overlay {
-  background-color: rgba(233, 71, 60, 1) !important;
+  background-color: rgba(45, 116, 186, 0.8) !important;
 }
 
 /* Différenciation AAC sur la page d'accueil (espaces disponibles et occupés) */
 #js-results .space_item.space-card--by-admin:hover,
 #js-results .space_item_unavailable.space-card--by-admin:hover {
-  background-color: rgba(233, 71, 60, 1) !important;
+  background-color: rgba(45, 116, 186, 0.4) !important;
 }
 
 #js-results .space_item.space-card--by-proprio:hover,
 #js-results .space_item_unavailable.space-card--by-proprio:hover {
-  background-color: rgba(242, 190, 106, 1) !important;
+  background-color: rgba(242, 190, 106, 0.4) !important;
 }
 
 /* Différenciation AAC sur la page "mes candidatures" */
 #property-listing .space_item.space-card--by-admin,
 #property-listing .space_item_unavailable.space-card--by-admin {
-  background-color: rgba(233, 71, 60, 0.4) !important;
+  background-color: rgba(45, 116, 186, 1) !important;
 }
 
 #property-listing .space_item.space-card--by-proprio,
 #property-listing .space_item_unavailable.space-card--by-proprio {
-  background-color: rgba(242, 190, 106, 0.4) !important;
+  background-color: rgba(242, 190, 106, 1) !important;
 }
 
 #property-listing .space_item_unavailable.space-card--by-proprio .availability-overlay,
 #property-listing .space_item.space-card--by-proprio .availability-overlay {
-  background-color: rgba(242, 190, 106, 1) !important;
+  background-color: rgba(242, 190, 106, 0.4) !important;
 }
 
 #property-listing .space_item_unavailable.space-card--by-admin .availability-overlay,
 #property-listing .space_item.space-card--by-admin .availability-overlay {
-  background-color: rgba(233, 71, 60, 1) !important;
+  background-color: rgba(45, 116, 186, 0.4) !important;
 }
 
 #property-listing .space_item.space-card--by-admin:hover,
 #property-listing .space_item_unavailable.space-card--by-admin:hover {
-  background-color: rgba(233, 71, 60, 1) !important;
+  background-color: rgba(45, 116, 186, 0.4) !important;
 }
 
 #property-listing .space_item.space-card--by-proprio:hover,
 #property-listing .space_item_unavailable.space-card--by-proprio:hover {
-  background-color: rgba(242, 190, 106, 1) !important;
+  background-color: rgba(242, 190, 106, 0.4) !important;
 }
 
 /* Suspended: on recolore uniquement l'overlay (la carte est déjà stylée dans le template) */
 #property-listing .space_item_suspended.space-card--by-admin {
-  background: rgba(233, 71, 60, 0.12) !important;
+  background: rgba(45, 116, 186, 0.12) !important;
 }
 
 #property-listing .space_item_suspended.space-card--by-proprio {
@@ -11543,7 +11543,7 @@ form .main .section-title {
 }
 
 #property-listing .space_item_suspended.space-card--by-admin .foot-suspended {
-  background: rgba(233, 71, 60, 0.12) !important;
+  background: rgba(45, 116, 186, 0.12) !important;
 }
 
 #property-listing .space_item_suspended.space-card--by-proprio .foot-suspended {
@@ -11552,12 +11552,35 @@ form .main .section-title {
 
 #property-listing .space_item_suspended.space-card--by-admin .availability-overlay,
 #property-listing .space_item_suspended.space-card--by-admin #overlay-suspended {
-  background: rgba(233, 71, 60, 0.2) !important;
+  background: rgba(45, 116, 186, 0.2) !important;
 }
 
 #property-listing .space_item_suspended.space-card--by-proprio .availability-overlay,
 #property-listing .space_item_suspended.space-card--by-proprio #overlay-suspended {
   background: rgba(242, 190, 106, 0.2) !important;
+}
+
+/* Badge "Géré par Plateau Urbain" affiché en absolu sur les cartes admin */
+.pu-managed-badge {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  z-index: 2;
+  background: rgba(45, 116, 186, 0.95);
+  color: #fff;
+  padding: 4px 9px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+.pu-managed-badge .fa {
+  margin-right: 4px;
 }
 
 .pie-legend span {
@@ -12721,6 +12744,19 @@ a.btn-line-19:hover span {
   width: 26px;
 }
 
+.tiktok {
+  background: url('/bundles/app/images/tiktok-fill.svg') no-repeat left;
+  height: 26px;
+  width: 26px;
+  display: block;
+}
+
+.tiktok:hover {
+  background: url('/bundles/app/images/tiktok-b.svg') no-repeat left;
+  height: 26px;
+  width: 26px;
+}
+
 /*ancres*/
 
 #proprio,
@@ -13480,6 +13516,21 @@ input.form-save {
 .sans-marge {
   padding-right: 0;
   padding-left: 0;
+}
+
+.login-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  max-height: 500px;
+}
+
+.login-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 @media (max-width: 992px) {
@@ -14251,4 +14302,45 @@ form .main .section-title.form-sixth:after {
     margin-right: auto !important;
     float: none !important;
   }
+}
+
+/* Icône TikTok – footer */
+.tiktok {
+  background: url('/bundles/app/images/tiktok-fill.svg') no-repeat left;
+  height: 26px;
+  width: 26px;
+  display: block;
+}
+
+.tiktok:hover {
+  background: url('/bundles/app/images/tiktok-b.svg') no-repeat left;
+  height: 26px;
+  width: 26px;
+}
+
+/* Badge "Géré par [structure]" pour les cartes proprio */
+.pu-owner-badge {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  z-index: 2;
+  background: #e7b15a;
+  color: #fff;
+  padding: 4px 9px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pu-owner-badge .fa {
+  margin-right: 4px;
 }

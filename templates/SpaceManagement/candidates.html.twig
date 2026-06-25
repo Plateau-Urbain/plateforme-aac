@@ -572,6 +572,7 @@
         <div class="col-panel">
           <div class="ctrl-panel panel-filters" style="height: calc(100% - 20px);">
             <h5><i class="fa fa-filter"></i> Filtres et Tri</h5>
+            {% form_theme filterForm 'Form/custom_front_fields.html.twig' %}
             {{ form_start(filterForm, { 'attr': { 'data-submit': true } } ) }}
             <div class="row">
               <div class="col-xs-12 col-sm-4" style="margin-bottom: 5px;">
@@ -695,7 +696,7 @@
               {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
               {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
               <li>Durée d'occupation : <strong>{% if _lengthValue %}{{ _lengthValue }}{% if _lengthType %} {{ _lengthType }}{% endif %}{% else %}—{% endif %}</strong></li>
-              <li>Date d'entrée souhaitée : <strong>{{ application.startOccupation|localizeddate('long', 'none') }}</strong></li>
+              <li>Date d'entrée souhaitée : <strong>{{ application.startOccupation|localizeddate('long', 'none', 'fr') }}</strong></li>
             </ul>
 
             <a href="{{ path('application_show', { 'id': application.id }) }}" class="btn btn-line-19"><span>Voir la candidature</span></a>

@@ -68,9 +68,11 @@ class ApplicationAdmin extends AbstractAdmin
     {
         assert($query instanceof ProxyQuery);
         $alias = $query->getRootAliases()[0];
-        $query->leftJoin($alias.'.projectHolder', 'application_holder')->addSelect('application_holder');
-        $query->leftJoin($alias.'.space', 'application_space')->addSelect('application_space');
-        $query->leftJoin('application_space.owner', 'application_space_owner')->addSelect('application_space_owner');
+        // LEFT JOINs pour le tri/filtre — sans addSelect() pour éviter l'hydratation
+        // eager de milliers d'objets liés en mémoire lors de l'affichage de la liste.
+        $query->leftJoin($alias.'.projectHolder', 'application_holder');
+        $query->leftJoin($alias.'.space', 'application_space');
+        $query->leftJoin('application_space.owner', 'application_space_owner');
 
         return $query;
     }
@@ -311,8 +313,10 @@ class ApplicationAdmin extends AbstractAdmin
           'Facebook' => 'projectHolder.facebookUrl',
           'Twitter' => 'projectHolder.twitterUrl',
           'Instagram' => 'projectHolder.instagramUrl',
-          'Google+' => 'projectHolder.googleUrl',
           'Linkedin' => 'projectHolder.linkedinUrl',
+          'YouTube' => 'projectHolder.youtubeUrl',
+          'TikTok' => 'projectHolder.tiktokUrl',
+          'Bluesky' => 'projectHolder.googleUrl',
           'Autre' => 'projectHolder.otherUrl',
           'Description' => 'description',
           'Date de dépôt de la candidature' => 'created',

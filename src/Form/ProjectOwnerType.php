@@ -28,7 +28,6 @@ class ProjectOwnerType extends AbstractType
         $builder
             ->add('userInfo', UserType::class)
             ->add('companyInfo', CompanyType::class, [
-                'mapped' => false,
                 'legacy_company_status' => $builder->getData() instanceof \App\Entity\User
                     ? $builder->getData()->getCompanyStatus()
                     : null,
@@ -78,7 +77,7 @@ class ProjectOwnerType extends AbstractType
             ->add('facebookUrl', null, ['label' => "Facebook", 'attr' => ['class' => 'form-control']])
             ->add('instagramUrl', null, ['label' => "Instagram", 'attr' => ['class' => 'form-control']])
             ->add('twitterUrl', null, ['label' => "Twitter / X", 'attr' => ['class' => 'form-control']])
-            ->add('googleUrl', null, ['label' => "Google+", 'attr' => ['class' => 'form-control']])
+            ->add('googleUrl', null, ['label' => "Bluesky", 'attr' => ['class' => 'form-control']])
             ->add('linkedinUrl', null, ['label' => "LinkedIn", 'attr' => ['class' => 'form-control']])
             ->add('youtubeUrl', null, ['label' => "YouTube", 'attr' => ['class' => 'form-control']])
             ->add('tiktokUrl', null, ['label' => "TikTok", 'attr' => ['class' => 'form-control']])

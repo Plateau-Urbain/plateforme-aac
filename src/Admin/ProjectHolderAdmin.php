@@ -145,7 +145,7 @@ class ProjectHolderAdmin extends AbstractAdmin
             ->add('linkedinUrl', null, ['required' => false, 'label' => 'LinkedIn'])
             ->add('youtubeUrl', null, ['required' => false, 'label' => 'YouTube'])
             ->add('tiktokUrl', null, ['required' => false, 'label' => 'TikTok'])
-            ->add('googleUrl', null, ['required' => false, 'label' => 'Google+'])
+            ->add('googleUrl', null, ['required' => false, 'label' => 'Bluesky'])
             ->add('otherUrl', null, ['required' => false, 'label' => 'Autre URL'])
 
             ->end()
