@@ -18,6 +18,8 @@ use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
 use App\Entity\Space;
 use App\Entity\User;
 use App\Form\UserDocumentType;
+use Sonata\DoctrineORMAdminBundle\Filter\ChoiceFilter;
+use Sonata\DoctrineORMAdminBundle\Filter\DateTimeRangeFilter;
 
 /** @extends AbstractAdmin<User> */
 class ProjectHolderAdmin extends AbstractAdmin
@@ -33,6 +35,10 @@ class ProjectHolderAdmin extends AbstractAdmin
     protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         $collection->remove('show');
+        $collection->add('select_export_fields', 'select-export-fields');
+        $collection->add('custom_export', 'custom-export');
+        $collection->add('help_filters', 'help-filters-export');
+        $collection->add('statistics', 'statistics');
     }
 
     protected function configureQuery(ProxyQueryInterface $query): ProxyQueryInterface
@@ -124,14 +130,14 @@ class ProjectHolderAdmin extends AbstractAdmin
 
             ->end()
             ->with('Souhaits')
-            ->add('wishedSize', null, ['required' => false, 'label' => 'Taille souhaitée (m²)'])
+            ->add('wishedSize', null, ['required' => false, 'label' => 'Surface souhaitée (m²)'])
             ->add('preferredDepartments', ChoiceType::class, [
                 'label' => 'Départements souhaités',
                 'choices' => User::getAllFrenchDepartments(),
                 'multiple' => true,
                 'required' => false,
             ])
-            ->add('useType', null, ['required' => false, 'label' => 'Type d\'usage'])
+            ->add('useType', null, ['required' => false, 'label' => 'Type de projet'])
             ->add('usageDate', null, ['required' => false, 'label' => 'Date de disponibilité'])
             ->add('usageDuration', null, ['required' => false, 'label' => 'Durée d\'occupation'])
             ->add('lengthTypeOccupation', ChoiceType::class, ['choices' => Application::getAllLengthType(), 'required' => false, 'label' => 'Type de durée'])
@@ -170,7 +176,22 @@ class ProjectHolderAdmin extends AbstractAdmin
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
-            ->add('email')
+            ->add('email', null, ['label' => 'Email'])
+            ->add('firstname', null, ['label' => 'Prénom'])
+            ->add('lastname', null, ['label' => 'Nom'])
+            ->add('company', null, ['label' => 'Structure'])
+            ->add('companyStatus', ChoiceFilter::class, [
+                'label' => 'Statut juridique',
+                'field_type' => ChoiceType::class,
+                'field_options' => [
+                    'choices' => User::getAllCompanyStatut(),
+                ],
+            ])
+            ->add('zipcode', null, ['label' => 'Code postal'])
+            ->add('city', null, ['label' => 'Ville'])
+            ->add('useType', null, ['label' => 'Type de projet'])
+            ->add('wishedSize', null, ['label' => 'Surface souhaitée (m²)'])
+            ->add('createdAt', DateTimeRangeFilter::class, ['label' => 'Date d\'inscription'])
         ;
     }
 
@@ -182,9 +203,11 @@ class ProjectHolderAdmin extends AbstractAdmin
                 'route' => ['name' => 'edit'],
             ])
             ->add('firstname', null, ['label' => 'Prénom'])
-            ->add('lastName', null, ['label' => 'Nom'])
+            ->add('lastname', null, ['label' => 'Nom'])
+            ->add('company', null, ['label' => 'Structure'])
+            ->add('createdAt', 'datetime', ['label' => 'Date d\'inscription', 'format' => 'd/m/Y H:i'])
             ->add('enabled', null, ['label' => 'Activé'])
-            ->add('locked', null, ['label' => 'Verouillé'])
+            ->add('locked', null, ['label' => 'Verrouillé'])
         ;
     }
 
@@ -217,6 +240,34 @@ class ProjectHolderAdmin extends AbstractAdmin
         }
 
         $this->syncDocs($object, $object->getDocuments());
+    }
+
+    protected function configureActionButtons(array $buttonList, string $action, ?object $object = null): array
+    {
+        $buttonList = parent::configureActionButtons($buttonList, $action, $object);
+        
+        if ($action === 'list') {
+            $buttonList['export_custom'] = [
+                'template' => 'Admin/button_export_custom.html.twig',
+            ];
+            $buttonList['statistics'] = [
+                'template' => 'Admin/User/button_statistics.html.twig',
+            ];
+        }
+        
+        return $buttonList;
+    }
+    
+    protected function configureDashboardActions(array $actions): array
+    {
+        $actions['custom_export'] = [
+            'label'              => 'Export personnalisé',
+            'translation_domain' => 'SonataAdminBundle',
+            'url'                => $this->generateUrl('select_export_fields'),
+            'icon'               => 'fa fa-download',
+        ];
+
+        return $actions;
     }
 
     

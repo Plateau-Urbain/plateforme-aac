@@ -29,17 +29,25 @@ $host = $parts["host"] ?? "127.0.0.1";
 $port = $parts["port"] ?? "3306";
 $db = trim($parts["path"] ?? "", "/");
 $testDb = $db . "_test";
+parse_str($parts["query"] ?? "", $queryOpts);
+$socket = $queryOpts["unix_socket"] ?? "";
 echo "DB_HOST=" . escapeshellarg($host);
 echo " DB_PORT=" . escapeshellarg($port);
 echo " DB_USER=" . escapeshellarg($user);
 echo " DB_PASS=" . escapeshellarg($pass);
 echo " TEST_DB=" . escapeshellarg($testDb);
+echo " DB_SOCKET=" . escapeshellarg($socket);
 ')"
 
 echo "Préparation de la base de test : ${TEST_DB}"
 
-MYSQL_PWD="${DB_PASS}" mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" \
-  -e "CREATE DATABASE IF NOT EXISTS \`${TEST_DB}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+if [[ -n "${DB_SOCKET}" ]]; then
+  MYSQL_PWD="${DB_PASS}" mysql --socket="${DB_SOCKET}" -u"${DB_USER}" \
+    -e "CREATE DATABASE IF NOT EXISTS \`${TEST_DB}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+else
+  MYSQL_PWD="${DB_PASS}" mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" \
+    -e "CREATE DATABASE IF NOT EXISTS \`${TEST_DB}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+fi
 
 APP_ENV=test php bin/console doctrine:schema:update --force --no-interaction
 

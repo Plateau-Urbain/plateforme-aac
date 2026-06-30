@@ -16,17 +16,17 @@
                 <div class="caption clearfix">
                     <span class="pull-right remove-picture">
                         {% if image.id is not empty %}
-                            <a href="{{ path('space_manager_removepicture', { 'id': image.id, 'token': csrf_token('remove_image') }) }}" class="btn js-btn-space" role="button" data-link-method="post">
+                            <a href="{{ path('space_manager_removepicture', { 'id': image.id, 'token': csrf_token('remove_image') }) }}" class="btn js-btn-space" role="button">
                                 <i class="fa fa-times"></i>
                             </a>
                         {% endif %}
                     </span>
                     <span class="move-image">
                         {% if image.id is not empty %}
-                            <a href="{{ path('space_manager_movepicture', { 'id': image.id, 'position': image.position-1, 'token': csrf_token('move_image') }) }}" class="btn {{ loop.first ? 'disabled' :'' }} js-btn-space" role="button" data-link-method="post">
+                            <a href="{{ path('space_manager_movepicture', { 'id': image.id, 'position': image.position-1, 'token': csrf_token('move_image') }) }}" class="btn {{ loop.first ? 'disabled' :'' }} js-btn-space" role="button">
                                 <i class="fa fa-chevron-left"></i>
                             </a>
-                            <a href="{{ path('space_manager_movepicture', { 'id': image.id, 'position': image.position+1, 'token': csrf_token('move_image') }) }}" class="btn {{ loop.last ? 'disabled' :'' }} js-btn-space" role="button" data-link-method="post">
+                            <a href="{{ path('space_manager_movepicture', { 'id': image.id, 'position': image.position+1, 'token': csrf_token('move_image') }) }}" class="btn {{ loop.last ? 'disabled' :'' }} js-btn-space" role="button">
                                 <i class="fa fa-chevron-right"></i>
                             </a>
                         {% endif %}

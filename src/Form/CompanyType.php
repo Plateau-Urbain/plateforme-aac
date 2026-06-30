@@ -81,6 +81,7 @@ class CompanyType extends AbstractType
             ])
             ->add('companyStructures', null, [
                 'label' => "Structure(s) d'accompagnement",
+                'required' => false,
                 'attr' => ['class' => 'form-control']
             ])
             ->add('companyBlog', TextType::class, [

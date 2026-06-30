@@ -141,8 +141,31 @@ class OwnerAdmin extends AbstractAdmin
         }
     }
 
-    public function prePersist(object $object): void {
+    public function prePersist(object $object): void
+    {
         $object->addRole('ROLE_OWNER');
+
+        // Synchroniser l'email canonique
+        $object->setEmailCanonical(strtolower((string) $object->getEmail()));
+
+        // Synchroniser username / usernameCanonical (colonnes legacy FOS)
+        if (!$object->getUsername()) {
+            $object->setUsername($object->getEmail());
+        }
+        if (!$object->getUsernameCanonical()) {
+            $object->setUsernameCanonical(strtolower((string) $object->getEmail()));
+        }
+
+        // Hasher le mot de passe (colonne NOT NULL en base)
+        if ($object->getPlainPassword()) {
+            $object->setPassword(
+                $this->passwordHasher->hashPassword($object, $object->getPlainPassword())
+            );
+            $object->setPlainPassword(null);
+        } elseif (!$object->getPassword()) {
+            // Sécurité : mot de passe vide → chaîne impossible à utiliser
+            $object->setPassword('!');
+        }
     }
 
     

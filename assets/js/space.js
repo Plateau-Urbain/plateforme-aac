@@ -35,10 +35,10 @@ $(document).ready(function () {
     }
 
     function initLinkListener() {
-        $('.js-btn-space').click(function () {
+        $('.js-btn-space').off('click.spacelink').on('click.spacelink', function () {
 
             var href = $(this).attr('href');
-            var method = $(this).data('link-method');
+            var method = $(this).data('link-method') || 'post';
 
             $.ajax({
                 url: href,

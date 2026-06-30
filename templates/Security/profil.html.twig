@@ -109,80 +109,92 @@
                         <div class="form-contener">
                             <h3>Mes informations</h3>
                             <div class="row">
-                                <div class="col-sm-6 inline-controls form-group civility-group{% if form.userInfo.civility.vars.errors|length %} has-error{% endif %}">
-                                    {{ form_label(form.userInfo.civility, null, {'label_attr': {'class': 'required'}}) }}
-                                    {{ form_widget(form.userInfo.civility, { 
-                                        'label_attr': { 'class': 'radio-inline' },
-                                        'attr': {
-                                            'aria-required': 'true',
-                                            'aria-invalid': form.userInfo.civility.vars.errors|length ? 'true' : 'false',
-                                            'aria-describedby': 'civility-error'
-                                        }
-                                    }) }}
-                                    {{ form_errors(form.userInfo.civility, {
-                                        'attr': {
-                                            'id': 'civility-error',
-                                            'role': 'alert',
-                                            'aria-live': 'polite'
-                                        }
-                                    }) }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6 form-group{% if form.userInfo.firstname.vars.errors|length %} has-error{% endif %}">
-                                    {{ form_label(form.userInfo.firstname, null, {'label_attr': {'class': 'required'}}) }}
-                                    {{ form_widget(form.userInfo.firstname, {
-                                        'attr': {
-                                            'required': 'required',
-                                            'aria-required': 'true',
-                                            'aria-invalid': form.userInfo.firstname.vars.errors|length ? 'true' : 'false',
-                                            'aria-describedby': 'firstname-error',
-                                            'data-error-message': 'Veuillez renseigner votre prénom'
-                                        }
-                                    }) }}
-                                    {{ form_errors(form.userInfo.firstname, {
-                                        'attr': {
-                                            'id': 'firstname-error',
-                                            'role': 'alert',
-                                            'aria-live': 'polite'
-                                        }
-                                    }) }}
-                                </div>
-                                <div class="col-sm-6 form-group{% if form.userInfo.lastname.vars.errors|length %} has-error{% endif %}">
-                                    {{ form_label(form.userInfo.lastname, null, {'label_attr': {'class': 'required'}}) }}
-                                    {{ form_widget(form.userInfo.lastname, {
-                                        'attr': {
-                                            'required': 'required',
-                                            'aria-required': 'true',
-                                            'aria-invalid': form.userInfo.lastname.vars.errors|length ? 'true' : 'false',
-                                            'aria-describedby': 'lastname-error',
-                                            'data-error-message': 'Veuillez renseigner votre nom'
-                                        }
-                                    }) }}
-                                    {{ form_errors(form.userInfo.lastname, {
-                                        'attr': {
-                                            'id': 'lastname-error',
-                                            'role': 'alert',
-                                            'aria-live': 'polite'
-                                        }
-                                    }) }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.userInfo.birthday) }}
-                                </div>
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.userInfo.phone) }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12 form-group">
-                                    {{ form_row(form.userInfo.email) }}
-                                    <small class="help-block text-muted">
-                                        <i class="fa fa-info-circle"></i> 
-                                        L'adresse email ne peut pas être modifiée après la création du compte. 
-                                    </small>
+                                 <div class="col-sm-6 inline-controls form-group civility-group{% if form.userInfo.civility.vars.errors|length %} has-error{% endif %}">
+                                     {{ form_label(form.userInfo.civility, null, {'label_attr': {'class': 'required'}}) }}
+                                     {{ form_widget(form.userInfo.civility, { 
+                                         'label_attr': { 'class': 'radio-inline' },
+                                         'attr': {
+                                             'aria-required': 'true',
+                                             'aria-invalid': form.userInfo.civility.vars.errors|length ? 'true' : 'false',
+                                             'aria-describedby': 'civility-error'
+                                         }
+                                     }) }}
+                                     {% if form.userInfo.civility.vars.errors|length %}
+                                         <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                             {{ form_errors(form.userInfo.civility) }}
+                                         </span>
+                                     {% endif %}
+                                 </div>
+                             </div>
+                             <div class="row">
+                                 <div class="col-sm-6 form-group{% if form.userInfo.firstname.vars.errors|length %} has-error{% endif %}">
+                                     {{ form_label(form.userInfo.firstname, null, {'label_attr': {'class': 'required'}}) }}
+                                     {{ form_widget(form.userInfo.firstname, {
+                                         'attr': {
+                                             'required': 'required',
+                                             'aria-required': 'true',
+                                             'aria-invalid': form.userInfo.firstname.vars.errors|length ? 'true' : 'false',
+                                             'aria-describedby': 'firstname-error',
+                                             'data-error-message': 'Veuillez renseigner votre prénom'
+                                         }
+                                     }) }}
+                                     {% if form.userInfo.firstname.vars.errors|length %}
+                                         <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                             {{ form_errors(form.userInfo.firstname) }}
+                                         </span>
+                                     {% endif %}
+                                 </div>
+                                 <div class="col-sm-6 form-group{% if form.userInfo.lastname.vars.errors|length %} has-error{% endif %}">
+                                     {{ form_label(form.userInfo.lastname, null, {'label_attr': {'class': 'required'}}) }}
+                                     {{ form_widget(form.userInfo.lastname, {
+                                         'attr': {
+                                             'required': 'required',
+                                             'aria-required': 'true',
+                                             'aria-invalid': form.userInfo.lastname.vars.errors|length ? 'true' : 'false',
+                                             'aria-describedby': 'lastname-error',
+                                             'data-error-message': 'Veuillez renseigner votre nom'
+                                         }
+                                     }) }}
+                                     {% if form.userInfo.lastname.vars.errors|length %}
+                                         <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                             {{ form_errors(form.userInfo.lastname) }}
+                                         </span>
+                                     {% endif %}
+                                 </div>
+                             </div>
+                             <div class="row">
+                                 <div class="col-sm-6 form-group{% if form.userInfo.birthday.vars.errors|length %} has-error{% endif %}">
+                                     {{ form_label(form.userInfo.birthday) }}
+                                     {{ form_widget(form.userInfo.birthday) }}
+                                     {% if form.userInfo.birthday.vars.errors|length %}
+                                         <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                             {{ form_errors(form.userInfo.birthday) }}
+                                         </span>
+                                     {% endif %}
+                                 </div>
+                                 <div class="col-sm-6 form-group{% if form.userInfo.phone.vars.errors|length %} has-error{% endif %}">
+                                     {{ form_label(form.userInfo.phone) }}
+                                     {{ form_widget(form.userInfo.phone) }}
+                                     {% if form.userInfo.phone.vars.errors|length %}
+                                         <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                             {{ form_errors(form.userInfo.phone) }}
+                                         </span>
+                                     {% endif %}
+                                 </div>
+                             </div>
+                             <div class="row">
+                                 <div class="col-sm-12 form-group{% if form.userInfo.email.vars.errors|length %} has-error{% endif %}">
+                                     {{ form_label(form.userInfo.email) }}
+                                     {{ form_widget(form.userInfo.email) }}
+                                     {% if form.userInfo.email.vars.errors|length %}
+                                         <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                             {{ form_errors(form.userInfo.email) }}
+                                         </span>
+                                     {% endif %}
+                                     <small class="help-block text-muted">
+                                         <i class="fa fa-info-circle"></i> 
+                                         L'adresse email ne peut pas être modifiée après la création du compte. 
+                                     </small>
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -197,63 +209,136 @@
                         <div class="form-contener">
                             <h3>Ma structure</h3>
                             <div class="row">
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.companyInfo.company) }}
+                                <div class="col-sm-6 form-group{% if form.companyInfo.company.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.company) }}
+                                    {{ form_widget(form.companyInfo.company) }}
+                                    {% if form.companyInfo.company.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.company) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.companyInfo.companyStatus) }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6  form-group">
-                                    {{ form_row(form.companyInfo.companyCreationDate) }}
-                                </div>
-                                <div class="col-sm-6  form-group">
-                                    {{ form_row(form.companyInfo.siret)}}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12 form-group">
-                                    {{ form_row(form.companyInfo.address)}}
-                                </div>
-                                {# <div class="col-sm-6 form-group">
-                                    {{ form_row(form.companyInfo.addressSuite) }}
-                                </div> #}
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.companyInfo.zipcode) }}
-                                </div>
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.companyInfo.city)}}
+                                <div class="col-sm-6 form-group{% if form.companyInfo.companyStatus.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.companyStatus) }}
+                                    {{ form_widget(form.companyInfo.companyStatus) }}
+                                    {% if form.companyInfo.companyStatus.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.companyStatus) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.companyInfo.companyPhone)}}
+                                <div class="col-sm-6  form-group{% if form.companyInfo.companyCreationDate.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.companyCreationDate) }}
+                                    {{ form_widget(form.companyInfo.companyCreationDate) }}
+                                    {% if form.companyInfo.companyCreationDate.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.companyCreationDate) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.companyInfo.companyMobile) }}
+                                <div class="col-sm-6  form-group{% if form.companyInfo.siret.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.siret) }}
+                                    {{ form_widget(form.companyInfo.siret) }}
+                                    {% if form.companyInfo.siret.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.siret) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12 form-group">
-                                    {{ form_row(form.companyInfo.companyDescription, {'attr': {'placeholder': 'Présentez votre structure (emojis non autorisés)'}}) }}
+                                <div class="col-sm-12 form-group{% if form.companyInfo.address.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.address) }}
+                                    {{ form_widget(form.companyInfo.address) }}
+                                    {% if form.companyInfo.address.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.address) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.companyInfo.companyEffective)}}
+                                <div class="col-sm-6 form-group{% if form.companyInfo.zipcode.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.zipcode) }}
+                                    {{ form_widget(form.companyInfo.zipcode) }}
+                                    {% if form.companyInfo.zipcode.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.zipcode) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.companyInfo.companyStructures)}}
+                                <div class="col-sm-6 form-group{% if form.companyInfo.city.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.city) }}
+                                    {{ form_widget(form.companyInfo.city) }}
+                                    {% if form.companyInfo.city.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.city) }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 form-group{% if form.companyInfo.companyPhone.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.companyPhone) }}
+                                    {{ form_widget(form.companyInfo.companyPhone) }}
+                                    {% if form.companyInfo.companyPhone.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.companyPhone) }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-sm-6 form-group{% if form.companyInfo.companyMobile.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.companyMobile) }}
+                                    {{ form_widget(form.companyInfo.companyMobile) }}
+                                    {% if form.companyInfo.companyMobile.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.companyMobile) }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group{% if form.companyInfo.companyDescription.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.companyDescription) }}
+                                    {{ form_widget(form.companyInfo.companyDescription, {'attr': {'placeholder': 'Présentez votre structure (emojis non autorisés)'}}) }}
+                                    {% if form.companyInfo.companyDescription.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.companyDescription) }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 form-group{% if form.companyInfo.companyEffective.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.companyEffective) }}
+                                    {{ form_widget(form.companyInfo.companyEffective) }}
+                                    {% if form.companyInfo.companyEffective.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.companyEffective) }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-sm-6 form-group{% if form.companyInfo.companyStructures.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.companyInfo.companyStructures) }}
+                                    {{ form_widget(form.companyInfo.companyStructures) }}
+                                    {% if form.companyInfo.companyStructures.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.companyStructures) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="row form-group">
-                                <div class="col-sm-12 form-group{% if not form.companyInfo.companySite.vars.valid %} has-error{% endif %}">
+                                <div class="col-sm-12 form-group{% if form.companyInfo.companySite.vars.errors|length %} has-error{% endif %}">
                                     {{ form_label(form.companyInfo.companySite) }}
                                     {{ form_widget(form.companyInfo.companySite) }}
-                                    {{ form_errors(form.companyInfo.companySite) }}
+                                    {% if form.companyInfo.companySite.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.companyInfo.companySite) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -502,16 +587,34 @@
                                         }
                                     }) }}
                                 </div>
-                                <div class="col-sm-4 form-group">
-                                    {{ form_row(form.wishedSize)}}
+                                <div class="col-sm-4 form-group{% if form.wishedSize.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.wishedSize) }}
+                                    {{ form_widget(form.wishedSize) }}
+                                    {% if form.wishedSize.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.wishedSize) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
-                                <div class="col-sm-4 form-group">
-                                    {{ form_row(form.monthlyBudgetMax) }}
+                                <div class="col-sm-4 form-group{% if form.monthlyBudgetMax.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.monthlyBudgetMax) }}
+                                    {{ form_widget(form.monthlyBudgetMax) }}
+                                    {% if form.monthlyBudgetMax.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.monthlyBudgetMax) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="row" >
-                                <div class="col-sm-12 form-group">
-                                    {{ form_row(form.preferredDepartments, {'attr': {'data-placeholder': 'Selectionnez un ou plusieurs departements'}}) }}
+                                 <div class="col-sm-12 form-group{% if form.preferredDepartments.vars.errors|length %} has-error{% endif %}">
+                                     {{ form_label(form.preferredDepartments) }}
+                                     {{ form_widget(form.preferredDepartments, {'attr': {'data-placeholder': 'Selectionnez un ou plusieurs departements'}}) }}
+                                     {% if form.preferredDepartments.vars.errors|length %}
+                                         <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                             {{ form_errors(form.preferredDepartments) }}
+                                         </span>
+                                     {% endif %}
                                     <div class="pu-dept-combobox" id="pu-dept-combobox">
                                         <div class="pu-dept-inputwrap">
                                             <input
@@ -532,9 +635,15 @@
                                 </div>
                             </div>
                             <div class="row" >
-                                <div class="col-sm-6 form-group">
-                                    {{ form_row(form.usageDate)}}
-                                </div>
+                                 <div class="col-sm-6 form-group{% if form.usageDate.vars.errors|length %} has-error{% endif %}">
+                                     {{ form_label(form.usageDate) }}
+                                     {{ form_widget(form.usageDate) }}
+                                     {% if form.usageDate.vars.errors|length %}
+                                         <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                             {{ form_errors(form.usageDate) }}
+                                         </span>
+                                     {% endif %}
+                                 </div>
                                 <div class="col-sm-6 form-group {% if form.usageDuration.vars.errors|length %}has-error{% endif %}">
                                     {{ form_label(form.usageDuration)}}<br />
                                     <div class="row">
@@ -545,13 +654,23 @@
                                             {{ form_widget(form.lengthTypeOccupation) }}
                                         </div>
                                     </div>
-                                    {{ form_errors(form.usageDuration) }}
+                                    {% if form.usageDuration.vars.errors|length %}
+                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                            {{ form_errors(form.usageDuration) }}
+                                        </span>
+                                    {% endif %}
                                 </div>
-                                
-                            </div>
+                             </div>
                                 <div class="row form-group">
-                                     <div class="col-sm-12 form-group">
-                                     {{ form_row(form.projectDescription, {'attr': {'placeholder': 'Présentez votre projet (emojis non autorisés)'}}) }}
+                                    <div class="col-sm-12 form-group{% if form.projectDescription.vars.errors|length %} has-error{% endif %}">
+                                        {{ form_label(form.projectDescription) }}
+                                        {{ form_widget(form.projectDescription, {'attr': {'placeholder': 'Présentez votre projet (emojis non autorisés)'}}) }}
+                                        {% if form.projectDescription.vars.errors|length %}
+                                            <span class="help-block js-help-block" role="alert" aria-live="polite">
+                                                {{ form_errors(form.projectDescription) }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -685,6 +804,12 @@
         .has-warning-new input[type="date"] {
             border-color: #C89641 !important;
         }
+        /* Suppression des puces devant les messages d'erreur */
+        .help-block ul {
+            list-style: none !important;
+            padding-left: 0 !important;
+            margin: 0 !important;
+        }
     </style>
 {% endblock %}
 
@@ -734,21 +859,21 @@
                     id:       'warn-monthlyBudgetMax',
                     selector: 'input[name*="monthlyBudgetMax"]',
                     label:    'Budget mensuel maximum',
-                    message:  '🆕 Nouveau champ obligatoire : veuillez renseigner votre budget mensuel maximum.',
+                    message:  'Nouveau champ obligatoire : veuillez renseigner votre budget mensuel maximum.',
                     anchor:   '#five'
                 },
                 {
                     id:       'warn-preferredDepartments',
                     selector: null, // traité séparément via $prefDeptLoad
                     label:    'Zone géographique souhaitée',
-                    message:  '🆕 Nouveau champ obligatoire : veuillez sélectionner au moins un département.',
+                    message:  'Nouveau champ obligatoire : veuillez sélectionner au moins un département.',
                     anchor:   '#five'
                 },
                 {
                     id:       'warn-useType',
                     selector: null, // traité séparément via $useTypeField
                     label:    'Type de projet',
-                    message:  '🆕 Nouveau champ obligatoire : veuillez sélectionner un type de projet.',
+                    message:  'Nouveau champ obligatoire : veuillez sélectionner un type de projet.',
                     anchor:   '#five'
                 },
                 {
@@ -770,7 +895,7 @@
                 }
                 $banner.html(
                     '<div style="background:#F1E9E2;border:1px solid #E6C68D;border-radius:0;padding:14px 18px;margin-bottom:16px;">' +
-                    '<strong style="color:#bc1b38;">⚠ Votre profil doit être vérifié avant de candidater</strong>' +
+                    '<strong style="color:#bc1b38;">⚠ Votre profil doit être complété avant de candidater</strong>' +
                     '<p style="margin:8px 0 0 0;color:#000;">Des champs de votre profil sont manquants ou ont été mis à jour depuis votre dernière connexion. ' +
                     'Merci de <strong>relire et compléter l\'ensemble des sections de votre profil</strong> (coordonnées, présentation, projet, réseaux sociaux…) ' +
                     'avant de déposer une candidature.</p>' +
@@ -863,7 +988,7 @@
                     const deptGroup = $('#pu-dept-combobox').closest('.form-group');
                     if (!deptGroup.find('.help-block-new').length) {
                         deptGroup.addClass('has-warning-new');
-                        $('#pu-dept-combobox').after('<span class="help-block-new" role="note">🆕 Nouveau champ obligatoire : veuillez sélectionner au moins un département.</span>');
+                        $('#pu-dept-combobox').after('<span class="help-block-new" role="note">Nouveau champ obligatoire : veuillez sélectionner au moins un département.</span>');
                         $prefDeptLoad.one('change', function() {
                             const v = $(this).val();
                             if (v && (Array.isArray(v) ? v.length > 0 : v.trim() !== '')) {
@@ -886,7 +1011,7 @@
                     if (!utGroup.find('.help-block-new').length) {
                         utGroup.addClass('has-warning-new');
                         const $utChosen = $useTypeField.next('.chzn-container');
-                        ($utChosen.length ? $utChosen : $useTypeField).after('<span class="help-block-new" role="note">🆕 Nouveau champ obligatoire : veuillez sélectionner un type de projet.</span>');
+                        ($utChosen.length ? $utChosen : $useTypeField).after('<span class="help-block-new" role="note">Nouveau champ obligatoire : veuillez sélectionner un type de projet.</span>');
                     }
                     $useTypeField.one('change', function() {
                         const v = $(this).val();
@@ -1383,8 +1508,8 @@
                         formGroup.removeClass('has-error');
                     }
                 } else {
-                    // companyMobile est nullable en base → pas d'erreur si vide
-                    formGroup.removeClass('has-error');
+                    formGroup.addClass('has-error');
+                    formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le téléphone mobile est obligatoire.</span>');
                 }
             });
             
@@ -1505,6 +1630,49 @@
                     }
                 });
 
+                // 2c. Téléphones requis et format valide — BLOQUANT
+                // Si on laisse soumettre avec un téléphone vide ou invalide, le serveur va rejeter
+                // la soumission et rafraîchir la page, faisant perdre les fichiers joints.
+                const phoneRegex = /^(\+33\s?[1-9](\s?\d{2}){4}|0[1-9](\s?\d{2}){4})$/;
+                
+                // Téléphone personnel
+                const $personalPhone = $('input[name*="[phone]"]');
+                if ($personalPhone.length) {
+                    const formGroup = $personalPhone.closest('.form-group');
+                    formGroup.find('.js-help-block').remove();
+                    const value = $personalPhone.val().trim();
+                    if (value === '') {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le téléphone est obligatoire.</span>');
+                        blockSubmit = true;
+                    } else if (!phoneRegex.test(value)) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du téléphone n\'est pas valide. Utilisez le format français (01 23 45 67 89) ou international (+33 1 23 45 67 89).</span>');
+                        blockSubmit = true;
+                    } else {
+                        formGroup.removeClass('has-error');
+                    }
+                }
+
+                // Téléphone mobile structure
+                const $companyMobile = $('input[name*="companyMobile"]');
+                if ($companyMobile.length) {
+                    const formGroup = $companyMobile.closest('.form-group');
+                    formGroup.find('.js-help-block').remove();
+                    const value = $companyMobile.val().trim();
+                    if (value === '') {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le téléphone mobile est obligatoire.</span>');
+                        blockSubmit = true;
+                    } else if (!phoneRegex.test(value)) {
+                        formGroup.addClass('has-error');
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du téléphone n\'est pas valide. Utilisez le format français (06 12 34 56 78) ou international (+33 6 12 34 56 78).</span>');
+                        blockSubmit = true;
+                    } else {
+                        formGroup.removeClass('has-error');
+                    }
+                }
+
                 // 3. Emojis dans les descriptions — BLOQUANT
                 const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u;
                 $(this).find('textarea').each(function() {
@@ -1557,6 +1725,11 @@
                         deptOuterGroup.removeClass('has-error');
                         $prefDept.closest('.form-group').removeClass('has-error');
                     }
+                }
+
+                // Si l'un des champs requis ou validés présente une erreur visuelle, on bloque la soumission.
+                if ($(this).find('.form-group.has-error, .file-infos.has-error').length > 0) {
+                    blockSubmit = true;
                 }
 
                 // 7. Bloquer et scroller vers la première erreur si nécessaire

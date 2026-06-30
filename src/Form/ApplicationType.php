@@ -89,7 +89,7 @@ class ApplicationType extends AbstractType
             ->add('description', TextareaType::class, [
                 'label'=>"Présentation du projet",
                 'attr' => [
-                    'class'=>'textarea-box',
+                    'class'=>'form-control textarea-box',
                     'rows'=> 6
                 ]
             ])
@@ -97,14 +97,14 @@ class ApplicationType extends AbstractType
                 'label' => "Quel sera l'usage du local ?",
                 'required' => false,
                 'attr' => [
-                    'class' => 'textarea-box',
+                    'class' => 'form-control textarea-box',
                     'rows' => 6
                 ]
             ])
             ->add('contribution', null, [
                 'required' => false,
                 'label'=>"Quelles idées avez-vous pour participer au projet collectif ?",
-                'attr' => ['class' => 'textarea-box', 'rows'=> 6],
+                'attr' => ['class' => 'form-control textarea-box', 'rows'=> 6],
             ])
             ->add(
                 'startOccupation',
@@ -113,7 +113,7 @@ class ApplicationType extends AbstractType
                     'label'=>"Date d'entrée souhaitée",
                     'input'  => 'datetime', // 'datetime' is the default !
                     'widget'=>'single_text',
-                    'attr' => []
+                    'attr' => ['class' => 'form-control']
                 ]
             )
             ->add(
@@ -121,7 +121,7 @@ class ApplicationType extends AbstractType
                 null,
                 [
                     'label'=>"Durée d'occupation",
-                    'attr' => []
+                    'attr' => ['class' => 'form-control']
                 ]
             )
             ->add('openToGlobalProject', null, ['label' => "Je suis ouvert(e) à faire parti(e) d'un projet collectif "])

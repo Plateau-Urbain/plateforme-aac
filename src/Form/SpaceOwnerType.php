@@ -14,9 +14,8 @@ class SpaceOwnerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('userInfo', UserType::class, ['mapped' => false])
+            ->add('userInfo', UserType::class)
             ->add('companyInfo', CompanyType::class, [
-                'mapped' => false,
                 'legacy_company_status' => $builder->getData() instanceof \App\Entity\User
                     ? $builder->getData()->getCompanyStatus()
                     : null,

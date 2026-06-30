@@ -99,7 +99,7 @@
             <a href="#parcels">Voir la répartition des espaces</a>
           </dd>
         </dl> #} 
-            <p class="pu-label">Disponibilité&nbsp;: {{ space.availability }}</p>
+            <p class="pu-label">Durée du projet&nbsp;: {{ space.availability }}</p>
             {% if space.nbSpaces or space.minSpace or space.maxSpace %}
             <p class="pu-label">
               Surfaces&nbsp;:
@@ -117,7 +117,7 @@
     <div class="pu-apply-zone">
       <p class="center">Date limite de candidature</p>
       <h5 class="center apply-date-show">
-        {{ space.limitAvailability|localizeddate('long', 'none') }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
+        {{ space.limitAvailability|localizeddate('long', 'none', 'fr') }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
       </h5>
       <p class="center">
         {% if not space.isEnabled() %}
@@ -176,21 +176,56 @@
         <img src="{{ asset('/bundles/app/images/closed.png') }}" alt="closed" class="closed" />
       {% endif %} #}
 
-      <div id="property-detail-large" class="owl-carousel ">
-        {% for p in space.pics %}
-          <div class="item">
-            <img src="{{ vich_uploader_asset(p, 'file') }}" alt="{{ space.name }}" />
-          </div>
-        {% endfor %}
-      </div>
 
-       <div id="property-detail-thumbs" class="owl-carousel">
-        {% for p in space.pics %}
-          <div class="item">
-            <img src="{{ vich_uploader_asset(p, 'file') }}" alt="{{ space.name }}" />
+      {% if space.pics|length > 0 %}
+      <div class="pu-gallery-wrapper">
+        {# --- Carousel principal --- #}
+        <div id="spaceCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+
+          {# Indicateurs (bullets) #}
+          {% if space.pics|length > 1 %}
+          <ol class="carousel-indicators">
+            {% for p in space.pics %}
+              <li data-target="#spaceCarousel" data-slide-to="{{ loop.index0 }}"{% if loop.first %} class="active"{% endif %}></li>
+            {% endfor %}
+          </ol>
+          {% endif %}
+
+          {# Slides #}
+          <div class="carousel-inner" role="listbox">
+            {% for p in space.pics %}
+              <div class="item{% if loop.first %} active{% endif %}">
+                <img src="{{ vich_uploader_asset(p, 'file') }}" alt="{{ space.name }}" />
+              </div>
+            {% endfor %}
           </div>
-        {% endfor %}
-      </div> 
+
+          {# Flèches de navigation #}
+          {% if space.pics|length > 1 %}
+          <a class="left carousel-control" href="#spaceCarousel" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">Précédent</span>
+          </a>
+          <a class="right carousel-control" href="#spaceCarousel" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">Suivant</span>
+          </a>
+          {% endif %}
+        </div>
+
+        {# --- Vignettes cliquables --- #}
+        {% if space.pics|length > 1 %}
+        <div class="pu-gallery-thumbs">
+          {% for p in space.pics %}
+            <div class="pu-gallery-thumb{% if loop.first %} active{% endif %}" data-target="#spaceCarousel" data-slide-to="{{ loop.index0 }}">
+              <img src="{{ vich_uploader_asset(p, 'file') }}" alt="{{ space.name }} – photo {{ loop.index }}" />
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
     </div>
 
 
@@ -385,5 +420,103 @@
             width: 100%;
             max-width: 200px;
         }
+
+        /* --- Galerie photos (Bootstrap Carousel + vignettes) --- */
+        .pu-gallery-wrapper {
+            margin-bottom: 20px;
+        }
+
+        /* Image principale */
+        #spaceCarousel .item img {
+            width: 100%;
+            height: 420px;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        /* Flèches de navigation */
+        #spaceCarousel .carousel-control {
+            background-image: none;
+            width: 40px;
+            opacity: 1;
+        }
+        #spaceCarousel .carousel-control .glyphicon {
+            color: #fff;
+            font-size: 22px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+            top: 50%;
+            transform: translateY(-50%);
+            margin: 0;
+        }
+
+        /* Indicateurs (bullets) */
+        #spaceCarousel .carousel-indicators {
+            bottom: 8px;
+        }
+        #spaceCarousel .carousel-indicators li {
+            background-color: rgba(255,255,255,0.55);
+            border: 1px solid rgba(255,255,255,0.8);
+            width: 10px;
+            height: 10px;
+        }
+        #spaceCarousel .carousel-indicators .active {
+            background-color: #fff;
+            width: 12px;
+            height: 12px;
+        }
+
+        /* Vignettes cliquables */
+        .pu-gallery-thumbs {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .pu-gallery-thumb {
+            flex: 0 0 auto;
+            width: 80px;
+            height: 56px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 3px;
+            overflow: hidden;
+            opacity: 0.65;
+            transition: opacity 0.2s, border-color 0.2s;
+        }
+        .pu-gallery-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .pu-gallery-thumb:hover {
+            opacity: 0.9;
+        }
+        .pu-gallery-thumb.active {
+            border-color: #c0392b;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            #spaceCarousel .item img { height: 220px; }
+            .pu-gallery-thumb { width: 60px; height: 42px; }
+        }
     </style>
+    <script>
+        $(document).ready(function () {
+            /* Sync vignettes → carousel */
+            $('.pu-gallery-thumb').on('click', function () {
+                var idx = $(this).data('slide-to');
+                $('#spaceCarousel').carousel(idx);
+            });
+
+            /* Sync carousel → vignettes */
+            $('#spaceCarousel').on('slid.bs.carousel', function () {
+                var active = $(this).find('.item.active');
+                var idx = active.index();
+                $('.pu-gallery-thumb').removeClass('active').eq(idx).addClass('active');
+            });
+        });
+    </script>
 {% endblock %}

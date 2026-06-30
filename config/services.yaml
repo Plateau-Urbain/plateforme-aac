@@ -69,6 +69,10 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
+    App\Controller\Admin\UserAdminController:
+        public: true
+        tags: ['controller.service_arguments']
+
     app.admin.application_file:
         class: App\Admin\ApplicationFileAdmin
         tags:
@@ -92,7 +96,7 @@ services:
     app.admin.category:
         class: App\Admin\CategoryAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\Category, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Catégories }
+            - { name: sonata.admin, model_class: App\Entity\Category, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Types d'usage }
 
     app.admin.attribute:
         class: App\Admin\AttributeAdmin
@@ -107,7 +111,7 @@ services:
     app.admin.use_type:
         class: App\Admin\UseTypeAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\UseType, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Types d'usage }
+            - { name: sonata.admin, model_class: App\Entity\UseType, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Types de projet }
 
     app.admin.local_type:
         class: App\Admin\LocalTypeAdmin
@@ -137,7 +141,7 @@ services:
     app.admin.project_holder:
         class: App\Admin\ProjectHolderAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\User, manager_type: orm, group: plateau_urbain.admin.group.users, label: Porteurs de projet }
+            - { name: sonata.admin, model_class: App\Entity\User, manager_type: orm, group: plateau_urbain.admin.group.users, label: Porteurs de projet, controller: App\Controller\Admin\UserAdminController }
 
     app.admin.file:
         class: App\Admin\FileAdmin

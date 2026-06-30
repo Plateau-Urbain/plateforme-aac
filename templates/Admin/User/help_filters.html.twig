@@ -1,0 +1,96 @@
+{% extends '@SonataAdmin/standard_layout.html.twig' %}
+
+{% block title %}Aide - Filtres et Export{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    <i class="fa fa-question-circle"></i> Comment utiliser les filtres et l'export personnalisé des porteurs de projet
+                </h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4><i class="fa fa-filter text-primary"></i> Étape 1 : Appliquer des filtres (optionnel)</h4>
+                        <ol>
+                            <li>Dans la liste des porteurs de projet, cliquez sur <strong>"Filtres"</strong> en haut à droite</li>
+                            <li>Un panneau s'ouvre avec tous les filtres disponibles :
+                                <ul>
+                                    <li>Nom, prénom, email</li>
+                                    <li>Structure, SIRET, code postal, ville</li>
+                                    <li>Type de projet, surface souhaitée</li>
+                                    <li>Etc.</li>
+                                </ul>
+                            </li>
+                            <li>Remplissez les filtres souhaités</li>
+                            <li>Cliquez sur <strong>"Filtrer"</strong></li>
+                        </ol>
+                        
+                        <div class="alert alert-info">
+                            <i class="fa fa-lightbulb-o"></i> 
+                            <strong>Astuce :</strong> Les filtres appliqués seront automatiquement pris en compte lors de l'export !
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h4><i class="fa fa-download text-success"></i> Étape 2 : Exporter avec choix des colonnes</h4>
+                        <ol>
+                            <li>Une fois vos filtres appliqués (ou pas), cliquez sur le bouton vert <strong>"Export personnalisé"</strong></li>
+                            <li>Une page s'ouvre avec tous les champs disponibles organisés par catégorie</li>
+                            <li>Sélectionnez les champs que vous souhaitez dans votre export :
+                                <ul>
+                                    <li>Cochez individuellement les champs souhaités</li>
+                                    <li>Ou utilisez "Tout sélectionner" pour une catégorie</li>
+                                    <li>Ou utilisez "Tout sélectionner" global en haut</li>
+                                </ul>
+                            </li>
+                            <li>Cliquez sur <strong>"Exporter les porteurs de projet"</strong></li>
+                            <li>Le fichier CSV est téléchargé automatiquement</li>
+                        </ol>
+                        
+                        <div class="alert alert-success">
+                            <i class="fa fa-check"></i> 
+                            <strong>Résultat :</strong> Vous obtenez un fichier CSV avec uniquement les colonnes sélectionnées et les porteurs filtrés !
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h4><i class="fa fa-list"></i> Exemples d'utilisation</h4>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-box bg-aqua">
+                            <span class="info-box-icon"><i class="fa fa-map-marker"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Par zone géographique</span>
+                                <span class="info-box-number">Filtre : Code postal / Ville</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="info-box bg-green">
+                            <span class="info-box-icon"><i class="fa fa-calendar"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Par date d'inscription</span>
+                                <span class="info-box-number">Filtre : Date de création</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="box-footer">
+                <a href="{{ admin.generateUrl('list') }}" class="btn btn-primary">
+                    <i class="fa fa-arrow-left"></i> Retour à la liste des porteurs de projet
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

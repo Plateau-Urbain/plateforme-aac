@@ -734,6 +734,43 @@ class SpaceManagementController extends AbstractController
         // Récupérer tous les champs disponibles
         $allFields = $this->getAllAvailableFieldsForExport();
         
+        // Réordonner les clés sélectionnées selon l'ordre souhaité par l'utilisateur
+        $orderPreset = [
+            'space',
+            'status',
+            'name',
+            'projectHolder_company',
+            'projectHolder_fullName',
+            'projectHolder_phone',
+            'projectHolder_companyPhone',
+            'projectHolder_email',
+            'projectHolder_companyDescription',
+            'projectHolder_companySite',
+            'projectHolder_facebookUrl',
+            'projectHolder_twitterUrl',
+            'projectHolder_instagramUrl',
+            'projectHolder_youtubeUrl',
+            'projectHolder_linkedinUrl',
+            'projectHolder_googleUrl',
+            'projectHolder_tiktokUrl',
+            'projectHolder_otherUrl',
+            'projectHolder_projectDescription',
+            'created',
+            'category',
+            'projectHolder_wishedSize',
+            'projectHolder_usageDuration',
+            'startOccupation',
+            'localUsageDescription',
+        ];
+
+        usort($selectedFieldKeys, function ($a, $b) use ($orderPreset) {
+            $posA = array_search($a, $orderPreset);
+            $posB = array_search($b, $orderPreset);
+            if ($posA === false) return 1; // les clés inconnues vont à la fin
+            if ($posB === false) return -1;
+            return $posA <=> $posB;
+        });
+
         // Construire le tableau des champs à exporter
         $exportFields = [];
         foreach ($selectedFieldKeys as $key) {
@@ -1336,8 +1373,8 @@ class SpaceManagementController extends AbstractController
         $tempFile = tempnam(sys_get_temp_dir(), 'export_candidatures_');
         $zip->open($tempFile, ZipArchive::CREATE);
 
-        $applicationFilesPath = $this->kernel->getProjectDir() . '/../web/uploads/application_files/';
-        $userDocumentsPath = $this->kernel->getProjectDir() . '/../web/uploads/user_documents/';
+        $applicationFilesPath = $this->kernel->getProjectDir() . '/public/uploads/application_files/';
+        $userDocumentsPath = $this->kernel->getProjectDir() . '/public/uploads/user_documents/';
 
         foreach ($applications as $application) {
             // Créer le nom du dossier pour cette candidature
@@ -1479,8 +1516,8 @@ class SpaceManagementController extends AbstractController
         $tempFile = tempnam(sys_get_temp_dir(), 'export_candidatures_selected_');
         $zip->open($tempFile, ZipArchive::CREATE);
 
-        $applicationFilesPath = $this->kernel->getProjectDir() . '/../web/uploads/application_files/';
-        $userDocumentsPath = $this->kernel->getProjectDir() . '/../web/uploads/user_documents/';
+        $applicationFilesPath = $this->kernel->getProjectDir() . '/public/uploads/application_files/';
+        $userDocumentsPath = $this->kernel->getProjectDir() . '/public/uploads/user_documents/';
 
         foreach ($applications as $application) {
             // Créer le nom du dossier pour cette candidature

@@ -668,24 +668,26 @@ $(document).ready(function() {
     // Sélection type : champs essentiels prédéfinis
     var presetFields = [
         'space',                          // Espace
-        'name',                           // Nom du projet
-        'created',                        // Date de dépôt de la candidature
-        'projectHolder_fullName',         // Nom complet du porteur
-        'projectHolder_company',          // Nom de la structure
-        'projectHolder_phone',            // Téléphone personnel
+        'status',                         // Statut
+        'name',                           // Nom
+        'projectHolder_company',          // Structure
+        'projectHolder_fullName',         // Nom du porteur
+        'projectHolder_phone',            // Téléphone
         'projectHolder_email',            // Email
-        'projectHolder_companyDescription', // Présentation de la structure
+        'projectHolder_companyDescription', // Présentation
         'projectHolder_facebookUrl',      // Facebook
         'projectHolder_twitterUrl',       // Twitter
-        'projectHolder_linkedinUrl',      // LinkedIn
         'projectHolder_instagramUrl',     // Instagram
-        'projectHolder_youtubeUrl',       // YouTube
-        'projectHolder_tiktokUrl',        // TikTok
-        'projectHolder_otherUrl',         // Autre URL
-        'projectHolder_useType',          // Type de projet
-        'wishedSize',                     // Surface recherchée (candidature)
+        'projectHolder_youtubeUrl',       // You tube
+        'projectHolder_linkedinUrl',      // Linkedin
+        'projectHolder_tiktokUrl',        // Tiktok
+        'projectHolder_projectDescription', // Description
+        'created',                        // Date de dépôt de la candidature
+        'category',                       // Type d'usage (candidature)
+        'projectHolder_wishedSize',       // Surface recherchée
         'projectHolder_usageDuration',    // Durée d'occupation souhaitée
-        'localUsageDescription'           // Quel sera l'usage du local ?
+        'startOccupation',                // Date d'entrée souhaitée
+        'localUsageDescription'           // Quel sera l'usage du local
     ];
 
     $('#presetBtn').click(function() {

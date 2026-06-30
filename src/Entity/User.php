@@ -82,20 +82,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
      * @var string
      */
     #[ORM\Column(name: 'civility', length: 3, type: 'string', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder', 'owner'])]
+    #[Assert\NotBlank(message: "Veuillez sélectionner votre civilité.", groups: ['projectHolder', 'owner'])]
     protected $civility;
 
     #[ORM\Column(name: 'firstname', type: 'string', length: 255, nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder', 'owner'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner votre prénom.", groups: ['projectHolder', 'owner'])]
     protected $firstname;
 
     #[ORM\Column(name: 'lastname', type: 'string', length: 255, nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder', 'owner'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner votre nom.", groups: ['projectHolder', 'owner'])]
     protected $lastname;
 
     #[ORM\Column(name: 'email', type: 'string', length: 180, unique: true, nullable: true)]
     #[Assert\Email(groups: ['projectHolder', 'owner'])]
-    #[Assert\NotBlank(groups: ['projectHolder', 'owner'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner votre adresse email.", groups: ['projectHolder', 'owner'])]
     protected $email;
 
     /**
@@ -112,19 +112,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
     protected $groups;
 
     #[ORM\Column(length: 255, type: 'string', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder', 'owner'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner le nom de votre structure.", groups: ['projectHolder', 'owner'])]
     protected $company;
 
     #[ORM\Column(name: 'company_status', length: 255, type: 'string', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder', 'owner'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner le statut juridique de votre structure.", groups: ['projectHolder', 'owner'])]
     protected $companyStatus;
 
     #[ORM\Column(name: 'company_creation_date', type: 'date', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner la date de création de votre structure.", groups: ['projectHolder'])]
     protected $companyCreationDate;
 
     #[ORM\Column(length: 255, type: 'string', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder', 'owner'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner votre adresse.", groups: ['projectHolder', 'owner'])]
     protected $address;
 
     #[ORM\Column(name: 'address_suite', length: 255, type: 'string', nullable: true)]
@@ -146,22 +146,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
     protected $company_blog;
 
     #[ORM\Column(length: 10, type: 'string', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder', 'owner'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner votre code postal.", groups: ['projectHolder', 'owner'])]
     #[Assert\Length(max: 5, min: 5, minMessage: 'Code postal invalide', maxMessage: 'Code postal invalide', groups: ['projectHolder', 'owner'])]
     #[Assert\Regex(pattern: '/[0-9]{2}[0-9]{3}/', message: 'Code postal invalide', groups: ['projectHolder', 'owner'])]
     protected $zipcode;
 
     #[ORM\Column(length: 255, type: 'string', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder', 'owner'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner votre ville.", groups: ['projectHolder', 'owner'])]
     protected $city;
 
     #[ORM\Column(name: 'company_function', length: 255, type: 'string', nullable: true)]
     protected $companyFunction;
 
     #[ORM\Column(name: 'company_description', type: 'text', nullable: true)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner la présentation de votre structure.', groups: ['projectHolder'])]
     protected $companyDescription;
 
     #[ORM\Column(name: 'company_effective', type: 'integer', nullable: true)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le nombre de personnes dans votre structure.', groups: ['projectHolder'])]
     #[Assert\Range(min: 0, minMessage: 'Vous devez obligatoirement renseigner une valeur positive.', groups: ['projectHolder'])]
     protected $companyEffective;
 
@@ -216,13 +218,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
     protected $siret;
 
     #[ORM\Column(name: 'wishedSize', type: 'integer', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner la surface souhaitée.", groups: ['projectHolder'])]
     #[Assert\Type(type: 'integer', message: "La valeur {{ value }} n'est pas un nombre entier valide.", groups: ['projectHolder', 'register'])]
     #[Assert\Range(min: 0, minMessage: 'Vous devez obligatoirement renseigner une surface positive.', groups: ['projectHolder', 'register'])]
     protected $wishedSize;
 
     #[ORM\Column(name: 'usage_date', type: 'date', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner votre date de disponibilité.", groups: ['projectHolder'])]
     protected $usageDate;
 
     /**
@@ -232,7 +234,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
     private $lengthTypeOccupation;
 
     #[ORM\Column(name: 'usageDuration', type: 'integer', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner la durée d'occupation souhaitée.", groups: ['projectHolder'])]
     #[Assert\Type(type: 'integer', message: "La valeur {{ value }} n'est pas un nombre entier valide.", groups: ['projectHolder'])]
     #[Assert\Range(min: 0, minMessage: 'Vous devez obligatoirement renseigner une durée positive.', groups: ['projectHolder'])]
     protected $usageDuration;
@@ -241,7 +243,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
      * Budget mensuel total maximum (en euros).
      */
     #[ORM\Column(name: 'monthly_budget_max', type: 'integer', nullable: true)]
-    #[Assert\NotBlank(groups: ['projectHolder'])]
+    #[Assert\NotBlank(message: "Veuillez renseigner votre budget mensuel maximum.", groups: ['projectHolder'])]
     #[Assert\Type(type: 'integer', message: "La valeur {{ value }} n'est pas un nombre entier valide.", groups: ['projectHolder'])]
     #[Assert\Range(min: 0, minMessage: 'Vous devez renseigner un budget positif.', groups: ['projectHolder'])]
     protected $monthlyBudgetMax;

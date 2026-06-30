@@ -264,6 +264,7 @@ class ApplicationAdminController extends CRUDController
             }
         }
         
+        $datagrid->getPager()->setMaxPerPage(PHP_INT_MAX);
         $datagrid->buildPager();
 
         // Export CSV manuel si des champs calculés sont sélectionnés
@@ -303,8 +304,11 @@ class ApplicationAdminController extends CRUDController
         // Export direct via query source iterator
         $proxyQuery = $datagrid->getQuery();
         assert($proxyQuery instanceof \Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery);
+        $query = $proxyQuery->getQuery();
+        $query->setMaxResults(null);
+        $query->setFirstResult(0);
         $sourceIterator = new \Sonata\Exporter\Source\DoctrineORMQuerySourceIterator(
-            $proxyQuery->getQuery(),
+            $query,
             $exportFields,
             'd/m/Y H:i'
         );
@@ -824,6 +828,42 @@ class ApplicationAdminController extends CRUDController
              ORDER BY day ASC'
         )->setParameters(array_intersect_key($baseParams, ['draft' => true, 'year' => true]))->getResult();
 
+        // --- Données par département (Zipcode) ---
+        $zipcodeRaw = $em->createQuery(
+            'SELECT ph.zipcode, COUNT(a.id) AS total
+             FROM App\\Entity\\Application a
+             JOIN a.projectHolder ph
+             WHERE a.status != :draft' . $yearFilter . '
+             GROUP BY ph.zipcode'
+        )->setParameters(array_intersect_key($baseParams, ['draft' => true, 'year' => true]))->getResult();
+
+        $formattedDepts = [];
+        foreach ($zipcodeRaw as $row) {
+            $zip = trim($row['zipcode'] ?? '');
+            $dept = 'Non renseigné';
+            if ($zip !== '') {
+                if (str_starts_with($zip, '97') && strlen($zip) >= 3) {
+                    $dept = substr($zip, 0, 3);
+                } elseif (strlen($zip) >= 2) {
+                    $dept = substr($zip, 0, 2);
+                }
+            }
+            if (isset($formattedDepts[$dept])) {
+                $formattedDepts[$dept] += (int) $row['total'];
+            } else {
+                $formattedDepts[$dept] = (int) $row['total'];
+            }
+        }
+        arsort($formattedDepts);
+
+        $zipcodeRows = [];
+        foreach ($formattedDepts as $dept => $count) {
+            $zipcodeRows[] = [
+                'label' => $dept,
+                'total' => $count
+            ];
+        }
+
         // --- Totaux globaux ---
         $totals = $em->createQuery(
             'SELECT COUNT(a.id) AS total,
@@ -840,6 +880,7 @@ class ApplicationAdminController extends CRUDController
             'useTypeRows'      => $useTypeRows,
             'companyStatusRows'=> $companyStatusRows,
             'timelineRows'     => $timelineRows,
+            'zipcodeRows'      => $zipcodeRows,
             'totals'           => $totals,
             'availableYears'   => $availableYears,
             'selectedYear'     => $selectedYear,

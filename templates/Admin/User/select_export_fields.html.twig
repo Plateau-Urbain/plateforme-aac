@@ -60,7 +60,7 @@
                 </div>
             </div>
             <div class="box-body">
-                <p>Vous êtes sur le point d'exporter <strong>TOUTES les candidatures</strong>.</p>
+                <p>Vous êtes sur le point d'exporter <strong>TOUS les porteurs de projet</strong>.</p>
             </div>
         </div>
         {% endif %}
@@ -153,7 +153,7 @@
 
         <div class="box-footer">
             <button type="submit" class="btn btn-success btn-lg" id="submit-btn">
-                <i class="fa fa-download"></i> Exporter les candidatures
+                <i class="fa fa-download"></i> Exporter les porteurs de projet
             </button>
             <a href="{{ admin.generateUrl('list') }}" class="btn btn-default btn-lg">
                 <i class="fa fa-times"></i> Annuler
@@ -194,7 +194,6 @@
         margin-bottom: 15px;
     }
     
-    /* Forcer à cacher les icheckbox de Sonata Admin */
     .checkbox div[class^="icheckbox"],
     .checkbox-inline div[class^="icheckbox"],
     .radio div[class^="iradio"],
@@ -202,7 +201,6 @@
         display: none !important;
     }
     
-    /* Indicateur visuel pour les champs sélectionnés */
     .checkbox label.field-selected {
         background-color: #d9edf7;
         padding: 5px 10px;
@@ -221,10 +219,7 @@
 </style>
 
 <script>
-// Utiliser jQuery si disponible, sinon vanilla JS
 (function($) {
-    
-// Attendre que le document soit prêt
 $(document).ready(function() {
     const fieldCheckboxes = $('.field-checkbox');
     const categoryCheckboxes = $('.select-category');
@@ -232,11 +227,8 @@ $(document).ready(function() {
     const selectAllBtn = $('#select-all-btn');
     const deselectAllBtn = $('#deselect-all-btn');
     
-    // Fonction pour mettre à jour le compteur
     function updateSelectedCount() {
-        // Forcer jQuery à recalculer les cases cochées
         const count = $('input[name="fields[]"]:checked').length;
-        
         selectedCountLabel.text(count + ' champ' + (count > 1 ? 's' : '') + ' sélectionné' + (count > 1 ? 's' : ''));
         
         if (count === 0) {
@@ -248,35 +240,24 @@ $(document).ready(function() {
         }
     }
     
-    // Bouton tout sélectionner
     selectAllBtn.on('click', function(e) {
         e.preventDefault();
-        
-        // Sélectionner toutes les checkboxes
         $('input[name="fields[]"]').prop('checked', true);
         $('.field-checkbox').prop('checked', true);
         $('.select-category').prop('checked', true);
-        
-        // Mettre à jour le compteur ET les indicateurs visuels
         updateSelectedCount();
         updateVisualIndicators();
     });
     
-    // Bouton tout désélectionner
     deselectAllBtn.on('click', function(e) {
         e.preventDefault();
-        
-        // Désélectionner toutes les checkboxes
         $('input[name="fields[]"]').prop('checked', false);
         $('.field-checkbox').prop('checked', false);
         $('.select-category').prop('checked', false);
-        
-        // Mettre à jour le compteur ET les indicateurs visuels
         updateSelectedCount();
         updateVisualIndicators();
     });
     
-    // Sélectionner/désélectionner par catégorie
     categoryCheckboxes.on('change', function() {
         const category = $(this).data('category');
         $('.category-' + category).prop('checked', $(this).prop('checked'));
@@ -284,7 +265,6 @@ $(document).ready(function() {
         updateVisualIndicators();
     });
     
-    // Fonction pour mettre à jour l'indicateur visuel des champs sélectionnés
     function updateVisualIndicators() {
         $('input[name="fields[]"]').each(function() {
             const $checkbox = $(this);
@@ -298,17 +278,14 @@ $(document).ready(function() {
         });
     }
     
-    // Mettre à jour le compteur ET les indicateurs visuels quand on coche un champ
     fieldCheckboxes.on('change', function() {
         updateSelectedCount();
         updateVisualIndicators();
     });
     
-    // Initialiser le compteur / style sans pré-sélection
     updateSelectedCount();
     updateVisualIndicators();
     
-    // Validation du formulaire
     $('#export-form').on('submit', function(e) {
         const checkedCount = $('.field-checkbox:checked').length;
         if (checkedCount === 0) {
@@ -316,14 +293,8 @@ $(document).ready(function() {
             alert('Veuillez sélectionner au moins un champ à exporter.');
             return false;
         }
-        
-        const selectedFields = [];
-        $('.field-checkbox:checked').each(function() {
-            selectedFields.push($(this).val());
-        });
     });
 });
-
-})(jQuery); // Fin du wrapper jQuery
+})(jQuery);
 </script>
 {% endblock %}

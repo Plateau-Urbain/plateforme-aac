@@ -633,6 +633,7 @@ class Space implements \Stringable
     {
         $doc->setSpace($this);
         $doc->setFileType($type);
+        $doc->setPosition($this->pics->count());
         $this->pics->add($doc);
 
         $this->setUpdated(new \DateTime());

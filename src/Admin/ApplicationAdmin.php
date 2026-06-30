@@ -104,7 +104,7 @@ class ApplicationAdmin extends AbstractAdmin
                 'admin_code' => 'app.admin.project_holder',
             ])
             ->add('name', null, ['label'=>"Nom du projet"] )
-            ->add('category', null, ['label'=>"Categorie du projet",'required'=> true])
+            ->add('category', null, ['label'=>"Type d'usage",'required'=> true])
         ;
 
         if ($hasProjectHolder) {
@@ -161,7 +161,7 @@ class ApplicationAdmin extends AbstractAdmin
                 ],
             ])
             ->add('selected', null, ['label' => 'Sélectionné'])
-            ->add('category', null, ['label' => 'Catégorie'])
+            ->add('category', null, ['label' => "Type d'usage"])
             ->add('projectHolder', null, [
                 'field_options' => [
                     'query_builder' => fn (UserRepository $repository) => $repository->createPorteursQueryBuilder(),
@@ -194,7 +194,7 @@ class ApplicationAdmin extends AbstractAdmin
                 ])
                 ->add('selected', null, ['label' => 'Sélectionné'])
                 ->add('space', null, ['label' => 'Espace'])
-                ->add('category', null, ['label' => 'Catégorie'])
+                ->add('category', null, ['label' => "Type d'usage"])
                 ->add('created', 'datetime', ['label' => 'Date de création', 'format' => 'd/m/Y à H:i'])
                 ->add('updated', 'datetime', ['label' => 'Date de mise à jour', 'format' => 'd/m/Y à H:i'])
             ->end()
@@ -233,11 +233,7 @@ class ApplicationAdmin extends AbstractAdmin
                 'route' => ['name' => 'edit'],
             ])
             ->add('space', null, ['label' => 'Espace'])
-            ->add('status', null, [
-                'label' => 'Statut',
-                'template' => 'Admin/list_status.html.twig'
-            ])
-            ->add('category', null, ['label' => 'Catégorie'])
+            ->add('category', null, ['label' => "Type d'usage"])
             ->add('projectHolder', null, [
                 'label' => 'Porteur de projet',
                 'admin_code' => 'app.admin.project_holder',

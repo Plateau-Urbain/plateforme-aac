@@ -20,6 +20,21 @@
     </div>
 </div>
 
+{% if app.flashes|length %}
+<div class="container" style="margin-bottom: 10px;">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'success' ? 'success' : 'info') }} alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer"><span aria-hidden="true">&times;</span></button>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{{ form_start(form) }}
+
 <div class="row">
         <div class=" col-xs-1 bkg ">
             <ul>
@@ -41,15 +56,6 @@
                 
             </ul>
         </div>     
-
-
-{{ form_start(form) }}
-
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'success' ? 'success' : 'info') }}">{{ message }}</div>
-    {% endfor %}
-{% endfor %}
 
 <div class="main col-xs-10">
     <div id="one" class="section">

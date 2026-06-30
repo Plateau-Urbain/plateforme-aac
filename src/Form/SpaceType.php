@@ -65,7 +65,7 @@ class SpaceType extends AbstractType
                 'scale'    => 2,
             ])
             ->add('priceText', null, ['label' => 'Prix personnalisé (texte libre)', 'attr' => ['class' => 'form-control', 'placeholder' => 'Ex: Sur devis, Prix négociable, etc.'], 'required' => false])
-            ->add('availability', null, ['label' => 'Période de disponibilité', 'attr' => ['class' => 'form-control', 'placeholder' => "1 an, 6 mois…"], 'required' => false])
+            ->add('availability', null, ['label' => 'Durée du projet', 'attr' => ['class' => 'form-control', 'placeholder' => "1 an, 6 mois…"], 'required' => false])
             ->add('nbSpaces', IntegerType::class, ['label' => 'Nombre d\'espaces', 'attr' => ['class' => 'form-control'], 'required' => false])
             ->add('minSpace', IntegerType::class, ['label' => 'Surface minimale (m²)', 'attr' => ['class' => 'form-control'], 'required' => false])
             ->add('maxSpace', IntegerType::class, ['label' => 'Surface maximale (m²)', 'attr' => ['class' => 'form-control'], 'required' => false])

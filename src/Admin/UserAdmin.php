@@ -21,6 +21,11 @@ class UserAdmin extends AbstractAdmin
     protected $baseRoutePattern = 'utilisateurs';
     protected $baseRouteName = 'utilisateurs';
 
+    public function __construct(private \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordHasher)
+    {
+        parent::__construct();
+    }
+
     protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         $collection->add('impersonate', $this->getRouterIdParameter() . '/impersonate');
@@ -40,6 +45,10 @@ class UserAdmin extends AbstractAdmin
                     ->add('firstname', TextType::class, ['label' => 'Prénom', 'required' => false])
                     ->add('lastname', TextType::class, ['label' => 'Nom', 'required' => false])
                     ->add('email', EmailType::class, ['label' => 'Email'])
+                    ->add('plainPassword', TextType::class, [
+                        'required' => $this->getSubject()->getId() === null,
+                        'label'     => 'Mot de passe',
+                    ])
                     ->add('birthday', DateType::class, [
                         'label'    => 'Date de naissance',
                         'widget'   => 'single_text',
@@ -124,8 +133,26 @@ class UserAdmin extends AbstractAdmin
 
     public function prePersist(object $object): void
     {
-        if ($object instanceof User && $object->getCreatedAt() === null) {
-            $object->setCreatedAt(new \DateTime());
+        if ($object instanceof User) {
+            if ($object->getCreatedAt() === null) {
+                $object->setCreatedAt(new \DateTime());
+            }
+            $this->hashPassword($object);
+        }
+    }
+
+    public function preUpdate(object $object): void
+    {
+        if ($object instanceof User) {
+            $this->hashPassword($object);
+        }
+    }
+
+    private function hashPassword(User $user): void
+    {
+        if ($user->getPlainPassword()) {
+            $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPlainPassword()));
+            $user->setPlainPassword(null);
         }
     }
 }
