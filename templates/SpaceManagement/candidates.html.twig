@@ -545,6 +545,9 @@
         <div class="col-panel">
           <div class="ctrl-panel panel-actions" style="height: calc(100% - 20px);">
             <h5><i class="fa fa-cogs"></i> Gestion des candidatures</h5>
+            <p class="small text-muted" style="margin-bottom: 3px;">
+              <i class="fa fa-info-circle"></i> Sélectionnez les candidat·es via les cases à cocher dans la liste ci-dessous.
+            </p>
             <div style="display: flex; gap: 10px; align-items: flex-start;">
               <div class="form-control-large" style="margin: 0; flex: 1;">
                 <select id="groupActionSelect" data-placeholder="Appliquer une action aux sélectionnés...">
@@ -557,9 +560,6 @@
                 <a href="#accept_content" class="btn btn-line-19 btn-form" id="groupActionBtn" style="margin-top: 0;">Appliquer</a>
               </div>
             </div>
-            <p class="small text-muted" style="margin-top: 10px;">
-              <i class="fa fa-info-circle"></i> Sélectionnez les candidat·es via les cases à cocher dans la liste ci-dessous.
-            </p>
           </div>
         </div>
 
@@ -580,6 +580,7 @@
               </div>
               <div class="col-xs-12 col-sm-3" style="margin-bottom: 5px;">
                 <label class="small">Ordre :</label>
+                <br>
                 {{ form_widget(filterForm.sort_order) }}
               </div>
             </div>

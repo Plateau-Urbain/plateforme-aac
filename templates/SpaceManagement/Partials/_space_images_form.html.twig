@@ -39,7 +39,9 @@
 
 
 
-{{ form_errors(form) }}
+<div class="form-group{% if not form.vars.valid %} has-error{% endif %}">
+    {{ form_errors(form) }}
+</div>
 
 <!-- Zone d'affichage des erreurs de validation -->
 <div id="file-validation-errors" class="alert alert-danger" style="display: none;">

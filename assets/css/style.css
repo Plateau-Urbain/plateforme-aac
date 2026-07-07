@@ -5946,8 +5946,8 @@ a.tp-caption.btn-lg {
 
 .view-mode,
 .sort {
-  float: right;
-  margin-left: 15px;
+  float: left !important;
+  
   height: 41px;
   margin-bottom: 15px;
   display: inline-block;
@@ -14343,4 +14343,12 @@ form .main .section-title.form-sixth:after {
 
 .pu-owner-badge .fa {
   margin-right: 4px;
+}
+
+/* edit spaces */
+.ou-separator {
+  text-align: center;
+  font-size: 25px;
+  color: #000;
+  margin-bottom: 0 !important;
 }

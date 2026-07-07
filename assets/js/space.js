@@ -1,22 +1,83 @@
 $(document).ready(function () {
-    $('#addAttribute').on('click', function (e) {
-        // empêche le lien de créer un « # » dans l'URL
-        e.preventDefault();
+    function scrollToFirstError() {
+        var $first = $('#js-form-space .has-error:visible').first();
+        if ($first.length) {
+            $('html, body').animate({ scrollTop: $first.offset().top - 100 }, 300);
+            var $input = $first.find('input, select, textarea').filter(':visible').first();
+            if ($input.length) {
+                $input.one('focus focusin', function (e) {
+                    e.stopPropagation();
+                });
+                $input.focus();
+            }
+            return true;
+        }
 
-        // ajoute un nouveau formulaire tag (voir le prochain bloc de code)
-        addForm($('table.tags'));
-    });
+        var $alert = $('#js-form-space .alert-danger:visible').first();
+        if ($alert.length) {
+            $('html, body').animate({ scrollTop: $alert.offset().top - 80 }, 300);
+            return true;
+        }
+
+        return false;
+    }
+
+    function syncTrumbowygFields() {
+        $('#js-form-space form textarea').each(function () {
+            var $textarea = $(this);
+            if ($textarea.data('trumbowyg')) {
+                $textarea.val($textarea.trumbowyg('html'));
+            }
+        });
+    }
+
+    function submitPublishForm($btn) {
+        var $form = $btn.closest('form');
+        var buttonName = $btn.attr('name');
+
+        $form.find('input.js-publish-flag').remove();
+
+        if (buttonName) {
+            $('<input>', {
+                type: 'hidden',
+                'class': 'js-publish-flag',
+                name: buttonName,
+                value: $btn.val() || ''
+            }).appendTo($form);
+        }
+
+        $form.get(0).submit();
+    }
+
+    function initPublishValidation() {
+        $(document)
+            .off('click.publishvalidation', '#js-form-space .js-publish')
+            .on('click.publishvalidation', '#js-form-space .js-publish', function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+
+                var $btn = $(this);
+                var message = $btn.attr('data-confirm');
+
+                if (message && !window.confirm(message)) {
+                    return false;
+                }
+
+                syncTrumbowygFields();
+                submitPublishForm($btn);
+                return false;
+            });
+    }
 
     function successAjax(data, saving) {
         $("#js-form-space").replaceWith($(data).find('#js-form-space'));
         initFormListener();
+        initPublishValidation();
         initLinkListener();
         initFileValidation();
-        //$("input[data-provide='datepicker']").datepicker({'format' : 'dd/mm/yyyy', 'language': 'fr'});
         $("select").attr("data-placeholder", "Sélectionnez une option");
         $("select").chosen();
 
-        // Réinitialiser l'éditeur Trumbowyg après mise à jour AJAX
         $.trumbowyg.svgPath = "/images/icons-trumbowyg.svg";
         $('textarea').trumbowyg({
             lang: 'fr',
@@ -29,14 +90,11 @@ $(document).ready(function () {
             $.colorbox({ html: $('#saveBox').html().replace('%%savemsg%%', saving) });
         }
 
-        if ($(data).find('.alert-danger').length > 0) {
-            $('html, body').animate({ scrollTop: $('.alert-danger').first().offset().top - 80 }, 300);
-        }
+        scrollToFirstError();
     }
 
     function initLinkListener() {
         $('.js-btn-space').off('click.spacelink').on('click.spacelink', function () {
-
             var href = $(this).attr('href');
             var method = $(this).data('link-method') || 'post';
 
@@ -52,27 +110,15 @@ $(document).ready(function () {
                 processData: false
             });
 
-
             return false;
         });
     }
 
-
     function initFormListener() {
-        var name = document.getElementById('appbundle_space_name');
-
-        $('button[type="submit"]:not(.no-ajax), input[type="submit"]:not(.no-ajax)').click(function (e) {
-            if (name.checkValidity() == false) {
-                window.scroll(name.scrollTop, name.scrollLeft)
-                name.focus()
-                name.parentElement.classList.add('has-error')
-                e.preventDefault()
-                return false
-            }
-
-            // Validation de la taille des fichiers (photos uniquement - 600 Ko)
-            var maxSize = 600 * 1024; // 600 Ko en bytes
-            // On exclut les inputs documents (.js-doc-upload) qui ont leur propre validation
+        $('button[type="submit"]:not(.no-ajax), input[type="submit"]:not(.no-ajax)')
+            .off('click.formlistener')
+            .on('click.formlistener', function (e) {
+            var maxSize = 600 * 1024;
             var fileInputs = $('input[type="file"]').not(function () {
                 return $(this).closest('.js-doc-upload').length > 0;
             });
@@ -81,7 +127,6 @@ $(document).ready(function () {
             var errorDiv = $('#file-validation-errors');
             var errorSpan = $('#file-error-message');
 
-            // Masquer les erreurs précédentes
             errorDiv.hide();
 
             fileInputs.each(function () {
@@ -103,10 +148,6 @@ $(document).ready(function () {
 
             var saving = false;
 
-            if ($(this).hasClass('js-publish')) {
-                return true;
-            }
-
             if ($(this).hasClass('save')) {
                 saving = $(this).data('save') ? $(this).data('save') : true;
             }
@@ -114,12 +155,7 @@ $(document).ready(function () {
             var form = $(this).closest('form');
             var action = form.attr('action');
 
-            form.find('textarea').each(function () {
-                var $textarea = $(this);
-                if ($textarea.data('trumbowyg')) {
-                    $textarea.val($textarea.trumbowyg('html'));
-                }
-            });
+            syncTrumbowygFields();
 
             var formData = new FormData(form[0]);
             var submitButton = $(this);
@@ -173,19 +209,16 @@ $(document).ready(function () {
         });
     }
 
-    // Validation en temps réel lors de la sélection des fichiers (photos uniquement - 600 Ko)
     function initFileValidation() {
-        // On exclut les inputs dans .js-doc-upload qui ont leur propre validation
         $('input[type="file"]').not(function () {
             return $(this).closest('.js-doc-upload').length > 0;
         }).on('change', function () {
-            var maxSize = 600 * 1024; // 600 Ko en bytes
+            var maxSize = 600 * 1024;
             var files = this.files;
             var errorMessage = '';
             var errorDiv = $('#file-validation-errors');
             var errorSpan = $('#file-error-message');
 
-            // Masquer les erreurs précédentes
             errorDiv.hide();
 
             for (var i = 0; i < files.length; i++) {
@@ -197,17 +230,44 @@ $(document).ready(function () {
             if (errorMessage) {
                 errorSpan.text(errorMessage);
                 errorDiv.show();
-                // Vider le champ de fichier
                 $(this).val('');
             }
         });
     }
 
+    $('#addAttribute').on('click', function (e) {
+        e.preventDefault();
+        addForm($('table.tags'));
+    });
+
+    // Efface l'état d'erreur dès que l'utilisateur corrige un champ
+    $(document).on('input change', '#js-form-space .has-error input, #js-form-space .has-error select, #js-form-space .has-error textarea', function () {
+        var $group = $(this).closest('.has-error');
+        if (!$group.length) {
+            return;
+        }
+
+        if (this.type === 'file') {
+            return;
+        }
+
+        if (this.value.trim() !== '') {
+            $group.removeClass('has-error').find('.help-block').remove();
+        }
+    });
+
+    $(document).on('tbwchange tbwpaste', 'textarea', function () {
+        var $group = $(this).closest('.has-error');
+        if ($group.length && $(this).trumbowyg('html').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim() !== '') {
+            $group.removeClass('has-error').find('.help-block').remove();
+        }
+    });
+
     initFormListener();
+    initPublishValidation();
     initLinkListener();
     initFileValidation();
 
-    // Initialiser l'éditeur Trumbowyg au chargement de la page
     $.trumbowyg.svgPath = "/images/icons-trumbowyg.svg";
     $('textarea').trumbowyg({
         lang: 'fr',
@@ -215,4 +275,7 @@ $(document).ready(function () {
         removeformatPasted: true,
         autogrow: true
     });
+
+    scrollToFirstError();
+    $(window).on('load', scrollToFirstError);
 });

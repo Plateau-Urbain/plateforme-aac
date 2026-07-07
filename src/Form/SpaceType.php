@@ -23,6 +23,8 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+
+
 class SpaceType extends AbstractType
 {
     /**
@@ -41,23 +43,22 @@ class SpaceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', null, ['label' => 'Nom de l\'espace' , 'attr' => ['class' => 'form-control']])
-            ->add('zipCode', null, ['label' => 'Code postal' , 'attr' => ['class' => 'form-control'], 'required' => false])
-            ->add('city', null, ['label' => 'Ville' , 'attr' => ['class' => 'form-control'], 'required' => false])
+            ->add('name', null, ['label' => 'Nom de l\'espace', 'attr' => ['class' => 'form-control'], 'error_bubbling' => false])
+            ->add('zipCode', null, ['label' => 'Code postal', 'attr' => ['class' => 'form-control'], 'required' => false, 'error_bubbling' => false])
+            ->add('city', null, ['label' => 'Ville', 'attr' => ['class' => 'form-control'], 'required' => false, 'error_bubbling' => false])
             ->add('limitAvailability', DateTimeType::class, [
                     'label' => 'Date et heure limite de candidature',
                     'date_widget' => 'single_text',
                     'time_widget' => 'choice',
                     'with_seconds' => false,
-                    'attr' => [
-                        'class' => 'form-control'
-                    ],
+                    'attr' => ['class' => 'form-control'],
                     'hours' => range(0, 23),
                     'minutes' => range(0, 59),
-                    'required' => false
+                    'required' => false,
+                    'error_bubbling' => false,
                 ]
             )
-            ->add('type', null, ['label' => 'Type de locaux', 'attr' => ['class' => 'form-control'], 'required' => true])
+            ->add('type', null, ['label' => 'Type de locaux', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
             ->add('price', NumberType::class, [
                 'label'    => 'Prix au m² mensuel',
                 'attr'     => ['class' => 'form-control', 'step' => '0.01', 'placeholder' => 'Ex: 12.50'],
@@ -65,12 +66,12 @@ class SpaceType extends AbstractType
                 'scale'    => 2,
             ])
             ->add('priceText', null, ['label' => 'Prix personnalisé (texte libre)', 'attr' => ['class' => 'form-control', 'placeholder' => 'Ex: Sur devis, Prix négociable, etc.'], 'required' => false])
-            ->add('availability', null, ['label' => 'Durée du projet', 'attr' => ['class' => 'form-control', 'placeholder' => "1 an, 6 mois…"], 'required' => false])
-            ->add('nbSpaces', IntegerType::class, ['label' => 'Nombre d\'espaces', 'attr' => ['class' => 'form-control'], 'required' => false])
-            ->add('minSpace', IntegerType::class, ['label' => 'Surface minimale (m²)', 'attr' => ['class' => 'form-control'], 'required' => false])
-            ->add('maxSpace', IntegerType::class, ['label' => 'Surface maximale (m²)', 'attr' => ['class' => 'form-control'], 'required' => false])
-            ->add('description', null, ['label' => 'Description', 'attr' => ['class' => 'form-control'], 'required' => false])
-            ->add('activityDescription', null, ['label' => 'Activités recherchées', 'attr' => ['class' => 'form-control'], 'required' => false])
+            ->add('availability', null, ['label' => 'Durée du projet', 'attr' => ['class' => 'form-control', 'placeholder' => "1 an, 6 mois…"], 'required' => true, 'error_bubbling' => false])
+            ->add('nbSpaces', IntegerType::class, ['label' => 'Nombre d\'espaces', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
+            ->add('minSpace', IntegerType::class, ['label' => 'Surface minimale (m²)', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
+            ->add('maxSpace', IntegerType::class, ['label' => 'Surface maximale (m²)', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
+            ->add('description', null, ['label' => 'Description', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
+            ->add('activityDescription', null, ['label' => 'Activités recherchées', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
             ->add('rollingApplications', CheckboxType::class, [
                 'label' => 'Candidature au fil de l’eau (affiche la “date d’entrée souhaitée” côté candidat)',
                 'required' => false,

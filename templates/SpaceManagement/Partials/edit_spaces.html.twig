@@ -24,7 +24,7 @@
 <div class="container" style="margin-bottom: 10px;">
     {% for label, messages in app.flashes %}
         {% for message in messages %}
-            <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'success' ? 'success' : 'info') }} alert-dismissible" role="alert">
+            <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'success' ? 'success' : (label == 'warning' ? 'warning' : 'info')) }} alert-dismissible" role="alert">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Fermer"><span aria-hidden="true">&times;</span></button>
                 {{ message }}
             </div>
@@ -33,7 +33,28 @@
 </div>
 {% endif %}
 
-{{ form_start(form) }}
+{% form_theme form 'Form/bootstrap_3_layout.html.twig' %}
+<style>
+    /* Le fond du formulaire n'étant pas garanti (variable selon la section),
+       le message d'erreur porte son propre fond pour rester lisible dans tous les cas. */
+    #js-form-space .has-error .help-block {
+        display: block;
+        color: #FFF;
+        background-color: #e9473c;
+        font-size: 13px;
+        margin-top: 4px;
+        padding: 6px 10px;
+        border-radius: 4px;
+    }
+    #js-form-space .has-error .help-block ul { margin: 0; }
+    #js-form-space .has-error .form-control,
+    #js-form-space .has-error select.form-control {
+        border-color: #e9473c;
+    }
+    #js-form-space .trumbowyg-box,
+    #js-form-space .trumbowyg-editor-box { border: none; }
+</style>
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
 <div class="row">
         <div class=" col-xs-1 bkg ">
@@ -64,28 +85,38 @@
             <h3>Votre espace</h3>
          
          {{ form_errors(form) }}
+
+
+
      
              <div class="row">
-                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
-                    {{ form_row(form.name) }}
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group{% if not form.name.vars.valid %} has-error{% endif %}">
+                    {{ form_label(form.name) }}
+                    {{ form_widget(form.name) }}
+                    {{ form_errors(form.name) }}
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group{% if not form.zipCode.vars.valid %} has-error{% endif %}">
+                    {{ form_label(form.zipCode) }}
+                    {{ form_widget(form.zipCode, {'attr': {'class': 'form-control', 'inputmode': 'numeric', 'autocomplete': 'postal-code'}}) }}
+                    {{ form_errors(form.zipCode) }}
+                </div>
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group{% if not form.city.vars.valid %} has-error{% endif %}">
+                    {{ form_label(form.city) }}
+                    {{ form_widget(form.city) }}
+                    {{ form_errors(form.city) }}
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
-                    {{ form_row(form.zipCode) }}
-                </div>
-                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
-                    {{ form_row(form.city) }}
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group{% if not form.limitAvailability.vars.valid %} has-error{% endif %}">
                     {{ form_label(form.limitAvailability) }}
                     <div class="row">
                         <div class="col-xs-12 col-sm-6 form-group">
-                            {{ form_widget(form.limitAvailability.date) }}
+                            {{ form_widget(form.limitAvailability.date, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="col-xs-6 col-sm-3 form-group">
                             {{ form_widget(form.limitAvailability.time.hour) }}
@@ -96,8 +127,10 @@
                     </div>
                     {{ form_errors(form.limitAvailability) }}
                 </div>
-                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
-                    {{ form_row(form.availability) }}
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group{% if not form.availability.vars.valid %} has-error{% endif %}">
+                    {{ form_label(form.availability) }}
+                    {{ form_widget(form.availability) }}
+                    {{ form_errors(form.availability) }}
                 </div>
             </div>
 
@@ -112,7 +145,7 @@
             <div class="col-md-5 col-sm-12 col-xs-12 form-group">
                 {{ form_row(form.price) }}
         </div>
-        <div class="col-sm-2 text-center form-group">
+        <div class="col-sm-2 text-center form-group ou-separator">
                 <span>ou</span>
         </div>
         <div class="col-md-6 col-sm-12 col-xs-12 form-group">
@@ -134,14 +167,18 @@
 
 
             <div class="row">
-                <div class="col-sm-12 form-group">
-                    {{ form_row(form.description) }}
+                <div class="col-sm-12 form-group{% if not form.description.vars.valid %} has-error{% endif %}">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description) }}
+                    {{ form_errors(form.description) }}
                 </div>
             </div>
 
             <div class="row form-group">
-                <div class="col-sm-12 form-group">
-                    {{ form_row(form.activityDescription) }}
+                <div class="col-sm-12 form-group{% if not form.activityDescription.vars.valid %} has-error{% endif %}">
+                    {{ form_label(form.activityDescription) }}
+                    {{ form_widget(form.activityDescription) }}
+                    {{ form_errors(form.activityDescription) }}
                 </div>
             </div>
 
@@ -248,8 +285,10 @@
                     form.publish, {
                         'label': is_granted('ROLE_ADMIN') ? 'Publier' : 'Soumettre pour validation',
                         'attr': {
-                            'class': 'btn btn-line-s js-publish',
-                            'onclick': "return confirm(\'{% if app.user and is_granted('ROLE_ADMIN') %}ADMIN : Êtes-vous sûr de vouloir publier cet espace ?\n\nL\'espace sera immédiatement visible par tous les candidats et le propriétaire sera notifié par email.{% else %}Êtes-vous sûr de vouloir soumettre cet espace pour validation ?\n\nUn administrateur vérifiera votre espace et le publiera. Vous serez notifié par email une fois l\'espace publié.{% endif %}\');"
+                            'class': 'btn btn-line-s js-publish no-ajax',
+                            'data-confirm': is_granted('ROLE_ADMIN')
+                                ? "ADMIN : Êtes-vous sûr de vouloir publier cet espace ?\n\nL'espace sera immédiatement visible par tous les candidats et le propriétaire sera notifié par email."
+                                : "Êtes-vous sûr de vouloir soumettre cet espace pour validation ?\n\nUn administrateur vérifiera votre espace et le publiera. Vous serez notifié par email une fois l'espace publié."
                         }
                     })
                 }}
@@ -279,5 +318,40 @@
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    // Mapping section id -> index de l'indicateur (0-based)
+    var sections = ['one', 'two', 'three', 'four', 'five'];
+
+    // Chercher la première section contenant au moins un champ en erreur
+    var targetSection = null;
+    var targetIndex   = -1;
+
+    for (var i = 0; i < sections.length; i++) {
+        var section = document.getElementById(sections[i]);
+        if (section && section.querySelector('.has-error')) {
+            targetSection = section;
+            targetIndex   = i;
+            break;
+        }
+    }
+
+    if (!targetSection) {
+        return; // Aucune erreur de validation inline, rien à faire
+    }
+
+    // Mettre en évidence l'indicateur latéral correspondant
+    var indicators = document.querySelectorAll('.bkg .indicator');
+    indicators.forEach(function (el) { el.classList.remove('active'); });
+    if (indicators[targetIndex]) {
+        indicators[targetIndex].classList.add('active');
+    }
+
+    // Scroll doux vers la section fautive
+    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+})();
+</script>
+
 
 

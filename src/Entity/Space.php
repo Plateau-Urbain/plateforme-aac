@@ -207,18 +207,21 @@ class Space implements \Stringable
      * @var int
      */
     #[ORM\Column(name: 'nb_spaces', type: 'integer', nullable: true)]
+    #[Assert\NotBlank(groups: ['save'])]
     private $nbSpaces;
 
     /**
      * @var int
      */
     #[ORM\Column(name: 'min_space', type: 'integer', nullable: true)]
+    #[Assert\NotBlank(groups: ['save'])]
     private $minSpace;
 
     /**
      * @var int
      */
     #[ORM\Column(name: 'max_space', type: 'integer', nullable: true)]
+    #[Assert\NotBlank(groups: ['save'])]
     private $maxSpace;
 
     /**

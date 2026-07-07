@@ -621,7 +621,7 @@
                                                 type="text"
                                                 id="preferred-departments-combobox-input"
                                                 class="form-control"
-                                                placeholder="Tapez un code (75) ou un nom (Paris)… (sélection multiple possible)"
+                                                placeholder="Tapez un code (75) ou le nom du département… (sélection multiple possible)"
                                                 autocomplete="off"
                                             />
                                             <div id="preferred-departments-combobox-results" class="pu-dept-results" role="listbox" aria-label="Résultats départements"></div>
@@ -894,8 +894,8 @@
                     return;
                 }
                 $banner.html(
-                    '<div style="background:#F1E9E2;border:1px solid #E6C68D;border-radius:0;padding:14px 18px;margin-bottom:16px;">' +
-                    '<strong style="color:#bc1b38;">⚠ Votre profil doit être complété avant de candidater</strong>' +
+                    '<div style="padding:14px 18px;margin-bottom:16px;">' +
+                    '<strong style="color:#bc1b38;">⚠ Votre profil doit être complété pour pouvoir candidater</strong>' +
                     '<p style="margin:8px 0 0 0;color:#000;">Des champs de votre profil sont manquants ou ont été mis à jour depuis votre dernière connexion. ' +
                     'Merci de <strong>relire et compléter l\'ensemble des sections de votre profil</strong> (coordonnées, présentation, projet, réseaux sociaux…) ' +
                     'avant de déposer une candidature.</p>' +
@@ -920,15 +920,12 @@
                     const empty = !v || (Array.isArray(v) ? v.length === 0 : String(v).trim() === '');
                     if (empty) missing.push('warn-preferredDepartments');
                 }
-                // useType vide
+                // useType vide (pas archivé — l'alerte Twig statique couvre déjà ce cas)
                 const $ut = $('#project_owner_useType');
-                if ($ut.length) {
+                if ($ut.length && $('#js-form-space').attr('data-use-type-archived') !== '1') {
                     const utVal = $ut.val();
                     const utEmpty = !utVal || String(utVal).trim() === '';
                     if (utEmpty) missing.push('warn-useType');
-                }
-                if ($('#js-form-space').attr('data-use-type-archived') === '1') {
-                    missing.push('warn-useType-archived');
                 }
                 return missing;
             }
@@ -941,7 +938,7 @@
                 if ($banner.find('li').length === 0) $banner.hide().empty();
             }
 
-            if (isExistingUser || $('#js-form-space').attr('data-use-type-archived') === '1' || !$('#project_owner_useType').val()) {
+            if (isExistingUser || !$('#project_owner_useType').val()) {
                 buildBanner(getMissingIds());
             }
 

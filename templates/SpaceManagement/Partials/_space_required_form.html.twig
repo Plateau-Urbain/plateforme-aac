@@ -1,15 +1,15 @@
 {% if space.getDocs('document_aac') | length == 0 and form.doc_aac.vars.errors | length %}
-    <div class="space-doc-error">
+    <div class="space-doc-error has-error">
         {% for error in form.doc_aac.vars.errors %}{{ error.message }}{% endfor %}
     </div>
 {% endif %}
 {% if space.getDocs('document_plan') | length == 0 and form.doc_plan.vars.errors | length %}
-    <div class="space-doc-error">
+    <div class="space-doc-error has-error">
         {% for error in form.doc_plan.vars.errors %}{{ error.message }}{% endfor %}
     </div>
 {% endif %}
 {% if space.getDocs('document_faq') | length == 0 and form.doc_faq.vars.errors | length %}
-    <div class="space-doc-error">
+    <div class="space-doc-error has-error">
         {% for error in form.doc_faq.vars.errors %}{{ error.message }}{% endfor %}
     </div>
 {% endif %}
