@@ -1,8 +1,25 @@
 {% extends '@SonataAdmin/standard_layout.html.twig' %}
 
+{% macro format_sonata_date(val) %}
+    {%- if val is not empty -%}
+        {%- if val is iterable -%}
+            {%- if val.year is defined and val.month is defined and val.day is defined -%}
+                {{- (val.year ~ '-' ~ val.month ~ '-' ~ val.day)|date('d/m/Y') -}}
+            {%- elseif val.date is defined -%}
+                {{- val.date|date('d/m/Y') -}}
+            {%- else -%}
+                {{- val|join('/') -}}
+            {%- endif -%}
+        {%- else -%}
+            {{- val|date('d/m/Y') -}}
+        {%- endif -%}
+    {%- endif -%}
+{% endmacro %}
+
 {% block title %}Sélection des champs à exporter{% endblock %}
 
 {% block content %}
+{% import _self as helper %}
 <div class="row">
     <div class="col-md-12">
         {# Afficher les filtres appliqués - Version robuste #}
@@ -13,11 +30,48 @@
             {% if key not in ['_page', '_sort_by', '_sort_order', '_per_page', 'fields'] %}
                 {% if value is iterable and value.value is defined %}
                     {% set filterValue = value.value %}
-                    {% if filterValue is not null and filterValue != '' and filterValue is not iterable %}
-                        {% set activeFilters = activeFilters|merge([{'name': key, 'value': filterValue}]) %}
+                    {% if filterValue is not null and filterValue != '' %}
+                        {% if key in ['usageDate', 'createdAt', 'startOccupation', 'created'] %}
+                            {% if filterValue is iterable %}
+                                {% set parts = [] %}
+                                {% if filterValue.start is defined and filterValue.start is not empty %}
+                                    {% set startStr = helper.format_sonata_date(filterValue.start) %}
+                                    {% if startStr is not empty %}
+                                        {% set parts = parts|merge(['du ' ~ startStr]) %}
+                                    {% endif %}
+                                {% endif %}
+                                {% if filterValue.end is defined and filterValue.end is not empty %}
+                                    {% set endStr = helper.format_sonata_date(filterValue.end) %}
+                                    {% if endStr is not empty %}
+                                        {% set parts = parts|merge(['au ' ~ endStr]) %}
+                                    {% endif %}
+                                {% endif %}
+                                {% if parts|length > 0 %}
+                                    {% set activeFilters = activeFilters|merge([{'name': key, 'value': parts|join(' ') }]) %}
+                                {% endif %}
+                            {% else %}
+                                {% set dateStr = helper.format_sonata_date(filterValue) %}
+                                {% if dateStr is not empty %}
+                                    {% set activeFilters = activeFilters|merge([{'name': key, 'value': dateStr}]) %}
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            {% if filterValue is iterable %}
+                                {% set activeFilters = activeFilters|merge([{'name': key, 'value': filterValue|join(', ')}]) %}
+                            {% else %}
+                                {% set activeFilters = activeFilters|merge([{'name': key, 'value': filterValue}]) %}
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
                 {% elseif value is not null and value != '' and value is not iterable %}
-                    {% set activeFilters = activeFilters|merge([{'name': key, 'value': value}]) %}
+                    {% if key in ['usageDate', 'createdAt', 'startOccupation', 'created'] %}
+                        {% set dateStr = helper.format_sonata_date(value) %}
+                        {% if dateStr is not empty %}
+                            {% set activeFilters = activeFilters|merge([{'name': key, 'value': dateStr}]) %}
+                        {% endif %}
+                    {% else %}
+                        {% set activeFilters = activeFilters|merge([{'name': key, 'value': value}]) %}
+                    {% endif %}
                 {% endif %}
             {% endif %}
         {% endfor %}

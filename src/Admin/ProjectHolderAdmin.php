@@ -193,6 +193,28 @@ class ProjectHolderAdmin extends AbstractAdmin
             ])
             ->add('zipcode', null, ['label' => 'Code postal'])
             ->add('city', null, ['label' => 'Ville'])
+            ->add('preferredDepartments', CallbackFilter::class, [
+                'label' => 'Département souhaité',
+                'callback' => static function (ProxyQueryInterface $query, string $alias, string $field, FilterData $data): bool {
+                    if (!$data->hasValue() || $data->getValue() === null || $data->getValue() === '') {
+                        return false;
+                    }
+
+                    $val = $data->getValue();
+                    $qb = $query->getQueryBuilder();
+                    
+                    $parameterName = 'prefDept_' . uniqid();
+                    $qb->andWhere(sprintf("CONCAT(',', CONCAT(%s.preferredDepartments, ',')) LIKE :%s", $alias, $parameterName))
+                       ->setParameter($parameterName, '%,' . $val . ',%');
+
+                    return true;
+                },
+                'field_type' => ChoiceType::class,
+                'field_options' => [
+                    'choices' => User::getAllFrenchDepartments(),
+                    'placeholder' => 'Sélectionner un département...',
+                ]
+            ])
             ->add('useType', null, ['label' => 'Type de projet'])
             ->add('wishedSizeMin', CallbackFilter::class, [
                 'label' => 'Surface souhaitée min (m²)',
@@ -239,7 +261,8 @@ class ProjectHolderAdmin extends AbstractAdmin
             ->add('firstname', null, ['label' => 'Prénom'])
             ->add('lastname', null, ['label' => 'Nom'])
             ->add('company', null, ['label' => 'Structure'])
-            ->add('wishedSize', null, ['label' => 'Surface (m²)'])
+            ->add('wishedSize', null, ['label' => 'Surface (m²)', 'row_align' => 'left', 'header_style' => 'text-align: left'])
+            ->add('preferredDepartmentsLabelsForExport', null, ['label' => 'Départements souhaités'])
             ->add('usageDate', 'date', ['label' => 'Disponibilité', 'format' => 'd/m/Y'])
             ->add('createdAt', 'datetime', ['label' => 'Date d\'inscription', 'format' => 'd/m/Y H:i'])
             ->add('enabled', null, ['label' => 'Activé'])
