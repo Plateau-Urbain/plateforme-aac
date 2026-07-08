@@ -11515,12 +11515,12 @@ form .main .section-title {
 
 #property-listing .space_item_unavailable.space-card--by-proprio .availability-overlay,
 #property-listing .space_item.space-card--by-proprio .availability-overlay {
-  background-color: rgba(242, 190, 106, 0.4) !important;
+  background-color: rgba(242, 190, 106, 1) !important;
 }
 
 #property-listing .space_item_unavailable.space-card--by-admin .availability-overlay,
 #property-listing .space_item.space-card--by-admin .availability-overlay {
-  background-color: rgba(45, 116, 186, 0.4) !important;
+  background-color: rgba(45, 116, 186, 1) !important;
 }
 
 #property-listing .space_item.space-card--by-admin:hover,

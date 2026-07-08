@@ -20,6 +20,10 @@ use App\Entity\User;
 use App\Form\UserDocumentType;
 use Sonata\DoctrineORMAdminBundle\Filter\ChoiceFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\DateTimeRangeFilter;
+use Sonata\DoctrineORMAdminBundle\Filter\DateRangeFilter;
+use Sonata\DoctrineORMAdminBundle\Filter\CallbackFilter;
+use Sonata\AdminBundle\Filter\Model\FilterData;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 /** @extends AbstractAdmin<User> */
 class ProjectHolderAdmin extends AbstractAdmin
@@ -190,7 +194,37 @@ class ProjectHolderAdmin extends AbstractAdmin
             ->add('zipcode', null, ['label' => 'Code postal'])
             ->add('city', null, ['label' => 'Ville'])
             ->add('useType', null, ['label' => 'Type de projet'])
-            ->add('wishedSize', null, ['label' => 'Surface souhaitée (m²)'])
+            ->add('wishedSizeMin', CallbackFilter::class, [
+                'label' => 'Surface souhaitée min (m²)',
+                'callback' => static function (ProxyQueryInterface $query, string $alias, string $field, FilterData $data): bool {
+                    if (!$data->hasValue() || $data->getValue() === null || $data->getValue() === '') {
+                        return false;
+                    }
+
+                    $query->getQueryBuilder()
+                        ->andWhere(sprintf('%s.wishedSize >= :wishedSizeMin', $alias))
+                        ->setParameter('wishedSizeMin', $data->getValue());
+
+                    return true;
+                },
+                'field_type' => NumberType::class,
+            ])
+            ->add('wishedSizeMax', CallbackFilter::class, [
+                'label' => 'Surface souhaitée max (m²)',
+                'callback' => static function (ProxyQueryInterface $query, string $alias, string $field, FilterData $data): bool {
+                    if (!$data->hasValue() || $data->getValue() === null || $data->getValue() === '') {
+                        return false;
+                    }
+
+                    $query->getQueryBuilder()
+                        ->andWhere(sprintf('%s.wishedSize <= :wishedSizeMax', $alias))
+                        ->setParameter('wishedSizeMax', $data->getValue());
+
+                    return true;
+                },
+                'field_type' => NumberType::class,
+            ])
+            ->add('usageDate', DateRangeFilter::class, ['label' => 'Date de disponibilité'])
             ->add('createdAt', DateTimeRangeFilter::class, ['label' => 'Date d\'inscription'])
         ;
     }
@@ -205,6 +239,8 @@ class ProjectHolderAdmin extends AbstractAdmin
             ->add('firstname', null, ['label' => 'Prénom'])
             ->add('lastname', null, ['label' => 'Nom'])
             ->add('company', null, ['label' => 'Structure'])
+            ->add('wishedSize', null, ['label' => 'Surface (m²)'])
+            ->add('usageDate', 'date', ['label' => 'Disponibilité', 'format' => 'd/m/Y'])
             ->add('createdAt', 'datetime', ['label' => 'Date d\'inscription', 'format' => 'd/m/Y H:i'])
             ->add('enabled', null, ['label' => 'Activé'])
             ->add('locked', null, ['label' => 'Verrouillé'])

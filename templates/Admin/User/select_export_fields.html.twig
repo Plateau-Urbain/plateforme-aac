@@ -34,17 +34,21 @@
             </div>
             <div class="box-body">
                 <p class="text-muted" style="margin-bottom:10px;">Les filtres suivants seront pris en compte dans l'export :</p>
-                <div class="row">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 5px;">
                     {% set tagColors = ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b','#6f42c1','#fd7e14','#20c9a6'] %}
                     {% for filter in activeFilters %}
-                    {% set filterLabel = availableFields[filter.name] is defined ? availableFields[filter.name].label : filter.name|replace({'_': ' '})|title %}
+                    {% set filterLabel = null %}
+                    {% if admin.datagrid.filters[filter.name] is defined and admin.datagrid.filters[filter.name].label is not empty %}
+                        {% set filterLabel = admin.datagrid.filters[filter.name].label %}
+                    {% endif %}
+                    {% if filterLabel is empty %}
+                        {% set filterLabel = availableFields[filter.name] is defined ? availableFields[filter.name].label : filter.name|replace({'_': ' '})|title %}
+                    {% endif %}
                     {% set tagColor = tagColors[loop.index0 % tagColors|length] %}
-                    <div class="col-sm-4 col-xs-6" style="margin-bottom:8px;">
-                        <span style="display:inline-block;padding:5px 10px;border-radius:4px;font-size:12px;background:{{ tagColor }};color:#fff;">
-                            <i class="fa fa-tag"></i>
-                            <strong>{{ filterLabel }}</strong> : {{ filter.value }}
-                        </span>
-                    </div>
+                    <span style="display:inline-block;padding:5px 10px;border-radius:4px;font-size:12px;background:{{ tagColor }};color:#fff;">
+                        <i class="fa fa-tag"></i>
+                        <strong>{{ filterLabel }}</strong> : {{ filter.value }}
+                    </span>
                     {% endfor %}
                 </div>
             </div>
