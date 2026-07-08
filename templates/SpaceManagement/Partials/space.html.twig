@@ -6,9 +6,9 @@
       <div class="col-xs-12 col-md-4">
         <div class="image">
           {% if space.isProposedByAdmin %}
-            <span class="pu-managed-badge"><i class="fa fa-shield"></i> Géré par Plateau Urbain</span>
+            <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel }} par Plateau Urbain</span>
           {% elseif space.owner and space.owner.company %}
-            <span class="pu-owner-badge"><i class="fa fa-building"></i> Géré par {{ space.owner.company }}</span>
+            <span class="pu-owner-badge"><i class="fa fa-building"></i> {{ space.managedByLabel }} par {{ space.owner.company }}</span>
           {% endif %}
           <div class="overlay">
             {% if space.isClosed %}

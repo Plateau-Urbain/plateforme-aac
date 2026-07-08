@@ -11,6 +11,9 @@
     </p>
 
     <div class="pu-profile-recap__grid">
+        
+        <h4 style="grid-column: 1 / -1; margin: 0 0 10px 0; font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; color: #333;">1. Informations administratives</h4>
+
         <div class="pu-profile-recap__item">
             <span class="pu-profile-recap__label">Structure</span>
             <span class="pu-profile-recap__value">{{ companyInfo.company ? companyInfo.company : '-' }}</span>
@@ -18,6 +21,20 @@
         <div class="pu-profile-recap__item">
             <span class="pu-profile-recap__label">Statut</span>
             <span class="pu-profile-recap__value">{{ companyInfo.companyStatus ? companyInfo.companyStatus : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Secteur d'activité</span>
+            <span class="pu-profile-recap__value">{{ companyInfo.useType ? companyInfo.useType : '-' }}</span>
+        </div>
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Assujetti à la TVA</span>
+            <span class="pu-profile-recap__value">
+                {% if companyInfo.isSubjectToVat is not null %}
+                    {{ companyInfo.isSubjectToVat ? 'Oui' : 'Non' }}
+                {% else %}
+                    -
+                {% endif %}
+            </span>
         </div>
         <div class="pu-profile-recap__item">
             <span class="pu-profile-recap__label">Date de création</span>
@@ -33,6 +50,23 @@
             <span class="pu-profile-recap__label">SIRET</span>
             <span class="pu-profile-recap__value">{{ companyInfo.siret ? companyInfo.siret : '-' }}</span>
         </div>
+
+        <h4 style="grid-column: 1 / -1; margin: 25px 0 10px 0; font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; color: #333;">2. Statut coopératif</h4>
+
+        <div class="pu-profile-recap__item">
+            <span class="pu-profile-recap__label">Sociétaire Plateau urbain</span>
+            <span class="pu-profile-recap__value">
+                {% if companyInfo.isPuShareholder is not null %}
+                    {{ companyInfo.isPuShareholder ? 'Oui' : 'Non' }}
+                {% else %}
+                    -
+                {% endif %}
+            </span>
+        </div>
+        <div class="pu-profile-recap__item" style="border-bottom: none;"></div>
+
+        <h4 style="grid-column: 1 / -1; margin: 25px 0 10px 0; font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; color: #333;">3. Coordonnées</h4>
+
         <div class="pu-profile-recap__item">
             <span class="pu-profile-recap__label">Adresse</span>
             <span class="pu-profile-recap__value">{{ companyInfo.address ? companyInfo.address : '-' }}</span>
@@ -57,21 +91,20 @@
             <span class="pu-profile-recap__label">Mobile</span>
             <span class="pu-profile-recap__value">{{ companyInfo.companyMobile ? companyInfo.companyMobile : '-' }}</span>
         </div>
+
+        <h4 style="grid-column: 1 / -1; margin: 25px 0 10px 0; font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; color: #333;">4. Fonctionnement &amp; Présentation</h4>
+
+        <div class="pu-profile-recap__item" style="grid-column: 1 / -1; flex-direction: column; align-items: flex-start; gap: 4px;">
+            <span class="pu-profile-recap__label">Description</span>
+            <span class="pu-profile-recap__value" style="width: 100%;">{{ companyInfo.companyDescription ? companyInfo.companyDescription : '-' }}</span>
+        </div>
         <div class="pu-profile-recap__item">
             <span class="pu-profile-recap__label">Effectif</span>
             <span class="pu-profile-recap__value">{{ companyInfo.companyEffective ? companyInfo.companyEffective : '-' }}</span>
         </div>
         <div class="pu-profile-recap__item">
-            <span class="pu-profile-recap__label">Structures</span>
+            <span class="pu-profile-recap__label">Structure(s) d'accompagnement</span>
             <span class="pu-profile-recap__value">{{ companyInfo.companyStructures ? companyInfo.companyStructures : '-' }}</span>
-        </div>
-        <div class="pu-profile-recap__item">
-            <span class="pu-profile-recap__label">Site</span>
-            <span class="pu-profile-recap__value">{{ companyInfo.companySite ? companyInfo.companySite : '-' }}</span>
-        </div>
-        <div class="pu-profile-recap__item">
-            <span class="pu-profile-recap__label">Description</span>
-            <span class="pu-profile-recap__value">{{ companyInfo.companyDescription ? companyInfo.companyDescription : '-' }}</span>
         </div>
         
     </div>

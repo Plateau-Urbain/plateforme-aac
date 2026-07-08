@@ -15,8 +15,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use App\Entity\User;
 
 class CompanyType extends AbstractType
@@ -83,6 +85,32 @@ class CompanyType extends AbstractType
                 'label' => "Structure(s) d'accompagnement",
                 'required' => false,
                 'attr' => ['class' => 'form-control']
+            ])
+            ->add('isPuShareholder', ChoiceType::class, [
+                'label' => "Je suis déjà sociétaire Plateau urbain",
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false,
+                ],
+                'placeholder' => 'Sélectionner...',
+                'required' => true,
+                'attr' => ['class' => 'form-control'],
+                'constraints' => [
+                    new NotNull(['message' => 'Veuillez indiquer si vous êtes déjà sociétaire Plateau urbain.'])
+                ]
+            ])
+            ->add('isSubjectToVat', ChoiceType::class, [
+                'label' => "Ma structure est assujettie à la TVA",
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false,
+                ],
+                'placeholder' => 'Sélectionner...',
+                'required' => true,
+                'attr' => ['class' => 'form-control'],
+                'constraints' => [
+                    new NotNull(['message' => 'Veuillez indiquer si votre structure est assujettie à la TVA.'])
+                ]
             ])
             ->add('companyBlog', TextType::class, [
                 'label' => "Blog",

@@ -183,6 +183,7 @@ class Application
     public function __construct()
     {
         $this->files = new ArrayCollection();
+        $this->lengthTypeOccupation = 'mois';
     }
 
     /**
@@ -399,7 +400,7 @@ class Application
      */
     public function getLengthTypeOccupation()
     {
-        return $this->lengthTypeOccupation;
+        return $this->lengthTypeOccupation ?: 'mois';
     }
 
     /**
@@ -737,6 +738,8 @@ class Application
             "image/png",
             "image/jpeg",
             "image/jpg",
+            "image/gif",
+            "image/webp",
             "application/pdf",
             "application/x-pdf",
             "application/msword"

@@ -208,6 +208,9 @@
                         <span class="section-title form-two"></span>
                         <div class="form-contener">
                             <h3>Ma structure</h3>
+                            
+                            <h4 style="margin: 20px 15px 15px 15px; font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; color: #333;">1. Informations administratives</h4>
+                            
                             <div class="row">
                                 <div class="col-sm-6 form-group{% if form.companyInfo.company.vars.errors|length %} has-error{% endif %}">
                                     {{ form_label(form.companyInfo.company) }}
@@ -226,6 +229,22 @@
                                             {{ form_errors(form.companyInfo.companyStatus) }}
                                         </span>
                                     {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 form-group{% if form.useType.vars.errors|length %} has-error{% endif %}">
+                                    {{ form_label(form.useType, "Secteur d'activité", {'label_attr': {'class': 'required'}}) }}
+                                    {{ form_widget(form.useType) }}
+                                    {{ form_errors(form.useType, {
+                                        'attr': {
+                                            'id': 'useType-error',
+                                            'role': 'alert',
+                                            'aria-live': 'polite'
+                                        }
+                                    }) }}
+                                </div>
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.isSubjectToVat) }}
                                 </div>
                             </div>
                             <div class="row">
@@ -248,6 +267,16 @@
                                     {% endif %}
                                 </div>
                             </div>
+
+                            <h4 style="margin: 30px 15px 15px 15px; font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; color: #333;">2. Statut coopératif</h4>
+                            <div class="row">
+                                <div class="col-sm-6 form-group">
+                                    {{ form_row(form.companyInfo.isPuShareholder) }}
+                                </div>
+                            </div>
+                            
+                            <h4 style="margin: 30px 15px 15px 15px; font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; color: #333;">3. Coordonnées</h4>
+                            
                             <div class="row">
                                 <div class="col-sm-12 form-group{% if form.companyInfo.address.vars.errors|length %} has-error{% endif %}">
                                     {{ form_label(form.companyInfo.address) }}
@@ -299,6 +328,9 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            
+                            <h4 style="margin: 30px 15px 15px 15px; font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; color: #333;">4. Fonctionnement &amp; Présentation</h4>
+                            
                             <div class="row">
                                 <div class="col-sm-12 form-group{% if form.companyInfo.companyDescription.vars.errors|length %} has-error{% endif %}">
                                     {{ form_label(form.companyInfo.companyDescription) }}
@@ -330,17 +362,8 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <div class="row form-group">
-                                <div class="col-sm-12 form-group{% if form.companyInfo.companySite.vars.errors|length %} has-error{% endif %}">
-                                    {{ form_label(form.companyInfo.companySite) }}
-                                    {{ form_widget(form.companyInfo.companySite) }}
-                                    {% if form.companyInfo.companySite.vars.errors|length %}
-                                        <span class="help-block js-help-block" role="alert" aria-live="polite">
-                                            {{ form_errors(form.companyInfo.companySite) }}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            </div>
+
+
                         </div>
 
                     </div>
@@ -348,15 +371,28 @@
                     <span id="three" class="section"></span>
                     <span class="section-title form-three"></span>
                     <div class="form-contener">
-                        <h3>Réseaux sociaux</h3>
+                        <h3>Site internet &amp; Réseaux sociaux</h3>
+                        <small class="help-block text-muted" style="margin-bottom: 20px; display: block; font-size: 13px;">
+                            <i class="fa fa-info-circle"></i> Tous les liens doivent être saisis sous forme d'URL complètes commençant par <strong>http://</strong> ou <strong>https://</strong>.
+                        </small>
                         <div class="row">
+                            <div class="col-sm-6 form-group{% if form.companyInfo.companySite.vars.errors|length %} has-error{% endif %}">
+                                <div class="input-group social-group">
+                                    <span class="input-group-addon"><i class="fa fa-globe fa-lg"></i></span>
+                                    {{ form_widget(form.companyInfo.companySite, {'attr': {'placeholder': 'Site internet (ex: https://www.monsite.fr)'}}) }}
+                                </div>
+                                {{ form_errors(form.companyInfo.companySite) }}
+                            </div>
                             <div class="col-sm-6 form-group{% if form.facebookUrl.vars.errors|length %} has-error{% endif %}">
                                 <div class="input-group social-group">
                                     <span class="input-group-addon"><i class="fa-brands fa-facebook-f fa-lg"></i></span>
-                                    {{ form_widget(form.facebookUrl) }}
+                                    {{ form_widget(form.facebookUrl, {'attr': {'placeholder': 'Facebook (ex: https://www.facebook.com/nompage)'}}) }}
                                 </div>
                                 {{ form_errors(form.facebookUrl) }}
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-sm-6 form-group{% if form.twitterUrl.vars.errors|length %} has-error{% endif %}">
                                 <div class="input-group social-group">
                                     <span class="input-group-addon" aria-label="X (anciennement Twitter)">
@@ -364,46 +400,44 @@
                                             <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/>
                                         </svg>
                                     </span>
-                                    {{ form_widget(form.twitterUrl) }}
+                                    {{ form_widget(form.twitterUrl, {'attr': {'placeholder': 'Twitter / X (ex: https://x.com/nomcompte)'}}) }}
                                 </div>
                                 {{ form_errors(form.twitterUrl) }}
                             </div>
-                        </div>
-
-                        <div class="row">
                             <div class="col-sm-6 form-group{% if form.linkedinUrl.vars.errors|length %} has-error{% endif %}">
                                 <div class="input-group social-group">
                                     <span class="input-group-addon"><i class="fa-brands fa-linkedin-in fa-lg"></i></span>
-                                    {{ form_widget(form.linkedinUrl) }}
+                                    {{ form_widget(form.linkedinUrl, {'attr': {'placeholder': 'LinkedIn (ex: https://www.linkedin.com/in/nomprofil)'}}) }}
                                 </div>
                                 {{ form_errors(form.linkedinUrl) }}
-                            </div>
-                            <div class="col-sm-6 form-group{% if form.instagramUrl.vars.errors|length %} has-error{% endif %}">
-                                <div class="input-group social-group">
-                                    <span class="input-group-addon"><i class="fa-brands fa-instagram fa-lg"></i></span>
-                                    {{ form_widget(form.instagramUrl) }}
-                                </div>
-                                {{ form_errors(form.instagramUrl) }}
                             </div>
                         </div>
 
                         <div class="row">
+                            <div class="col-sm-6 form-group{% if form.instagramUrl.vars.errors|length %} has-error{% endif %}">
+                                <div class="input-group social-group">
+                                    <span class="input-group-addon"><i class="fa-brands fa-instagram fa-lg"></i></span>
+                                    {{ form_widget(form.instagramUrl, {'attr': {'placeholder': 'Instagram (ex: https://www.instagram.com/nomcompte)'}}) }}
+                                </div>
+                                {{ form_errors(form.instagramUrl) }}
+                            </div>
                             <div class="col-sm-6 form-group{% if form.youtubeUrl.vars.errors|length %} has-error{% endif %}">
                                 <div class="input-group social-group">
                                     <span class="input-group-addon"><i class="fa-brands fa-youtube fa-lg"></i></span>
-                                    {{ form_widget(form.youtubeUrl) }}
+                                    {{ form_widget(form.youtubeUrl, {'attr': {'placeholder': 'YouTube (ex: https://www.youtube.com/@nomchaine)'}}) }}
                                 </div>
                                 {{ form_errors(form.youtubeUrl) }}
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-sm-6 form-group{% if form.tiktokUrl.vars.errors|length %} has-error{% endif %}">
                                 <div class="input-group social-group">
                                     <span class="input-group-addon"><i class="fa-brands fa-tiktok fa-lg"></i></span>
-                                    {{ form_widget(form.tiktokUrl) }}
+                                    {{ form_widget(form.tiktokUrl, {'attr': {'placeholder': 'TikTok (ex: https://www.tiktok.com/@nomcompte)'}}) }}
                                 </div>
                                 {{ form_errors(form.tiktokUrl) }}
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-sm-6 form-group{% if form.googleUrl.vars.errors|length %} has-error{% endif %}">
                                 <div class="input-group social-group">
                                     <span class="input-group-addon" aria-label="Bluesky">
@@ -411,14 +445,17 @@
                                             <path d="m135.72 44.03c66.5 49.92 138.02 151.14 164.28 205.46 26.26-54.32 97.78-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
                                         </svg>
                                     </span>
-                                    {{ form_widget(form.googleUrl) }}
+                                    {{ form_widget(form.googleUrl, {'attr': {'placeholder': 'Bluesky (ex: https://bsky.app/profile/nomcompte)'}}) }}
                                 </div>
                                 {{ form_errors(form.googleUrl) }}
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-sm-6 form-group{% if form.otherUrl.vars.errors|length %} has-error{% endif %}">
                                 <div class="input-group social-group">
                                     <span class="input-group-addon"><i class="fa fa-link fa-lg"></i></span>
-                                    {{ form_widget(form.otherUrl) }}
+                                    {{ form_widget(form.otherUrl, {'attr': {'placeholder': 'Autre URL (ex: https://...)'}}) }}
                                 </div>
                                 {{ form_errors(form.otherUrl) }}
                             </div>
@@ -442,8 +479,8 @@
                                         </dd>
                                         <br/>
                                          <dd>
-                                        Formats autorisés : JPG, GIF, PNG, PDF ou DOC.<br/>
-                                        Chaque fichier ne doit pas excéder 10Mo.
+                                         Formats autorisés : JPG, GIF, PNG, WEBP, PDF ou DOC.<br/>
+                                         Chaque fichier ne doit pas excéder 10Mo.
                                          </dd>
                                                     
                                     </dl>
@@ -576,18 +613,7 @@
                                 Ces informations sont utilisées à titre informatif et ne sont pas toutes reprises automatiquement dans votre candidature.
                             </p>
                             <div class="row" >
-                                <div class="col-sm-4 form-group{% if form.useType.vars.errors|length %} has-error{% endif %}">
-                                    {{ form_label(form.useType, null, {'label_attr': {'class': 'required'}}) }}
-                                    {{ form_widget(form.useType) }}
-                                    {{ form_errors(form.useType, {
-                                        'attr': {
-                                            'id': 'useType-error',
-                                            'role': 'alert',
-                                            'aria-live': 'polite'
-                                        }
-                                    }) }}
-                                </div>
-                                <div class="col-sm-4 form-group{% if form.wishedSize.vars.errors|length %} has-error{% endif %}">
+                                <div class="col-sm-6 form-group{% if form.wishedSize.vars.errors|length %} has-error{% endif %}">
                                     {{ form_label(form.wishedSize) }}
                                     {{ form_widget(form.wishedSize) }}
                                     {% if form.wishedSize.vars.errors|length %}
@@ -596,7 +622,7 @@
                                         </span>
                                     {% endif %}
                                 </div>
-                                <div class="col-sm-4 form-group{% if form.monthlyBudgetMax.vars.errors|length %} has-error{% endif %}">
+                                <div class="col-sm-6 form-group{% if form.monthlyBudgetMax.vars.errors|length %} has-error{% endif %}">
                                     {{ form_label(form.monthlyBudgetMax) }}
                                     {{ form_widget(form.monthlyBudgetMax) }}
                                     {% if form.monthlyBudgetMax.vars.errors|length %}

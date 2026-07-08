@@ -5947,7 +5947,7 @@ a.tp-caption.btn-lg {
 .view-mode,
 .sort {
   float: left !important;
-  
+
   height: 41px;
   margin-bottom: 15px;
   display: inline-block;
@@ -11483,12 +11483,12 @@ form .main .section-title {
 
 #js-results .space_item_unavailable.space-card--by-proprio .availability-overlay,
 #js-results .space_item.space-card--by-proprio .availability-overlay {
-  background-color: rgba(242, 190, 106, 0.8) !important;
+  background-color: rgba(242, 190, 106, 1) !important;
 }
 
 #js-results .space_item_unavailable.space-card--by-admin .availability-overlay,
 #js-results .space_item.space-card--by-admin .availability-overlay {
-  background-color: rgba(45, 116, 186, 0.8) !important;
+  background-color: rgba(45, 116, 186, 1) !important;
 }
 
 /* Différenciation AAC sur la page d'accueil (espaces disponibles et occupés) */
@@ -11571,7 +11571,6 @@ form .main .section-title {
   padding: 4px 9px;
   border-radius: 3px;
   font-size: 11px;
-  font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   line-height: 1.2;
@@ -14045,7 +14044,6 @@ form .main .section-title.form-sixth:after {
   color: white;
   padding: 5px 10px;
   font-size: 14px;
-  font-weight: bold;
   z-index: 10;
   max-width: 80%;
   text-align: center;
@@ -14329,7 +14327,6 @@ form .main .section-title.form-sixth:after {
   padding: 4px 9px;
   border-radius: 3px;
   font-size: 11px;
-  font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   line-height: 1.2;

@@ -231,6 +231,12 @@ class Space implements \Stringable
     private $societaireMessageType;
 
     /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'managed_by_label', type: 'string', length: 255, nullable: true)]
+    private $managedByLabel;
+
+    /**
      * @return ArrayCollection
      */
     public function getTags()
@@ -1553,6 +1559,24 @@ class Space implements \Stringable
     public function setSocietaireMessageType($societaireMessageType)
     {
         $this->societaireMessageType = $societaireMessageType;
+    }
+
+    /**
+     * @param string|null $managedByLabel
+     * @return Space
+     */
+    public function setManagedByLabel($managedByLabel)
+    {
+        $this->managedByLabel = $managedByLabel;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getManagedByLabel()
+    {
+        return $this->managedByLabel ?: 'Géré';
     }
 
     /**

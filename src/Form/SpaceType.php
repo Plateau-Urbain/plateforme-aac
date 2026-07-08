@@ -44,6 +44,13 @@ class SpaceType extends AbstractType
     {
         $builder
             ->add('name', null, ['label' => 'Nom de l\'espace', 'attr' => ['class' => 'form-control'], 'error_bubbling' => false])
+            ->add('managedByLabel', null, [
+                'label' => 'Texte du badge (ex: "Géré", "Commercialisé", "Proposé")',
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Géré'],
+                'required' => false,
+                'empty_data' => 'Géré',
+                'error_bubbling' => false,
+            ])
             ->add('zipCode', null, ['label' => 'Code postal', 'attr' => ['class' => 'form-control'], 'required' => false, 'error_bubbling' => false])
             ->add('city', null, ['label' => 'Ville', 'attr' => ['class' => 'form-control'], 'required' => false, 'error_bubbling' => false])
             ->add('limitAvailability', DateTimeType::class, [

@@ -105,6 +105,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
     protected $newsletter;
 
     /**
+     * @var bool|null
+     */
+    #[ORM\Column(name: 'is_pu_shareholder', type: 'boolean', nullable: true, options: ['default' => false])]
+    protected $isPuShareholder = false;
+
+    /**
+     * @var bool|null
+     */
+    #[ORM\Column(name: 'is_subject_to_vat', type: 'boolean', nullable: true, options: ['default' => false])]
+    protected $isSubjectToVat = false;
+
+    /**
      * @var
      */
     #[ORM\ManyToMany(targetEntity: \App\Entity\Group::class, inversedBy: 'users')]
@@ -616,6 +628,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
     }
 
     /**
+     * @return bool|null
+     */
+    public function getIsPuShareholder()
+    {
+        return $this->isPuShareholder;
+    }
+
+    /**
+     * @param bool|null $isPuShareholder
+     * @return self
+     */
+    public function setIsPuShareholder($isPuShareholder)
+    {
+        $this->isPuShareholder = $isPuShareholder;
+        return $this;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getIsSubjectToVat()
+    {
+        return $this->isSubjectToVat;
+    }
+
+    /**
+     * @param bool|null $isSubjectToVat
+     * @return self
+     */
+    public function setIsSubjectToVat($isSubjectToVat)
+    {
+        $this->isSubjectToVat = $isSubjectToVat;
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getUseType()
@@ -815,6 +863,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
         $this->documents = new ArrayCollection();
         $this->typeUser = self::PORTEUR;
         $this->preferredDepartments = [];
+        $this->lengthTypeOccupation = 'mois';
+        $this->isPuShareholder = false;
+        $this->isSubjectToVat = false;
     }
 
     /**
@@ -1129,7 +1180,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
      */
     public function getLengthTypeOccupation()
     {
-        return $this->lengthTypeOccupation;
+        return $this->lengthTypeOccupation ?: 'mois';
     }
 
     /**
@@ -1720,6 +1771,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
             "image/png",
             "image/jpeg",
             "image/jpg",
+            "image/gif",
+            "image/webp",
             "application/pdf",
             "application/x-pdf",
             "application/msword"

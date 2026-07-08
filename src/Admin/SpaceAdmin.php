@@ -103,6 +103,11 @@ class SpaceAdmin extends AbstractAdmin
         $formMapper
             ->with('General')
             ->add('name', null, ['label' => "Nom de l'espace"])
+            ->add('managedByLabel', null, [
+                'label' => "Texte du badge (ex: Géré, Commercialisé...)",
+                'required' => false,
+                'help' => 'Par défaut: Géré'
+            ])
             ->add('owner', null, [
                 'required' => true,
                 'query_builder' => fn (UserRepository $repository) => $repository->createProprietairesQueryBuilder(),

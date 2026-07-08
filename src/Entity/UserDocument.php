@@ -44,7 +44,7 @@ class UserDocument implements \Stringable
     private $updatedAt;
 
     #[Vich\UploadableField(mapping: 'user_documents', fileNameProperty: 'fileName')]
-    #[Assert\File(maxSize: '10M', mimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf', 'application/x-pdf', 'application/msword'])]
+    #[Assert\File(maxSize: '10M', mimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp', 'application/pdf', 'application/x-pdf', 'application/msword'])]
     private $file;
 
     /**

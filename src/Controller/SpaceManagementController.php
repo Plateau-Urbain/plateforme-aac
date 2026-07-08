@@ -1210,6 +1210,16 @@ class SpaceManagementController extends AbstractController
                 'property' => 'projectHolder.companyDescription',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
+            'projectHolder_isPuShareholder' => [
+                'label' => '[Profil] Déjà sociétaire Plateau urbain',
+                'property' => 'projectHolder.isPuShareholder',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_isSubjectToVat' => [
+                'label' => '[Profil] Assujetti à la TVA',
+                'property' => 'projectHolder.isSubjectToVat',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
             
             // Profil - Réseaux sociaux
             'projectHolder_facebookUrl' => [
@@ -1684,6 +1694,9 @@ class SpaceManagementController extends AbstractController
 
         if ($value instanceof \DateTime) {
             $value = $value->format('d/m/Y H:i');
+        }
+        if (is_bool($value)) {
+            $value = $value ? 'Oui' : 'Non';
         }
         if (is_array($value)) {
             $value = implode('; ', array_map(fn(mixed $v): string => is_scalar($v) ? (string) $v : '', $value));

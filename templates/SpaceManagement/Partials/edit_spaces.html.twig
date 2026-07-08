@@ -95,6 +95,11 @@
                     {{ form_widget(form.name) }}
                     {{ form_errors(form.name) }}
                 </div>
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group{% if not form.managedByLabel.vars.valid %} has-error{% endif %}">
+                    {{ form_label(form.managedByLabel) }}
+                    {{ form_widget(form.managedByLabel) }}
+                    {{ form_errors(form.managedByLabel) }}
+                </div>
             </div>
 
 
