@@ -232,13 +232,17 @@
             margin-top: 10px;
         }
         
-        /* Options d'export documents */
         .export-options-section {
             background: #f8f8f8;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
             padding: 18px 20px;
             margin-bottom: 25px;
+        }
+        .export-options-section ul li {
+            font-size: 13px !important;
+            line-height: 1.6;
+            color: #444;
         }
         .export-options-section h4 {
             margin: 0 0 15px 0;
@@ -479,94 +483,96 @@
         <!-- Informations sur l'espace -->
         <div class="space-info">
             <h2> {{ space.name }}</h2>
-        </div>
-
-        <!-- Affichage des filtres et du tri appliqués -->
-        <div class="filters-applied" style="background: #eef6ff; border: 1px solid #2d74ba; color: #333;">
-            <h4 style="color: #2d74ba; margin-bottom: 15px;"><i class="fa fa-info-circle"></i> Paramètres de l'export</h4>
-            <div class="row">
-                <div class="col-sm-6">
-                    <p><strong><i class="fa fa-filter"></i> Filtrage :</strong></p>
-                    <ul>
-                        {% if filterData.status_filter %}
-                            <li>Statut : 
-                                <strong>
-                                    {% if filterData.status_filter == 'unread' %}Non lue
-                                    {% elseif filterData.status_filter == 'awaiting' %}En attente
-                                    {% elseif filterData.status_filter == 'accepted' %}Accepté
-                                    {% elseif filterData.status_filter == 'rejected' %}Refusé
-                                    {% elseif filterData.status_filter == 'selected' %}Sélectionné
-                                    {% else %}{{ filterData.status_filter }}{% endif %}
-                                </strong>
-                            </li>
-                        {% else %}
-                            <li>Aucun filtre de statut (toutes les candidatures)</li>
-                        {% endif %}
-                        {% if space.isMultiLocation and filterData.location_filter %}
-                            <li>Site : <strong>
-                                {% for location in space.orderedActiveLocations %}
-                                    {% if filterData.location_filter == location.id %}{{ location.name }}{% if location.city %} ({{ location.city }}){% endif %}{% endif %}
-                                {% endfor %}
-                            </strong>
-                            {% if filterData.location_filter_rank %}
-                                — rang : <strong>{% if filterData.location_filter_rank == '1' %}1er choix{% elseif filterData.location_filter_rank == '2' %}2e choix{% else %}{{ filterData.location_filter_rank }}e choix{% endif %}</strong>
-                            {% else %}
-                                — <strong>tout rang</strong>
-                            {% endif %}
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-                <div class="col-sm-6">
-                    <p><strong><i class="fa fa-sort"></i> Tri des données :</strong></p>
-                    <ul>
-                        <li>
-                            Trié par : 
-                            <strong>
-                                {% if filterData.sort_field == 'created' %}Date de candidature
-                                {% elseif filterData.sort_field == 'wishedSize' %}Surface souhaitée
-                                {% elseif filterData.sort_field == 'startOccupation' %}Date d'entrée souhaitée
-                                {% elseif filterData.sort_field == 'lengthOccupation' %}Durée d'occupation
-                                {% elseif filterData.sort_field == 'locationFirstChoice' %}1er site préféré
-                                {% else %}{{ filterData.sort_field }}{% endif %}
-                            </strong>
-                            ({{ filterData.sort_order == 'desc' ? 'du plus récent au plus ancien' : 'du plus ancien au plus récent' }})
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div style="margin-top: 15px; border-top: 2px solid #2d74ba; padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-                <p class="small" style="color: #666; font-style: italic; margin: 0;">Note : l'export respectera l'ordre et le filtrage définis ci-dessus.</p>
-                <a href="{{ path('space_manager_candidates', {'id': space.id}) }}" class="btn btn-sm btn-line-16" style="background-color: #f0ad4e; border-color: #eea236; color: white !important; font-weight: bold; border-width: 2px;">
-                    <i class="fa fa-edit"></i> MODIFIER LE FILTRAGE OU LE TRI
-                </a>
-            </div>
-        </div>
-
-        <!-- Formulaire de sélection des champs -->
+        </div>        <!-- Formulaire de sélection des champs -->
         <form method="post" id="exportForm">
             <input type="hidden" name="_token" value="{{ csrf_token('export_fields') }}" />
 
-            <!-- Options d'export -->
-            <div class="export-options-section">
-                <h4><i class="fa fa-cog"></i> Options d'export</h4>
-                <label class="docs-option-main">
-                    <input type="checkbox" id="includeDocsCheckbox" name="include_documents" value="1">
-                    Inclure les documents des candidats
-                    <span class="zip-badge"><i class="fa fa-file-archive-o"></i> ZIP</span>
-                </label>
-                <p class="help-text" style="margin: 8px 0 0 0;">
-                    <i class="fa fa-info-circle"></i> Si coché, l'export sera un fichier ZIP contenant le CSV et les documents pour chaque candidat.
-                </p>
-                <div class="docs-suboptions" id="docsSuboptions">
-                    <label>
-                        <input type="checkbox" name="include_application_files" value="1" checked id="includeAppFiles">
-                        <i class="fa fa-file-pdf-o"></i> Documents de candidature (dossiers déposés)
-                    </label>
-                    <label>
-                        <input type="checkbox" name="include_user_documents" value="1" checked id="includeUserDocs">
-                        <i class="fa fa-id-card"></i> Documents du profil (pièces d'identité, etc.)
-                    </label>
+            <div class="row" style="display: flex; flex-wrap: wrap;">
+                <!-- 1. Paramètres de l'export -->
+                <div class="col-sm-6" style="margin-bottom: 20px; display: flex; flex-direction: column;">
+                    <div class="export-options-section" style="flex: 1; margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between; border-color: #2D74BA; background: #fafcff;">
+                        <div>
+                            <h4 style="color: #2D74BA; margin-top: 0; margin-bottom: 12px; font-size: 15px;">
+                                <i class="fa fa-info-circle"></i> Paramètres de l'export
+                            </h4>
+                            <ul style="margin: 0; padding-left: 15px; font-size: 13px; line-height: 1.6; color: #444;">
+                                {% if filterData.status_filter %}
+                                    <li>Statut : 
+                                        <strong>
+                                            {% if filterData.status_filter == 'unread' %}Non lue
+                                            {% elseif filterData.status_filter == 'awaiting' %}En attente
+                                            {% elseif filterData.status_filter == 'accepted' %}Accepté
+                                            {% elseif filterData.status_filter == 'rejected' %}Refusé
+                                            {% elseif filterData.status_filter == 'selected' %}Sélectionné
+                                            {% else %}{{ filterData.status_filter }}{% endif %}
+                                        </strong>
+                                    </li>
+                                {% else %}
+                                    <li>Aucun filtre de statut (toutes les candidatures)</li>
+                                {% endif %}
+                                {% if space.isMultiLocation and filterData.location_filter %}
+                                    <li>Site : <strong>
+                                        {% for location in space.orderedActiveLocations %}
+                                            {% if filterData.location_filter == location.id %}{{ location.name }}{% if location.city %} ({{ location.city }}){% endif %}{% endif %}
+                                        {% endfor %}
+                                    </strong>
+                                    {% if filterData.location_filter_rank %}
+                                        — rang : <strong>{% if filterData.location_filter_rank == '1' %}1er choix{% elseif filterData.location_filter_rank == '2' %}2e choix{% else %}{{ filterData.location_filter_rank }}e choix{% endif %}</strong>
+                                    {% else %}
+                                        — <strong>tout rang</strong>
+                                    {% endif %}
+                                    </li>
+                                {% endif %}
+                                <li>
+                                    Trié par : 
+                                    <strong>
+                                        {% if filterData.sort_field == 'created' %}Date de candidature
+                                        {% elseif filterData.sort_field == 'wishedSize' %}Surface souhaitée
+                                        {% elseif filterData.sort_field == 'startOccupation' %}Date d'entrée souhaitée
+                                        {% elseif filterData.sort_field == 'lengthOccupation' %}Durée d'occupation
+                                        {% elseif filterData.sort_field == 'locationFirstChoice' %}1er site préféré
+                                        {% else %}{{ filterData.sort_field }}{% endif %}
+                                    </strong>
+                                    ({{ filterData.sort_order == 'desc' ? 'décroissant' : 'croissant' }})
+                                </li>
+                            </ul>
+                        </div>
+                        <div style="margin-top: 15px; border-top: 1px dashed #c0d7ed; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span class="small" style="color: #666; font-style: italic; font-size: 11px;">L'export respectera ces filtres.</span>
+                            <a href="{{ path('space_manager_candidates', {'id': space.id}) }}" class="btn btn-xs btn-line-16" style="background-color: #f0ad4e; border-color: #eea236; color: white !important; font-weight: bold; border-width: 2px; padding: 3px 8px; font-size: 11px;">
+                                <i class="fa fa-edit"></i> MODIFIER
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Options d'export -->
+                <div class="col-sm-6" style="margin-bottom: 20px; display: flex; flex-direction: column;">
+                    <div class="export-options-section" style="flex: 1; margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h4 style="margin-top: 0; margin-bottom: 12px; font-size: 15px;">
+                                <i class="fa fa-cog"></i> Options d'export
+                            </h4>
+                            <label class="docs-option-main" style="margin-bottom: 5px; padding: 6px 10px; font-size: 14px;">
+                                <input type="checkbox" id="includeDocsCheckbox" name="include_documents" value="1" style="width: 16px; height: 16px; margin: 0 8px 0 0;">
+                                Inclure les documents des candidats
+                                <span class="zip-badge" style="margin-left: 5px; padding: 2px 5px; font-size: 10px;"><i class="fa fa-file-archive-o"></i> ZIP</span>
+                            </label>
+                            <p class="help-text" style="margin: 4px 0 0 0; font-size: 12px; color: #777;">
+                                <i class="fa fa-info-circle"></i> Génère un fichier ZIP contenant le CSV et les documents.
+                            </p>
+                        </div>
+                        <div class="docs-suboptions" id="docsSuboptions" style="margin-top: 10px; padding: 8px 12px; border-left-width: 3px;">
+                            <label style="margin-bottom: 4px; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" name="include_application_files" value="1" checked id="includeAppFiles" style="width: 14px; height: 14px; margin: 0;">
+                                <i class="fa fa-file-pdf-o"></i> Pièces de candidature
+                            </label>
+                            <label style="margin-bottom: 0; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" name="include_user_documents" value="1" checked id="includeUserDocs" style="width: 14px; height: 14px; margin: 0;">
+                                <i class="fa fa-id-card"></i> Pièces d'identité & justificatifs
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="field-selection">

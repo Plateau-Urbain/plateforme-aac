@@ -869,7 +869,7 @@
         <div class="ctrl-panel panel-filters">
           <h5><i class="fa fa-filter"></i> Filtres et tri</h5>
           {% form_theme filterForm 'Form/custom_front_fields.html.twig' %}
-          {{ form_start(filterForm, { 'attr': { 'data-submit': true, 'data-scroll-key': 'candidates_scroll_' ~ space.id } } ) }}
+          {{ form_start(filterForm, { 'attr': { 'data-submit': true, 'data-scroll-key': 'candidates_scroll_' ~ space.id }, 'action': '#management-toolbar' } ) }}
           <div class="filter-field">
             <label class="small">Statut :</label>
             {{ form_widget(filterForm.status_filter) }}
@@ -1079,63 +1079,26 @@
     <script type="text/javascript" src="{{ asset('bundles/app/js/chart.min.js') }}"></script>
 
     <script type="text/javascript">
+        // Fallback Chrome : Chrome ignore le #fragment sur les soumissions GET de formulaire
         (function () {
-            var scrollKey = document.querySelector('form[data-scroll-key]')
-                ? document.querySelector('form[data-scroll-key]').getAttribute('data-scroll-key')
-                : ('candidates_scroll' + window.location.pathname);
-
-            function getScrollY() {
-                return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
-            }
-
-            window.saveCandidatesScroll = function () {
-                sessionStorage.setItem(scrollKey, String(getScrollY()));
-            };
-
-            function restoreCandidatesScroll(clearStorage) {
-                var scrollPos = sessionStorage.getItem(scrollKey);
-                if (!scrollPos) {
-                    return;
-                }
-
-                var y = parseInt(scrollPos, 10);
-                if (isNaN(y)) {
-                    sessionStorage.removeItem(scrollKey);
-                    return;
-                }
-
-                if ('scrollRestoration' in history) {
-                    history.scrollRestoration = 'manual';
-                }
-
-                window.scrollTo(0, y);
-
-                if (clearStorage) {
-                    sessionStorage.removeItem(scrollKey);
-                    sessionStorage.removeItem('candidates_filter_pending');
+            var hash = window.location.hash;
+            if (hash) {
+                var target = document.querySelector(hash);
+                if (target) {
+                    // Attendre que la page soit entièrement rendue
+                    function scrollToTarget() {
+                        target.scrollIntoView({ behavior: 'instant', block: 'start' });
+                    }
+                    // Essayer immédiatement, puis après chargement complet
+                    if (document.readyState === 'complete') {
+                        scrollToTarget();
+                    } else {
+                        window.addEventListener('load', scrollToTarget);
+                    }
+                    // Sécurité : réessayer après un court délai (images, fonts, etc.)
+                    setTimeout(scrollToTarget, 300);
                 }
             }
-
-            if ('scrollRestoration' in history) {
-                history.scrollRestoration = 'manual';
-            }
-
-            restoreCandidatesScroll(false);
-            document.addEventListener('DOMContentLoaded', function () {
-                restoreCandidatesScroll(false);
-            });
-            window.addEventListener('load', function () {
-                restoreCandidatesScroll(false);
-            });
-            setTimeout(function () { restoreCandidatesScroll(false); }, 150);
-            setTimeout(function () { restoreCandidatesScroll(true); }, 500);
-
-            window.addEventListener('beforeunload', function () {
-                if (sessionStorage.getItem('candidates_filter_pending')) {
-                    window.saveCandidatesScroll();
-                    sessionStorage.removeItem('candidates_filter_pending');
-                }
-            });
         })();
 
         $(document).ready(function() {
@@ -1162,10 +1125,20 @@
                 if (!$form.length) {
                     return;
                 }
-                sessionStorage.setItem('candidates_filter_pending', '1');
-                window.saveCandidatesScroll();
+                var action = $form.attr('action') || '';
+                if (action.indexOf('#') === -1) {
+                    $form.attr('action', action + '#management-toolbar');
+                }
                 $form.get(0).submit();
             }
+
+            // Ajouter l'ancre de tri/filtres aux liens de la pagination
+            $('.pagination a, .navigation a').each(function() {
+                var href = $(this).attr('href');
+                if (href && href.indexOf('#') === -1) {
+                    $(this).attr('href', href + '#management-toolbar');
+                }
+            });
 
             // Manage sort field (visuel uniquement)
             $(function () {
