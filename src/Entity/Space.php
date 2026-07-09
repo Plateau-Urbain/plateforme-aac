@@ -850,6 +850,17 @@ class Space implements \Stringable
         return $this->locations->filter(static fn (SpaceLocation $location) => !$location->isSuspended())->toArray();
     }
 
+    /**
+     * @return SpaceLocation[]
+     */
+    public function getOrderedActiveLocations(): array
+    {
+        $locations = $this->getActiveLocations();
+        usort($locations, static fn (SpaceLocation $a, SpaceLocation $b): int => $a->getDisplayOrder() <=> $b->getDisplayOrder());
+
+        return $locations;
+    }
+
     public function getDisplayCity(): ?string
     {
         if ($this->isMultiLocation()) {
@@ -1263,6 +1274,16 @@ class Space implements \Stringable
         return $this->isRollingAAC();
     }
 
+    public function requiresStartOccupation(): bool
+    {
+        return $this->isMultiLocation() || $this->isRollingAAC();
+    }
+
+    public function isStartOccupationRequired(): bool
+    {
+        return $this->requiresStartOccupation();
+    }
+
     /**
      * @return bool
      */
@@ -1530,7 +1551,7 @@ class Space implements \Stringable
         }
 
         if ($activeLocations < 1) {
-            $context->buildViolation('Au moins un lieu complet (nom, ville, code postal) est requis pour publier.')
+            $context->buildViolation('Au moins un site complet (nom, ville, code postal) est requis pour publier.')
                 ->atPath('locations')
                 ->addViolation();
         }

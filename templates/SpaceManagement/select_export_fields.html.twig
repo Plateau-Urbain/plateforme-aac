@@ -502,6 +502,19 @@
                         {% else %}
                             <li>Aucun filtre de statut (toutes les candidatures)</li>
                         {% endif %}
+                        {% if space.isMultiLocation and filterData.location_filter %}
+                            <li>Site : <strong>
+                                {% for location in space.orderedActiveLocations %}
+                                    {% if filterData.location_filter == location.id %}{{ location.name }}{% if location.city %} ({{ location.city }}){% endif %}{% endif %}
+                                {% endfor %}
+                            </strong>
+                            {% if filterData.location_filter_rank %}
+                                — rang : <strong>{% if filterData.location_filter_rank == '1' %}1er choix{% elseif filterData.location_filter_rank == '2' %}2e choix{% else %}{{ filterData.location_filter_rank }}e choix{% endif %}</strong>
+                            {% else %}
+                                — <strong>tout rang</strong>
+                            {% endif %}
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
                 <div class="col-sm-6">
@@ -514,6 +527,7 @@
                                 {% elseif filterData.sort_field == 'wishedSize' %}Surface souhaitée (candidature)
                                 {% elseif filterData.sort_field == 'startOccupation' %}Date d'entrée souhaitée
                                 {% elseif filterData.sort_field == 'lengthOccupation' %}Durée d'occupation
+                                {% elseif filterData.sort_field == 'locationFirstChoice' %}1er site préféré
                                 {% else %}{{ filterData.sort_field }}{% endif %}
                             </strong>
                             ({{ filterData.sort_order == 'desc' ? 'du plus récent au plus ancien' : 'du plus ancien au plus récent' }})
@@ -688,6 +702,12 @@ $(document).ready(function() {
         'projectHolder_usageDuration',    // Durée d'occupation souhaitée
         'startOccupation',                // Date d'entrée souhaitée
         'localUsageDescription'           // Quel sera l'usage du local
+        {% if space.isMultiLocation %},
+        'locationPreferences'             // Classement des sites (résumé)
+        {% for rank in 1..space.orderedActiveLocations|length %},
+        'locationPreference_rank_{{ rank }}' // Choix {{ rank }}
+        {% endfor %}
+        {% endif %}
     ];
 
     $('#presetBtn').click(function() {

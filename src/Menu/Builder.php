@@ -86,8 +86,8 @@ class Builder
 
                 if ($user->isProprio() || $context->isGranted('ROLE_OWNER')) {
                     $loggedMenu->addChild('Mes espaces', ['route' => 'space_manager_list', 'attributes' => ['class'=>'']]);
-                    $loggedMenu->addChild('Ajouter un espace', ['route' => 'space_manager_add', 'attributes' => ['class'=>'']]);
-                    $loggedMenu->addChild('Ajouter un espace multi-lieux', ['route' => 'space_manager_add_multi', 'attributes' => ['class'=>'']]);
+                    $loggedMenu->addChild('Publier un AAC', ['route' => 'space_manager_add', 'attributes' => ['class'=>'']]);
+                    $loggedMenu->addChild('Publier un AAC multi-sites', ['route' => 'space_manager_add_multi', 'attributes' => ['class'=>'']]);
 
                     /* $loggedMenu->addChild('Liste des AACs', ['route' => 'aac_list', 'attributes' => ['class' => '']]);*/
                 } else if ($user->isPorteur() || $context->isGranted('ROLE_PROJECT_HOLDER')) {

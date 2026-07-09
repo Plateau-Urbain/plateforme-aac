@@ -33,7 +33,7 @@ class CategoryAdmin extends AbstractAdmin
                 'help' => "Décocher pour archiver : la valeur ne sera plus proposée dans les formulaires utilisateurs, mais reste visible pour les candidatures/profils qui l'ont déjà sélectionnée.",
             ])
             ->add('requiresErp', null, [
-                'label' => "Réservé aux lieux ERP",
+                'label' => "Réservé aux sites ERP",
                 'required' => false,
                 'help' => "Si coché, ce type d'usage ne sera proposé aux candidats que pour les espaces marqués comme ERP (Établissement Recevant du Public).",
             ])

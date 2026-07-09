@@ -10,6 +10,7 @@ use App\Entity\Space;
 use App\Entity\User;
 use App\Form\ProjectOwnerType;
 use App\Form\ApplicationFileType;
+use App\Form\ApplicationLocationPreferenceType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
@@ -26,6 +27,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 /**
  * Class ApplicationType
@@ -242,6 +244,41 @@ class ApplicationType extends AbstractType
           );
         }
 
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            $form = $event->getForm();
+            $application = $event->getData();
+
+            if (!$application instanceof Application) {
+                return;
+            }
+
+            $space = $application->getSpace();
+            $activeLocations = ($space instanceof Space) ? $space->getActiveLocations() : [];
+            if (!$space instanceof Space || !$space->isMultiLocation() || count($activeLocations) < 2) {
+                if ($form->has('locationPreferences')) {
+                    $form->remove('locationPreferences');
+                }
+
+                return;
+            }
+
+            $application->syncLocationPreferencesFromSpace();
+            $application->sortLocationPreferencesByRank();
+
+            if (!$form->has('locationPreferences')) {
+                $form->add('locationPreferences', CollectionType::class, [
+                    'entry_type' => ApplicationLocationPreferenceType::class,
+                    'entry_options' => [
+                        'locations' => $activeLocations,
+                    ],
+                    'label' => false,
+                    'by_reference' => false,
+                    'allow_add' => false,
+                    'allow_delete' => false,
+                ]);
+            }
+        });
+
         $builder->add('save', SubmitType::class, [
             'label' => 'Enregistrer en brouillon',
             'attr' => [
@@ -279,6 +316,15 @@ class ApplicationType extends AbstractType
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
             $form = $event->getForm();
             $application = $event->getData();
+
+            if ($application instanceof Application && $form->has('locationPreferences')) {
+                foreach ($form->get('locationPreferences') as $childForm) {
+                    $preference = $childForm->getData();
+                    if ($preference instanceof \App\Entity\ApplicationLocationPreference) {
+                        $preference->setApplication($application);
+                    }
+                }
+            }
 
             // Bloquer les emojis côté serveur (la DB n'accepte pas utf8mb4 sur certains champs).
             // Sinon on obtient une exception SQL "Incorrect string value" à la soumission.

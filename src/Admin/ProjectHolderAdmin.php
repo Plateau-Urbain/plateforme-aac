@@ -31,9 +31,16 @@ class ProjectHolderAdmin extends AbstractAdmin
     protected $baseRouteName = 'project-holder';
     protected $baseRoutePattern = 'project-holder';
 
-    public function __construct(private UserPasswordHasherInterface $passwordHasher)
-    {
-        parent::__construct();
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(
+        UserPasswordHasherInterface $passwordHasher,
+        ?string $code = null,
+        ?string $class = null,
+        ?string $baseControllerName = null
+    ) {
+        parent::__construct($code, $class, $baseControllerName);
+        $this->passwordHasher = $passwordHasher;
     }
 
     protected function configureRoutes(RouteCollectionInterface $collection): void

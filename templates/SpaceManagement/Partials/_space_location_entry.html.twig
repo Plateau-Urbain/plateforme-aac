@@ -1,6 +1,6 @@
 <div class="panel-heading clearfix">
-    <strong>Lieu <span class="js-location-number">{{ index + 1 }}</span></strong>
-    <button type="button" class="btn btn-xs btn-danger pull-right js-remove-location" title="Supprimer ce lieu">
+    <strong>Site <span class="js-location-number">{{ index + 1 }}</span></strong>
+    <button type="button" class="btn btn-xs btn-danger pull-right js-remove-location" title="Supprimer ce site">
         <i class="fa fa-times"></i> Supprimer
     </button>
 </div>
@@ -58,7 +58,7 @@
     <div class="row">
         <div class="col-sm-12 form-group">
             <div class="alert alert-info" role="alert" style="margin-top: 0; margin-bottom: 8px; padding: 8px 12px; font-size: 13px;">
-                <strong>ERP :</strong> cochez si ce lieu est un Établissement Recevant du Public.
+                <strong>ERP :</strong> cochez si ce site est un Établissement Recevant du Public.
             </div>
             {{ form_row(locationForm.isErp) }}
         </div>

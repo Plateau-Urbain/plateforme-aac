@@ -92,7 +92,7 @@
 </div>
 
 {% set space = application.space %}
-<div class="application-space space-card item show-app" id="space-card">
+<div class="application-space space-card item show-app {{ space.listingCardClass }}" id="space-card">
   <div class="item">
     <div class="row row-flex">
       <div class="col-xs-12 col-md-4 ">
@@ -117,7 +117,7 @@
         <div class="info">
           <div class="row">
             <div class="col-sm-7">
-                <p class="ville">{{ space.city }} ({{ space.zipCode|slice(0,2)}})</p>
+                <p class="ville">{{ space.displayCity|default(space.city) }}{% if not space.isMultiLocation and space.depCode %} ({{ space.depCode }}){% endif %}</p>
                 <h5>{{ application.space.name }}</h5>               
             </div>
            {#  <div class="col-sm-5 right">
@@ -135,9 +135,11 @@
                   À partir de {{ space.price * 12 }} € / m<sup>2</sup> / an
                 {% endif %}
               </li>
+              {% if not space.isMultiLocation and (space.nbSpaces or space.minSpace or space.maxSpace) %}
               <li>
                 <strong>{{ space.nbSpaces }}</strong> espace(s) de {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup>
               </li>
+              {% endif %}
                 <li>Bailleur: {{ application.space.owner.company }}</li>
               </ul>
              </div>
@@ -148,10 +150,15 @@
                        <div class="col-sm-6">
                             <div class="calendar"></div>
                             <div class="apply-date">
+                            {% if space.isMultiLocation %}
+                            <p class="apply-date-p">Candidatures</p>
+                            <p class="apply-date-b">Ouvertes sans date limite</p>
+                            {% else %}
                             <p class="apply-date-p">Date limite de candidature</p>
                             <p class="apply-date-b">
                   {{ space.limitAvailability | localizeddate("long", "none", "fr") }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
                   </p>
+                            {% endif %}
                       </div>
       </div>
 
@@ -312,6 +319,7 @@
             {% if application.localUsageDescription %}
               <tr><th>Quel sera l'usage du local ?</th><td>{{ application.localUsageDescription|nl2br }}</td></tr>
             {% endif %}
+            {% include 'Application/Partials/_location_preferences.html.twig' with { application: application } %}
             <tr><th>Ouvert(e) à un projet collectif</th><td>{{ application.openToGlobalProject ? 'Oui' : 'Non' }}</td></tr>
             {% if application.contribution %}
               <tr><th>Quelles idées avez-vous pour participer au projet collectif ?</th><td>{{ application.contribution|nl2br }}</td></tr>

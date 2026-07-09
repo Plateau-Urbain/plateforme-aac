@@ -137,7 +137,7 @@
         });
 
         $item.find('.js-remove-location').off('click').on('click', function () {
-            if (!window.confirm('Supprimer ce lieu ?')) {
+            if (!window.confirm('Supprimer ce site ?')) {
                 return;
             }
             var $checkbox = $item.find('input[type="checkbox"][name$="[_delete]"]');

@@ -6,13 +6,13 @@
         <div class="row top-profil">
             <div class="col-sm-12">
                 <div class="titre-page">
-                    <h1>{{ space.id ? 'Éditer un AAC multi-lieux' : 'Ajouter un AAC multi-lieux' }}</h1>
+                    <h1>{{ space.id ? 'Éditer un AAC multi-sites' : 'Ajouter un AAC multi-sites' }}</h1>
                     <div class="img-aac"><img src="{{ asset('images/groupe_ajouter_espace.png') }}" alt="Plateau Urbain" /></div>
                 </div>
             </div>
             <div class="col-sm-8">
                 <p class="left">
-                    Cet appel à candidatures couvre plusieurs lieux. Les candidats pourront indiquer leurs préférences par lieu.
+                    Cet appel à candidatures couvre plusieurs sites. Les candidats pourront indiquer leurs préférences par site.
                     L'appel reste ouvert sans date limite jusqu'à clôture manuelle.
                     Enregistrez à tout moment, puis soumettez pour validation par un administrateur.
                 </p>
@@ -185,7 +185,7 @@
                 <div id="two" class="section{% if form.locations is defined and not form.locations.vars.valid %} section-has-error{% endif %}">
                     <span class="section-title form-two"></span>
                     <div class="form-contener bleu">
-                        <h3>Lieux proposés</h3>
+                        <h3>Sites proposés</h3>
                         {% if form.locations is defined %}
                             {% include 'SpaceManagement/Partials/_space_locations_form.html.twig' with { 'form': form } %}
                         {% endif %}
@@ -249,8 +249,8 @@
                             'attr': {
                                 'class': 'btn btn-line-s js-publish no-ajax',
                                 'data-confirm': is_granted('ROLE_ADMIN')
-                                    ? "ADMIN : Êtes-vous sûr de vouloir publier cet AAC multi-lieux ?\n\nIl sera immédiatement visible par tous les candidats."
-                                    : "Êtes-vous sûr de vouloir soumettre cet AAC pour validation ?\n\nUn administrateur vérifiera les lieux et le contenu avant publication."
+                                    ? "ADMIN : Êtes-vous sûr de vouloir publier cet AAC multi-sites ?\n\nIl sera immédiatement visible par tous les candidats."
+                                    : "Êtes-vous sûr de vouloir soumettre cet AAC pour validation ?\n\nUn administrateur vérifiera les sites et le contenu avant publication."
                             }
                         }) }}
                     </div>

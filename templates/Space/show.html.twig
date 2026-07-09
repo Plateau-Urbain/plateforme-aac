@@ -254,9 +254,9 @@
     </div>
 
     {% if space.isMultiLocation and space.locations|length > 0 %}
-    <h4>Lieux proposés</h4>
+    <h4>Sites proposés</h4>
     <div class="pu-col-container content-block">
-        <p class="text-muted aac-map-hint"><i class="fa fa-map-marker"></i> Cliquez sur un repère pour afficher le détail du lieu.</p>
+        <p class="text-muted aac-map-hint"><i class="fa fa-map-marker"></i> Cliquez sur un repère pour afficher le détail du site.</p>
         <div id="aac-locations-map"></div>
     </div>
     {% endif %}
@@ -650,7 +650,7 @@
 
             function escapeHtml(text) {
                 var div = document.createElement('div');
-                div.textContent = text || 'Lieu';
+                div.textContent = text || 'Site';
                 return div.innerHTML;
             }
 

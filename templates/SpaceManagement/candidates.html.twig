@@ -584,6 +584,18 @@
                 {{ form_widget(filterForm.sort_order) }}
               </div>
             </div>
+            {% if space.isMultiLocation and filterForm.location_filter is defined %}
+            <div class="row">
+              <div class="col-xs-12 col-sm-6" style="margin-bottom: 5px;">
+                <label class="small">Filtrer par site :</label>
+                {{ form_widget(filterForm.location_filter) }}
+              </div>
+              <div class="col-xs-12 col-sm-6" style="margin-bottom: 5px;">
+                <label class="small">Au rang :</label>
+                {{ form_widget(filterForm.location_filter_rank) }}
+              </div>
+            </div>
+            {% endif %}
             {{ form_end(filterForm) }}
           </div>
         </div>

@@ -15,7 +15,7 @@
         {% if name not in skipFields %}
         {% set childBreadcrumbs = breadcrumbs %}
         {% if name matches '/^\\d+$/' %}
-            {% set childBreadcrumbs = breadcrumbs|merge(['Lieu ' ~ (name + 1)]) %}
+            {% set childBreadcrumbs = breadcrumbs|merge(['Site ' ~ (name + 1)]) %}
         {% else %}
             {% set label = child.vars.label|default('') %}
             {% if label is not same as(false) and label is not empty %}
@@ -27,7 +27,7 @@
             {% elseif name == 'doc_faq' %}
                 {% set childBreadcrumbs = breadcrumbs|merge(['F.A.Q']) %}
             {% elseif name == 'locations' %}
-                {% set childBreadcrumbs = breadcrumbs|merge(['Lieux proposés']) %}
+                {% set childBreadcrumbs = breadcrumbs|merge(['Sites proposés']) %}
             {% elseif name == 'type' %}
                 {% set childBreadcrumbs = breadcrumbs|merge(['Type de locaux']) %}
             {% elseif name == 'price' %}

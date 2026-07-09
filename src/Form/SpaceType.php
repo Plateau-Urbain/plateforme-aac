@@ -85,7 +85,7 @@ class SpaceType extends AbstractType
                 'required' => false,
             ])
             ->add('isErp', CheckboxType::class, [
-                'label' => 'Le lieu est un ERP (Établissement Recevant du Public)',
+                'label' => 'Le site est un ERP (Établissement Recevant du Public)',
                 'required' => false,
             ])
             ->add('locations', CollectionType::class, [

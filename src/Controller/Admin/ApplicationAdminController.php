@@ -613,6 +613,11 @@ class ApplicationAdminController extends CRUDController
                 'property' => 'openToGlobalProject',
                 'category' => 'Candidature - Informations sur le projet'
             ],
+            'locationPreferences' => [
+                'label' => '[Candidature] Classement des sites',
+                'property' => 'locationPreferencesLabelsForExport',
+                'category' => 'Candidature - Informations sur le projet'
+            ],
 
             // Candidature - Occupation
             'wishedSize' => [

@@ -1,0 +1,17 @@
+{% if application.space.isMultiLocation and application.locationPreferencesOrdered|length > 1 %}
+<tr>
+    <th>Classement des sites</th>
+    <td>
+        <ol class="application-location-preferences-read">
+            {% for preference in application.locationPreferencesOrdered %}
+                <li>
+                    <strong>{{ preference.location.name }}</strong>
+                    {% if preference.location.city %}
+                        — {{ preference.location.city }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    </td>
+</tr>
+{% endif %}

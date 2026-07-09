@@ -224,6 +224,7 @@
             <tr><th>Date d'entrée souhaitée</th><td>{% if application.startOccupation %}{{ application.startOccupation|date('d/m/Y') }}{% else %}—{% endif %}</td></tr>
             <tr><th>Présentation du projet</th><td>{% if application.description %}{{ application.description|nl2br }}{% else %}—{% endif %}</td></tr>
             <tr><th>Quel sera l'usage du local ?</th><td>{% if application.localUsageDescription %}{{ application.localUsageDescription|nl2br }}{% else %}—{% endif %}</td></tr>
+            {% include 'Application/Partials/_location_preferences.html.twig' with { application: application } %}
             <tr><th>Ouvert(e) à un projet collectif</th><td>{{ application.openToGlobalProject ? 'Oui' : 'Non' }}</td></tr>
             <tr><th>Quelles idées avez-vous pour participer au projet collectif ?</th><td>{{ application.contribution|nl2br }}</td></tr>
           </tbody>

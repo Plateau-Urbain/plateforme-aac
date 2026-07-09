@@ -159,80 +159,88 @@
     <div id="property-listing" class=" clearfix">
       <div class="row last-space row-flex">
         {% for application in applications %}
+                 {% set space = application.space %}
                  <div class="item col-xs-12 col-md-6 col-lg-4">
                  
-                   {% if application.space.isClosed %}
-                            <div class="space_item_unavailable{{ application.space.isProposedByAdmin ? ' space-card--by-admin' : ' space-card--by-proprio' }}">
-                  {% elseif not application.space.isEnabled %}
-                            <div class="space_item_suspended{{ application.space.isProposedByAdmin ? ' space-card--by-admin' : ' space-card--by-proprio' }}">
+                   {% if space.isClosed %}
+                            <div class="space_item_unavailable {{ space.listingCardClass }}">
+                  {% elseif not space.isEnabled %}
+                            <div class="space_item_suspended {{ space.listingCardClass }}">
                   {% else %}
-                           <div class="space_item{{ application.space.isProposedByAdmin ? ' space-card--by-admin' : ' space-card--by-proprio' }}">
+                           <div class="space_item {{ space.listingCardClass }}">
                   {% endif %}
-                    {% if application.space.isProposedByAdmin %}
-                      <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ application.space.managedByLabel }} par Plateau Urbain</span>
-                    {% elseif application.space.owner and application.space.owner.company %}
-                      <span class="pu-owner-badge"><i class="fa fa-building"></i> {{ application.space.managedByLabel }} par {{ application.space.owner.company }}</span>
+                    {% if space.isProposedByAdmin %}
+                      <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel }} par Plateau Urbain</span>
+                    {% elseif space.owner and space.owner.company %}
+                      <span class="pu-owner-badge"><i class="fa fa-building"></i> {{ space.managedByLabel }} par {{ space.owner.company }}</span>
                     {% endif %}
-                  <a href="{{ path('space_show', {'id': application.space.id}) }}">
+                  <a href="{{ path('space_show', {'id': space.id}) }}">
                     <div class="image">
-                      <img src="{% if application.space.pics.0 is not null %}{{ vich_uploader_asset(application.space.pics.0, 'file') }}{% endif %}" alt="" />
+                      <img src="{% if space.pics.0 is not null %}{{ vich_uploader_asset(space.pics.0, 'file') }}{% endif %}" alt="" />
                       <div class="availability-overlay">
-                        <span class="availability-text">Durée du projet : {{ application.space.availability }}</span>
+                        <span class="availability-text">Durée du projet : {{ space.availability }}</span>
                       </div>
                     </div>
                   </a>
               
-                   {% if application.space.isClosed %}
+                   {% if space.isClosed %}
                             <div class="foot-unavailable">
-                  {% elseif not application.space.isEnabled %}
+                  {% elseif not space.isEnabled %}
                             <div class="foot-suspended">
                   {% else %}
                            <div class="foot">
                   {% endif %}              
-                          <p class="ville">{{ application.space.zipCode }} {{ application.space.city }}</p>
+                          <p class="ville">{{ space.displayCity|default(space.city) }}{% if not space.isMultiLocation and space.depCode %} ({{ space.depCode }}){% endif %}</p>
                           <div class="statut-aac">
-                        {% if application.space.isClosed %}
+                        {% if space.isClosed %}
                           <div class="clos"><span><i class="fa fa-times fa-lg"></i>Cloturé</span></div>
-                        {% elseif not application.space.isEnabled %}
+                        {% elseif not space.isEnabled %}
                           <div class="suspended"><span><i class="fa fa-pause fa-lg"></i>Suspendu</span></div>
                         {% else %}
                           <div class="encours"><span><i class="fa fa-check fa-lg"></i>En cours</span></div>
                         {% endif %}
                       </div>
-                          <h5>{{ application.space.name }}</h5>
+                          <h5>{{ space.name }}</h5>
                       
-                        {#   <a href="{{ path('space_show', {'id': application.space.id}) }}" class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Voir l'annonce</a> #}
+                        {#   <a href="{{ path('space_show', {'id': space.id}) }}" class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Voir l'annonce</a> #}
                     
                    
                       <ul>
-                        <li>{{ application.space.type }}</li>
+                        <li>{{ space.type }}</li>
                         <li>
-                          {% if application.space.priceText %}
-                            {{ application.space.priceText }}
+                          {% if space.priceText %}
+                            {{ space.priceText }}
                           {% else %}
-                            À partir de {{ application.space.price * 12 }} € / m<sup>2</sup> / an
+                            À partir de {{ space.price * 12 }} € / m<sup>2</sup> / an
                           {% endif %}
                         </li>
+                        {% if not space.isMultiLocation and (space.nbSpaces or space.minSpace or space.maxSpace) %}
                         <li>
-                          <strong>{{ application.space.nbSpaces }}</strong> espace(s) de {{ application.space.minSpace }} m<sup>2</sup> à {{ application.space.maxSpace }} m<sup>2</sup>
+                          <strong>{{ space.nbSpaces }}</strong> espace(s) de {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup>
                         </li>
-                        <li> Bailleur: {{ application.space.owner.company }}
+                        {% endif %}
+                        <li> Bailleur: {{ space.owner.company }}
                         </li>
                         </ul>
                             <div class="calendar"></div>
                             <div class="apply-date">
+                            {% if space.isMultiLocation %}
+                            <p class="apply-date-p">Candidatures</p>
+                            <p class="apply-date-b">Ouvertes sans date limite</p>
+                            {% else %}
                             <p class="apply-date-p">Date limite de candidature</p>
-                              {% if application.space.isClosed %}
+                              {% if space.isClosed %}
                             <p class="apply-date-b"> 
                              Terminé
                             </p>
                                  {% else %}
                             <p class="apply-date-b"> 
-                             {{ application.space.limitAvailability|localizeddate('long', 'none', 'fr') }} à {{ application.space.limitAvailability|date('H') }}h{{ application.space.limitAvailability|date('i') }}
+                             {{ space.limitAvailability|localizeddate('long', 'none', 'fr') }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
                             </p>
                                 {% endif %}
+                            {% endif %}
                           
-                        {% if not application.space.isClosed %}
+                        {% if not space.isClosed %}
                         <p>Statut de votre candidature</p> 
                           {% if application.status == 'draft' %}
                             {% if not application.space.isEnabled %}

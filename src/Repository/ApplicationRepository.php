@@ -101,10 +101,28 @@ class ApplicationRepository extends ServiceEntityRepository
             $qb->andWhere('a.space = :space')->setParameter('space', $params['space']);
         }
 
+        if (!empty($params['locationId'])) {
+            $locationFilterDql = 'SELECT 1 FROM App\Entity\ApplicationLocationPreference lp_filter
+                WHERE lp_filter.application = a AND lp_filter.location = :locationFilterId';
+            if (!empty($params['locationRank'])) {
+                $locationFilterDql .= ' AND lp_filter.rank = :locationFilterRank';
+                $qb->setParameter('locationFilterRank', (int) $params['locationRank']);
+            }
+            $qb->andWhere($qb->expr()->exists($locationFilterDql));
+            $qb->setParameter('locationFilterId', (int) $params['locationId']);
+        }
+
         if (!empty($params['orderBy'])) {
-            $qb->orderBy('a.'.$params['orderBy'], $params['sort']);
-            if ($params['orderBy'] === 'lengthOccupation') {
-                $qb->addOrderBy('a.lengthTypeOccupation', $params['sort']);
+            if ($params['orderBy'] === 'locationFirstChoice') {
+                $qb->leftJoin('a.locationPreferences', 'lp_sort_first', 'WITH', 'lp_sort_first.rank = 1')
+                    ->leftJoin('lp_sort_first.location', 'loc_sort_first')
+                    ->orderBy('loc_sort_first.name', $params['sort'] ?? 'ASC')
+                    ->addOrderBy('a.created', 'DESC');
+            } else {
+                $qb->orderBy('a.'.$params['orderBy'], $params['sort']);
+                if ($params['orderBy'] === 'lengthOccupation') {
+                    $qb->addOrderBy('a.lengthTypeOccupation', $params['sort']);
+                }
             }
         }
 

@@ -18,7 +18,7 @@ class SpaceLocationType extends AbstractType
     {
         $builder
             ->add('name', null, [
-                'label' => 'Nom du lieu',
+                'label' => 'Nom du site',
                 'attr' => ['class' => 'form-control'],
                 'error_bubbling' => false,
             ])
@@ -52,14 +52,14 @@ class SpaceLocationType extends AbstractType
                 'error_bubbling' => false,
             ])
             ->add('isErp', CheckboxType::class, [
-                'label' => 'Le lieu est un ERP (Établissement Recevant du Public)',
+                'label' => 'Le site est un ERP (Établissement Recevant du Public)',
                 'required' => false,
             ])
             ->add('displayOrder', HiddenType::class, [
                 'attr' => ['class' => 'js-location-order'],
             ])
             ->add('suspended', CheckboxType::class, [
-                'label' => 'Suspendre ce lieu (plus de disponibilité)',
+                'label' => 'Suspendre ce site (plus de disponibilité)',
                 'required' => false,
                 'attr' => ['class' => 'js-location-suspended'],
             ])

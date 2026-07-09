@@ -228,7 +228,7 @@ class SpaceManagementController extends AbstractController
                 $this->em->persist($space);
                 $this->em->flush();
 
-                $this->addFlash('success', 'L\'appel à candidatures multi-lieux a été enregistré.');
+                $this->addFlash('success', 'L\'appel à candidatures multi-sites a été enregistré.');
 
                 return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $space->getId()]));
             }
@@ -546,7 +546,9 @@ class SpaceManagementController extends AbstractController
         $filterForm = $this->handleFilterForm($request, [
             'sort_field' => 'created',
             'sort_order' => 'desc',
-            'status_filter' => null
+            'status_filter' => null,
+            'location_filter' => null,
+            'location_filter_rank' => null,
         ], $space);
 
         $filters = $filterForm->getData();
@@ -561,7 +563,9 @@ class SpaceManagementController extends AbstractController
             'orderBy'   => $filters['sort_field'],
             'status'    => $filters['status_filter'],
             'selected'  => $filters['status_filter'],
-            'sort'      => $filters['sort_order']
+            'sort'      => $filters['sort_order'],
+            'locationId' => $filters['location_filter'] ?? null,
+            'locationRank' => $filters['location_filter_rank'] ?? null,
         ];
 
         $query = $this->em->getRepository(\App\Entity\Application::class)->filter($params);
@@ -640,7 +644,9 @@ class SpaceManagementController extends AbstractController
         $filterForm = $this->handleFilterForm($request, [
             'sort_field' => 'created',
             'sort_order' => 'desc',
-            'status_filter' => null
+            'status_filter' => null,
+            'location_filter' => null,
+            'location_filter_rank' => null,
         ], $space);
 
         $filters = $filterForm->getData();
@@ -650,14 +656,14 @@ class SpaceManagementController extends AbstractController
             'space'     => $space,
             'orderBy'   => $filters['sort_field'],
             'status'    => $filters['status_filter'],
-            'sort'      => $filters['sort_order']
+            'sort'      => $filters['sort_order'],
+            'locationId' => $filters['location_filter'] ?? null,
+            'locationRank' => $filters['location_filter_rank'] ?? null,
         ];
 
         $qb = $this->em->getRepository(\App\Entity\Application::class)->filter($params);
 
-        $sourceIterator = new DoctrineORMQuerySourceIterator(
-            $qb->getQuery(),
-            [
+        $exportColumns = [
                 'Espace' => 'space',
                 'Statut' => 'statusLabel',
                 'Nom' => 'name',
@@ -686,8 +692,21 @@ class SpaceManagementController extends AbstractController
                 'Surface souhaitée (candidature)' => 'wishedSize',
                 'Budget mensuel total maximum (€)' => 'projectHolder.monthlyBudgetMax',
                 'Date d\'entrée souhaitée' => 'startOccupation',
-                'Quelles idées avez-vous pour participer au projet collectif ?' => 'contribution'
-            ],
+        ];
+
+        if ($space->isMultiLocation()) {
+            $exportColumns['Classement des sites (résumé)'] = 'locationPreferencesLabelsForExport';
+            foreach ($space->getOrderedActiveLocations() as $index => $location) {
+                $rank = $index + 1;
+                $exportColumns[sprintf('Choix %d', $rank)] = sprintf('locationPreferenceRank%d', $rank);
+            }
+        }
+
+        $exportColumns['Quelles idées avez-vous pour participer au projet collectif ?'] = 'contribution';
+
+        $sourceIterator = new DoctrineORMQuerySourceIterator(
+            $qb->getQuery(),
+            $exportColumns,
             'd/m/Y'
         );
 
@@ -720,7 +739,7 @@ class SpaceManagementController extends AbstractController
         }
 
         // Récupérer tous les champs disponibles
-        $availableFields = $this->getAllAvailableFieldsForExport();
+        $availableFields = $this->getAllAvailableFieldsForExport($space);
         
         // Récupérer les filtres depuis la session
         $session = $request->getSession();
@@ -796,7 +815,7 @@ class SpaceManagementController extends AbstractController
         }
         
         // Récupérer tous les champs disponibles
-        $allFields = $this->getAllAvailableFieldsForExport();
+        $allFields = $this->getAllAvailableFieldsForExport($space);
         
         // Réordonner les clés sélectionnées selon l'ordre souhaité par l'utilisateur
         $orderPreset = [
@@ -825,6 +844,7 @@ class SpaceManagementController extends AbstractController
             'projectHolder_usageDuration',
             'startOccupation',
             'localUsageDescription',
+            'locationPreferences',
         ];
 
         usort($selectedFieldKeys, function ($a, $b) use ($orderPreset) {
@@ -857,7 +877,9 @@ class SpaceManagementController extends AbstractController
             'space'     => $space,
             'orderBy'   => $filterData['sort_field'],
             'status'    => $filterData['status_filter'],
-            'sort'      => $filterData['sort_order']
+            'sort'      => $filterData['sort_order'],
+            'locationId' => $filterData['location_filter'] ?? null,
+            'locationRank' => $filterData['location_filter_rank'] ?? null,
         ];
         
         // Récupérer les candidatures filtrées
@@ -1108,9 +1130,9 @@ class SpaceManagementController extends AbstractController
      * Retourne tous les champs disponibles pour l'export
      */
     /** @return array<string, array{label: string, property: string, category: string}> */
-    private function getAllAvailableFieldsForExport(): array
+    private function getAllAvailableFieldsForExport(?Space $space = null): array
     {
-        return [
+        $fields = [
             // Informations générales
             'space' => [
                 'label' => '[Candidature] Espace',
@@ -1387,6 +1409,11 @@ class SpaceManagementController extends AbstractController
                 'property' => 'openToGlobalProject',
                 'category' => 'Candidature - Informations sur le projet'
             ],
+            'locationPreferences' => [
+                'label' => '[Candidature] Classement des sites',
+                'property' => 'locationPreferencesLabelsForExport',
+                'category' => 'Candidature - Informations sur le projet'
+            ],
             
             // Candidature - Occupation
             'wishedSize' => [
@@ -1405,6 +1432,21 @@ class SpaceManagementController extends AbstractController
                 'category' => 'Candidature - Documents déposés'
             ],
         ];
+
+        if ($space !== null && $space->isMultiLocation()) {
+            $rankCount = count($space->getOrderedActiveLocations());
+            for ($rank = 1; $rank <= $rankCount; $rank++) {
+                $fields[sprintf('locationPreference_rank_%d', $rank)] = [
+                    'label' => sprintf('[Candidature] Choix %d', $rank),
+                    'property' => sprintf('computed.locationPreference.rank.%d', $rank),
+                    'category' => 'Candidature - Classement des sites',
+                ];
+            }
+        } else {
+            unset($fields['locationPreferences']);
+        }
+
+        return $fields;
     }
 
     /**
@@ -1426,7 +1468,9 @@ class SpaceManagementController extends AbstractController
         $filterForm = $this->handleFilterForm($request, [
             'sort_field' => 'created',
             'sort_order' => 'desc',
-            'status_filter' => null
+            'status_filter' => null,
+            'location_filter' => null,
+            'location_filter_rank' => null,
         ], $space);
 
         $filters = $filterForm->getData();
@@ -1436,7 +1480,9 @@ class SpaceManagementController extends AbstractController
             'space'     => $space,
             'orderBy'   => $filters['sort_field'],
             'status'    => $filters['status_filter'],
-            'sort'      => $filters['sort_order']
+            'sort'      => $filters['sort_order'],
+            'locationId' => $filters['location_filter'] ?? null,
+            'locationRank' => $filters['location_filter_rank'] ?? null,
         ];
 
         $qb = $this->em->getRepository(\App\Entity\Application::class)->filter($params);
@@ -1457,7 +1503,7 @@ class SpaceManagementController extends AbstractController
             $folderName = $candidateName . '_' . $companyName;
             
             // Préparer les données du récapitulatif (mêmes champs que l'export personnalisé)
-            $availableFields = $this->getAllAvailableFieldsForExport();
+            $availableFields = $this->getAllAvailableFieldsForExport($space);
             $recapByCategory = [];
             foreach ($availableFields as $field) {
                 $category = isset($field['category']) ? (string) $field['category'] : 'Autres';
@@ -1600,7 +1646,7 @@ class SpaceManagementController extends AbstractController
             $folderName = $candidateName . '_' . $companyName;
             
             // Préparer les données du récapitulatif (mêmes champs que l'export personnalisé)
-            $availableFields = $this->getAllAvailableFieldsForExport();
+            $availableFields = $this->getAllAvailableFieldsForExport($space);
             $recapByCategory = [];
             foreach ($availableFields as $field) {
                 $category = isset($field['category']) ? (string) $field['category'] : 'Autres';
@@ -1775,6 +1821,10 @@ class SpaceManagementController extends AbstractController
         if ($property === 'computed.applicationDocumentsPaths') {
             $paths = $this->getApplicationDocumentRelativePaths($application, $folderName);
             return $paths ? implode('; ', $paths) : '';
+        }
+
+        if (preg_match('/^computed\.locationPreference\.rank\.(\d+)$/', $property, $matches)) {
+            return $application->getLocationLabelAtRank((int) $matches[1]);
         }
 
         $projectHolder = $application->getProjectHolder();
@@ -2320,17 +2370,22 @@ class SpaceManagementController extends AbstractController
             'csrf_protection' => false
         ]);
 
+        $sortChoices = [
+            'wishedSize' => 'Surface souhaitée (candidature)',
+            'startOccupation' => 'Date d\'entrée souhaitée',
+            'lengthOccupation' => 'Durée d\'occupation',
+            'created' => 'Date de candidature',
+        ];
+        if ($space instanceof Space && $space->isMultiLocation()) {
+            $sortChoices['locationFirstChoice'] = '1er site préféré';
+        }
+
         $builder->add('sort_field',
             //ChoiceType::class,
             \Symfony\Component\Form\Extension\Core\Type\ChoiceType::class,
             [
             'required' => false,
-            'choices' => array_flip([
-                'wishedSize' => 'Surface souhaitée (candidature)',
-                'startOccupation' => 'Date d\'entrée souhaitée',
-                'lengthOccupation' => 'Durée d\'occupation',
-                'created' => 'Date de candidature'
-            ]),
+            'choices' => array_flip($sortChoices),
             'placeholder' => 'Trier par',
             'empty_data' => 'created'
         ]);
@@ -2358,6 +2413,38 @@ class SpaceManagementController extends AbstractController
             ]),
             'empty_data' => 'desc'
         ]);
+
+        if ($space instanceof Space && $space->isMultiLocation()) {
+            $locationChoices = ['Tous les sites' => ''];
+            foreach ($space->getOrderedActiveLocations() as $location) {
+                $label = (string) $location->getName();
+                if ($location->getCity()) {
+                    $label .= ' (' . $location->getCity() . ')';
+                }
+                $locationChoices[$label] = (string) $location->getId();
+            }
+
+            $rankChoices = ['N\'importe quel rang' => ''];
+            $rankCount = count($space->getOrderedActiveLocations());
+            for ($rank = 1; $rank <= $rankCount; $rank++) {
+                $rankLabel = $rank === 1 ? '1er choix' : ($rank === 2 ? '2e choix' : $rank . 'e choix');
+                $rankChoices[$rankLabel] = (string) $rank;
+            }
+
+            $builder->add('location_filter', ChoiceType::class, [
+                'required' => false,
+                'choices' => $locationChoices,
+                'placeholder' => false,
+                'empty_data' => '',
+            ]);
+
+            $builder->add('location_filter_rank', ChoiceType::class, [
+                'required' => false,
+                'choices' => $rankChoices,
+                'placeholder' => false,
+                'empty_data' => '',
+            ]);
+        }
 
         $form = $builder->getForm();
         $form->handleRequest($request);
@@ -2475,7 +2562,7 @@ class SpaceManagementController extends AbstractController
         }
 
         if ($space->isMultiLocation() && $newVisit->getLocation() === null) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez sélectionner un lieu pour cette visite.', $this->getFormSectionAnchor($space, 'visits'));
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez sélectionner un site pour cette visite.', $this->getFormSectionAnchor($space, 'visits'));
         }
 
         if (!$space->getVisits()->contains($newVisit)) {
@@ -2629,10 +2716,10 @@ class SpaceManagementController extends AbstractController
             'price'               => 'Prix au m² mensuel',
             'priceText'           => 'Prix personnalisé',
             'doc_aac'             => 'Document d\'appel à candidature',
-            'locations'           => 'Lieux proposés',
+            'locations'           => 'Sites proposés',
         ];
         $locationFieldLabels = [
-            'name'              => 'Nom du lieu',
+            'name'              => 'Nom du site',
             'zipCode'           => 'Code postal',
             'city'              => 'Ville',
             'suspensionMessage' => 'Message de suspension',
@@ -2643,7 +2730,7 @@ class SpaceManagementController extends AbstractController
             $path = $violation->getPropertyPath();
             if (preg_match('/^locations\[(\d+)\]\.(.+)$/', $path, $matches) === 1) {
                 $fieldName = $locationFieldLabels[$matches[2]] ?? $matches[2];
-                $missing[$path] = 'Lieu ' . ((int) $matches[1] + 1) . ' — ' . $fieldName;
+                $missing[$path] = 'Site ' . ((int) $matches[1] + 1) . ' — ' . $fieldName;
 
                 continue;
             }
@@ -2691,7 +2778,7 @@ class SpaceManagementController extends AbstractController
             'doc_aac'             => 'Document d\'appel à candidature',
             'doc_plan'            => 'Répartition des espaces',
             'doc_faq'             => 'F.A.Q',
-            'locations'           => 'Lieux proposés',
+            'locations'           => 'Sites proposés',
             'price'               => 'Prix au m² mensuel',
             'priceText'           => 'Prix personnalisé',
             'type'                => 'Type de locaux',
@@ -2712,7 +2799,7 @@ class SpaceManagementController extends AbstractController
         foreach ($form->all() as $name => $child) {
             $bc = $breadcrumbs;
             if (is_numeric((string) $name)) {
-                $bc[] = 'Lieu ' . ((int) $name + 1);
+                $bc[] = 'Site ' . ((int) $name + 1);
             } else {
                 $label = $child->getConfig()->getOption('label');
                 if (is_string($label) && $label !== '') {

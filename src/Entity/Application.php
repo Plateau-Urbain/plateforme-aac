@@ -128,6 +128,10 @@ class Application
     #[Assert\Valid]
     protected $files;
 
+    #[ORM\OneToMany(targetEntity: ApplicationLocationPreference::class, mappedBy: 'application', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[Assert\Valid(groups: ['submit'])]
+    private $locationPreferences;
+
     #[ORM\Column(name: 'created', type: 'datetime')]
     private $created;
 
@@ -141,8 +145,8 @@ class Application
     protected $wishedSize;
 
     /**
-     * Validation conditionnelle : la "date d'entrée souhaitée" n'est requise que
-     * si l'AAC est tagguée "indéfini".
+     * Validation conditionnelle : la "date d'entrée souhaitée" est requise pour
+     * les AAC au fil de l'eau et les AAC multi-lieux.
      */
     #[Assert\Callback(groups: ['submit'])]
     public function validateStartOccupationForIndefiniteAAC(ExecutionContextInterface $context)
@@ -152,21 +156,78 @@ class Application
             return;
         }
 
-        $isRolling = false;
-        if (method_exists($space, 'isRollingAAC')) {
-            $isRolling = (bool) $space->isRollingAAC();
-        } elseif (method_exists($space, 'isIndefiniteAAC')) {
-            // Compat ancien nom
-            $isRolling = (bool) $space->isIndefiniteAAC();
-        }
+        $requiresStartOccupation = method_exists($space, 'requiresStartOccupation')
+            ? (bool) $space->requiresStartOccupation()
+            : (bool) $space->isRollingAAC();
 
-        if (!$isRolling) {
+        if (!$requiresStartOccupation) {
             return;
         }
 
         if ($this->startOccupation === null) {
             $context->buildViolation('Veuillez indiquer une date d\'entrée souhaitée.')
                 ->atPath('startOccupation')
+                ->addViolation();
+        }
+    }
+
+    #[Assert\Callback(groups: ['submit'])]
+    public function validateLocationPreferencesForMultiLocation(ExecutionContextInterface $context): void
+    {
+        $space = $this->getSpace();
+        if (!$space || !$space->isMultiLocation()) {
+            return;
+        }
+
+        $activeLocations = $space->getActiveLocations();
+        if (count($activeLocations) < 2) {
+            return;
+        }
+
+        $coveredLocationIds = [];
+        foreach ($this->locationPreferences as $preference) {
+            $location = $preference->getLocation();
+            if (!$location || $location->isSuspended()) {
+                continue;
+            }
+
+            $locationId = $location->getId();
+            if ($locationId !== null && in_array($locationId, $coveredLocationIds, true)) {
+                $context->buildViolation('Chaque site ne peut apparaître qu\'une seule fois dans votre classement.')
+                    ->atPath('locationPreferences')
+                    ->addViolation();
+
+                return;
+            }
+
+            if ($locationId !== null) {
+                $coveredLocationIds[] = $locationId;
+            }
+        }
+
+        foreach ($activeLocations as $activeLocation) {
+            $activeId = $activeLocation->getId();
+            if ($activeId !== null && !in_array($activeId, $coveredLocationIds, true)) {
+                $context->buildViolation('Veuillez classer tous les sites proposés par ordre de préférence.')
+                    ->atPath('locationPreferences')
+                    ->addViolation();
+
+                return;
+            }
+        }
+
+        $ranks = [];
+        foreach ($this->locationPreferences as $preference) {
+            if ($preference->getRank() !== null) {
+                $ranks[] = $preference->getRank();
+            }
+        }
+
+        sort($ranks);
+        $expectedRanks = range(1, count($activeLocations));
+        if ($ranks !== $expectedRanks) {
+            $context->buildViolation('Le classement des sites est incomplet ou invalide.')
+                ->atPath('locationPreferences')
                 ->addViolation();
         }
     }
@@ -183,6 +244,7 @@ class Application
     public function __construct()
     {
         $this->files = new ArrayCollection();
+        $this->locationPreferences = new ArrayCollection();
         $this->lengthTypeOccupation = 'mois';
     }
 
@@ -473,6 +535,159 @@ class Application
     public function removeFile(ApplicationFile $file)
     {
         $this->files->removeElement($file);
+    }
+
+    /**
+     * @return ArrayCollection|ApplicationLocationPreference[]
+     */
+    public function getLocationPreferences()
+    {
+        return $this->locationPreferences;
+    }
+
+    /**
+     * @return ApplicationLocationPreference[]
+     */
+    public function getLocationPreferencesOrdered(): array
+    {
+        $preferences = $this->locationPreferences->toArray();
+        usort($preferences, static function (ApplicationLocationPreference $a, ApplicationLocationPreference $b): int {
+            return ($a->getRank() ?? PHP_INT_MAX) <=> ($b->getRank() ?? PHP_INT_MAX);
+        });
+
+        return $preferences;
+    }
+
+    public function addLocationPreference(ApplicationLocationPreference $preference): self
+    {
+        if (!$this->locationPreferences->contains($preference)) {
+            $this->locationPreferences->add($preference);
+            $preference->setApplication($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLocationPreference(ApplicationLocationPreference $preference): self
+    {
+        if ($this->locationPreferences->removeElement($preference)) {
+            if ($preference->getApplication() === $this) {
+                $preference->setApplication(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function syncLocationPreferencesFromSpace(): void
+    {
+        $space = $this->getSpace();
+        if (!$space || !$space->isMultiLocation()) {
+            return;
+        }
+
+        $activeLocations = $space->getActiveLocations();
+        usort($activeLocations, static function (SpaceLocation $a, SpaceLocation $b): int {
+            return $a->getDisplayOrder() <=> $b->getDisplayOrder();
+        });
+
+        $activeIds = [];
+        foreach ($activeLocations as $location) {
+            if ($location->getId() !== null) {
+                $activeIds[] = $location->getId();
+            }
+        }
+
+        foreach ($this->locationPreferences->toArray() as $preference) {
+            $location = $preference->getLocation();
+            $locationId = $location ? $location->getId() : null;
+            if ($locationId === null || !in_array($locationId, $activeIds, true)) {
+                $this->removeLocationPreference($preference);
+            }
+        }
+
+        $existingByLocationId = [];
+        foreach ($this->locationPreferences as $preference) {
+            $location = $preference->getLocation();
+            if ($location && $location->getId() !== null) {
+                $existingByLocationId[$location->getId()] = $preference;
+            }
+        }
+
+        $nextRank = count($this->locationPreferences) + 1;
+        foreach ($activeLocations as $location) {
+            $locationId = $location->getId();
+            if ($locationId === null || isset($existingByLocationId[$locationId])) {
+                continue;
+            }
+
+            $preference = new ApplicationLocationPreference();
+            $preference->setLocation($location);
+            $preference->setRank($nextRank++);
+            $this->addLocationPreference($preference);
+        }
+    }
+
+    public function sortLocationPreferencesByRank(): void
+    {
+        $ordered = $this->getLocationPreferencesOrdered();
+        $this->locationPreferences->clear();
+        foreach ($ordered as $preference) {
+            $this->locationPreferences->add($preference);
+        }
+    }
+
+    public function getLocationPreferencesLabelsForExport(): string
+    {
+        $space = $this->getSpace();
+        if (!$space || !$space->isMultiLocation()) {
+            return '';
+        }
+
+        $parts = [];
+        foreach ($this->getLocationPreferencesOrdered() as $preference) {
+            $location = $preference->getLocation();
+            if (!$location || $location->isSuspended()) {
+                continue;
+            }
+
+            $name = (string) ($location->getName() ?? '');
+            $city = $location->getCity();
+            $label = $city ? sprintf('%s — %s', $name, $city) : $name;
+            $parts[] = sprintf('Site %d: %s', $preference->getRank(), $label);
+        }
+
+        return implode('; ', $parts);
+    }
+
+    public function getLocationLabelAtRank(int $rank): string
+    {
+        foreach ($this->getLocationPreferencesOrdered() as $preference) {
+            if ((int) $preference->getRank() !== $rank) {
+                continue;
+            }
+
+            $location = $preference->getLocation();
+            if (!$location || $location->isSuspended()) {
+                return '';
+            }
+
+            $name = (string) ($location->getName() ?? '');
+            $city = $location->getCity();
+
+            return $city ? sprintf('%s — %s', $name, $city) : $name;
+        }
+
+        return '';
+    }
+
+    public function __call(string $method, array $arguments)
+    {
+        if (preg_match('/^getLocationPreferenceRank(\d+)$/', $method, $matches)) {
+            return $this->getLocationLabelAtRank((int) $matches[1]);
+        }
+
+        throw new \BadMethodCallException(sprintf('Undefined method "%s" called on Application.', $method));
     }
 
     /**

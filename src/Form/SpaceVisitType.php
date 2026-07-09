@@ -25,8 +25,8 @@ class SpaceVisitType extends AbstractType
                 'class' => SpaceLocation::class,
                 'choices' => $options['space']->getLocations()->toArray(),
                 'choice_label' => 'name',
-                'label' => 'Lieu',
-                'placeholder' => 'Choisir un lieu',
+                'label' => 'Site',
+                'placeholder' => 'Choisir un site',
                 'attr' => ['class' => 'form-control'],
                 'required' => true,
             ]);
