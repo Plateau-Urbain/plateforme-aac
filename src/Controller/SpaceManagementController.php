@@ -155,7 +155,7 @@ class SpaceManagementController extends AbstractController
                 if (!$form->isValid()) {
                     $this->addFlash('error', $this->formatFormErrors($form));
 
-                    return $this->render('SpaceManagement/add.html.twig', ['form' => $form->createView(), 'space' => $space]);
+                    return $this->render($this->getSpaceFormTemplate($space), ['form' => $form->createView(), 'space' => $space]);
                 }
 
                 $this->em->persist($space);
@@ -180,7 +180,63 @@ class SpaceManagementController extends AbstractController
             $this->addFlash('error', $this->formatFormErrors($form));
         }
 
-        return $this->render('SpaceManagement/add.html.twig', ['form' => $form->createView(), 'space' => $space]);
+        return $this->render($this->getSpaceFormTemplate($space), ['form' => $form->createView(), 'space' => $space]);
+    }
+
+    #[Route("/ajouter-multi-lieux", name:"space_manager_add_multi")]
+    public function addMultiAction(Request $request): Response
+    {
+        $space = new Space();
+        $owner = $this->getUser();
+        assert($owner instanceof \App\Entity\User);
+        $space->setOwner($owner);
+        $space->setClosed(false);
+        $space->setWorkflowType(Space::WORKFLOW_MULTI_LOCATION);
+        $space->setLimitAvailability(null);
+
+        $form = $this->createSpaceForm($space, [
+            'action' => $this->generateUrl('space_manager_add_multi'),
+            'method' => 'post',
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $partialSaveResponse = $this->handlePartialSpaceFormActions($request, $form, $space);
+            if ($partialSaveResponse !== null) {
+                return $partialSaveResponse;
+            }
+
+            if ($this->isPreviewClicked($form)) {
+                if (!$form->isValid()) {
+                    $this->addFlash('error', $this->formatFormErrors($form));
+
+                    return $this->render($this->getSpaceFormTemplate($space), ['form' => $form->createView(), 'space' => $space]);
+                }
+
+                $this->em->persist($space);
+                $this->em->flush();
+
+                return $this->createPreviewUrlResponse($space);
+            }
+
+            if ($form->isValid()) {
+                if (($form->get('publish') instanceof ClickableInterface && $form->get('publish')->isClicked())) {
+                    return $this->submitSpace($space);
+                }
+
+                $this->em->persist($space);
+                $this->em->flush();
+
+                $this->addFlash('success', 'L\'appel à candidatures multi-lieux a été enregistré.');
+
+                return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $space->getId()]));
+            }
+
+            $this->addFlash('error', $this->formatFormErrors($form));
+        }
+
+        return $this->render($this->getSpaceFormTemplate($space), ['form' => $form->createView(), 'space' => $space]);
     }
 
     /**
@@ -222,7 +278,7 @@ class SpaceManagementController extends AbstractController
                 if (!$form->isValid()) {
                     $this->addFlash('error', $this->formatFormErrors($form));
 
-                    return $this->render('SpaceManagement/edit.html.twig', [
+                    return $this->render($this->getSpaceFormTemplate($space), [
                         'form'  => $form->createView(),
                         'space' => $space,
                     ]);
@@ -248,7 +304,7 @@ class SpaceManagementController extends AbstractController
             $this->addFlash('error', $this->formatFormErrors($form));
         }
 
-        return $this->render('SpaceManagement/edit.html.twig', [
+        return $this->render($this->getSpaceFormTemplate($space), [
             'form' => $form->createView(),
             'space' => $space,
         ]);
@@ -1943,7 +1999,10 @@ class SpaceManagementController extends AbstractController
 
         $this->addFlash('success', 'La photo a été supprimée.');
 
-        return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . '#two');
+        $space = $image->getSpace();
+        $anchor = $space instanceof Space ? $this->getFormSectionAnchor($space, 'photos') : '#two';
+
+        return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . $anchor);
     }
 
     /**
@@ -1972,7 +2031,10 @@ class SpaceManagementController extends AbstractController
 
         $this->addFlash('success', 'La photo a été déplacée.');
 
-        return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . '#two');
+        $space = $image->getSpace();
+        $anchor = $space instanceof Space ? $this->getFormSectionAnchor($space, 'photos') : '#two';
+
+        return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . $anchor);
     }
 
     /**
@@ -2049,14 +2111,15 @@ class SpaceManagementController extends AbstractController
             throw new AccessDeniedException('Vous n\'êtes pas autorisé à supprimer ce document.');
         }
 
-        $spaceId = $spaceDocument->getSpace()->getId();
+        $space = $spaceDocument->getSpace();
+        $spaceId = $space->getId();
 
         $em->remove($spaceDocument);
         $em->flush();
 
         $this->addFlash('success', 'Le document a été supprimé.');
 
-        return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . '#three');
+        return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . $this->getFormSectionAnchor($space, 'documents'));
     }
 
     /**
@@ -2107,7 +2170,8 @@ class SpaceManagementController extends AbstractController
             throw new BadRequestHttpException('Invalid token');
         }
 
-        $spaceId = $visit->getSpace()->getId();
+        $space = $visit->getSpace();
+        $spaceId = $space->getId();
 
         $em = $this->em;
         $em->remove($visit);
@@ -2115,7 +2179,7 @@ class SpaceManagementController extends AbstractController
 
         $this->addFlash('success', 'La visite a bien été supprimée.');
 
-        return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . '#five');
+        return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . $this->getFormSectionAnchor($space, 'visits'));
     }
 
     /**
@@ -2123,6 +2187,28 @@ class SpaceManagementController extends AbstractController
      * @param array $options
      *
      */
+    private function getSpaceFormTemplate(Space $space): string
+    {
+        if ($space->isMultiLocation()) {
+            return $space->getId() !== null
+                ? 'SpaceManagement/edit_multi.html.twig'
+                : 'SpaceManagement/add_multi.html.twig';
+        }
+
+        return $space->getId() !== null
+            ? 'SpaceManagement/edit.html.twig'
+            : 'SpaceManagement/add.html.twig';
+    }
+
+    private function getFormSectionAnchor(Space $space, string $section): string
+    {
+        $anchors = $space->isMultiLocation()
+            ? ['photos' => 'three', 'documents' => 'four', 'resources' => 'five', 'visits' => 'six', 'locations' => 'two']
+            : ['photos' => 'two', 'documents' => 'three', 'resources' => 'four', 'visits' => 'five'];
+
+        return '#' . ($anchors[$section] ?? 'one');
+    }
+
     /** @param array<string, mixed> $options */
     protected function createSpaceForm(mixed $data, array $options = []): FormInterface
     {
@@ -2372,43 +2458,47 @@ class SpaceManagementController extends AbstractController
     private function handleAddVisitSubmission(FormInterface $form, Space $space): Response
     {
         if (!$form->has('newVisit')) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire de visite indisponible.', '#five');
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire de visite indisponible.', $this->getFormSectionAnchor($space, 'visits'));
         }
 
         $newVisit = $form->get('newVisit')->getData();
         if (!$newVisit instanceof SpaceVisit) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Données de visite invalides.', '#five');
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Données de visite invalides.', $this->getFormSectionAnchor($space, 'visits'));
         }
 
         if ($newVisit->getVisitDate() === null) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez renseigner une date de visite.', '#five');
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez renseigner une date de visite.', $this->getFormSectionAnchor($space, 'visits'));
         }
 
         if ($newVisit->getStartTime() === null || $newVisit->getEndTime() === null) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez renseigner les heures de début et de fin.', '#five');
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez renseigner les heures de début et de fin.', $this->getFormSectionAnchor($space, 'visits'));
+        }
+
+        if ($space->isMultiLocation() && $newVisit->getLocation() === null) {
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez sélectionner un lieu pour cette visite.', $this->getFormSectionAnchor($space, 'visits'));
         }
 
         if (!$space->getVisits()->contains($newVisit)) {
             $space->addVisit($newVisit);
         }
 
-        return $this->persistSpaceAndRedirectToEdit($space, 'La visite a été ajoutée.', '#five');
+        return $this->persistSpaceAndRedirectToEdit($space, 'La visite a été ajoutée.', $this->getFormSectionAnchor($space, 'visits'));
     }
 
     private function handleAddDocumentSubmission(FormInterface $form, Space $space): Response
     {
         if (!$form->has('newDocument')) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire de document indisponible.', '#three');
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire de document indisponible.', $this->getFormSectionAnchor($space, 'documents'));
         }
 
         $newDocument = $form->get('newDocument')->getData();
         if (!$newDocument instanceof \App\Entity\SpaceDocument) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Données de document invalides.', '#three');
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Données de document invalides.', $this->getFormSectionAnchor($space, 'documents'));
         }
 
         $name = trim((string) $newDocument->getName());
         if ($name === '') {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez saisir le nom de la pièce à joindre.', '#three');
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez saisir le nom de la pièce à joindre.', $this->getFormSectionAnchor($space, 'documents'));
         }
 
         $newDocument->setName($name);
@@ -2417,18 +2507,18 @@ class SpaceManagementController extends AbstractController
             $space->addDocument($newDocument);
         }
 
-        return $this->persistSpaceAndRedirectToEdit($space, 'La pièce demandée a été ajoutée.', '#three');
+        return $this->persistSpaceAndRedirectToEdit($space, 'La pièce demandée a été ajoutée.', $this->getFormSectionAnchor($space, 'documents'));
     }
 
     private function handleAddPhotoSubmission(Request $request, FormInterface $form, Space $space): Response
     {
         if (!$form->has('pics')) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire photo indisponible.', '#two');
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire photo indisponible.', $this->getFormSectionAnchor($space, 'photos'));
         }
 
         $newImage = $this->extractSpaceImageFromPhotoForm($form, $request);
         if ($newImage === null || $newImage->getFile() === null) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez sélectionner une photo à ajouter.', '#two');
+            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez sélectionner une photo à ajouter.', $this->getFormSectionAnchor($space, 'photos'));
         }
 
         if (!\in_array($newImage, $space->getPics(), true)) {
@@ -2436,7 +2526,7 @@ class SpaceManagementController extends AbstractController
             $space->addPic($newImage);
         }
 
-        return $this->persistSpaceAndRedirectToEdit($space, 'La photo a été ajoutée.', '#two');
+        return $this->persistSpaceAndRedirectToEdit($space, 'La photo a été ajoutée.', $this->getFormSectionAnchor($space, 'photos'));
     }
 
     private function extractSpaceImageFromPhotoForm(FormInterface $form, Request $request): ?SpaceImage
@@ -2517,7 +2607,10 @@ class SpaceManagementController extends AbstractController
 
     private function addMissingPublicationFieldsWarning(Space $space): void
     {
-        $violations = $this->validator->validate($space, null, ['save']);
+        $groups = ['save'];
+        $groups[] = $space->isMultiLocation() ? 'multi_location' : 'standard';
+
+        $violations = $this->validator->validate($space, null, $groups);
         if (count($violations) === 0) {
             return;
         }
@@ -2525,7 +2618,7 @@ class SpaceManagementController extends AbstractController
         $fieldLabels = [
             'name'                => 'Nom de l\'espace',
             'zipCode'             => 'Code postal',
-            'city'                => 'Ville',
+            'city'                => $space->isMultiLocation() ? 'Commune ou territoire' : 'Ville',
             'description'         => 'Description',
             'activityDescription' => 'Activités recherchées',
             'availability'        => 'Durée du projet',
@@ -2533,11 +2626,28 @@ class SpaceManagementController extends AbstractController
             'minSpace'            => 'Surface minimale',
             'maxSpace'            => 'Surface maximale',
             'type'                => 'Type de locaux',
+            'price'               => 'Prix au m² mensuel',
+            'priceText'           => 'Prix personnalisé',
+            'doc_aac'             => 'Document d\'appel à candidature',
+            'locations'           => 'Lieux proposés',
+        ];
+        $locationFieldLabels = [
+            'name'              => 'Nom du lieu',
+            'zipCode'           => 'Code postal',
+            'city'              => 'Ville',
+            'suspensionMessage' => 'Message de suspension',
         ];
 
         $missing = [];
         foreach ($violations as $violation) {
             $path = $violation->getPropertyPath();
+            if (preg_match('/^locations\[(\d+)\]\.(.+)$/', $path, $matches) === 1) {
+                $fieldName = $locationFieldLabels[$matches[2]] ?? $matches[2];
+                $missing[$path] = 'Lieu ' . ((int) $matches[1] + 1) . ' — ' . $fieldName;
+
+                continue;
+            }
+
             $missing[$path] = $fieldLabels[$path] ?? $path;
         }
 
@@ -2554,31 +2664,68 @@ class SpaceManagementController extends AbstractController
 
     private function formatFormErrors(FormInterface $form): string
     {
-        $items = [];
-
-        foreach ($form->getErrors(true, true) as $error) {
-            $origin = $error->getOrigin();
-            if ($origin === null) {
-                continue;
-            }
-
-            $label   = $origin->getConfig()->getOption('label');
-            $message = $error->getMessage();
-
-            if ($label && $label !== false) {
-                $items[$label] = $label . ' : ' . $message;
-            } else {
-                $items[$message] = $message;
-            }
-        }
+        $items = $this->collectFormErrors($form);
 
         if ($items === []) {
-            return 'Le formulaire n\'a pas pu être enregistré. Vérifiez les champs signalés.';
+            return 'Le formulaire n\'a pas pu être publié. Vérifiez les champs signalés en rouge sur la page.';
         }
 
-        $listed = implode(' — ', array_slice(array_values($items), 0, 5));
+        if (count($items) <= 8) {
+            return 'Publication impossible — veuillez corriger : ' . implode(' · ', $items);
+        }
 
-        return 'Le formulaire contient des erreurs : ' . $listed;
+        return sprintf(
+            'Publication impossible — %d points à corriger (liste détaillée en haut du formulaire) : %s',
+            count($items),
+            implode(' · ', array_slice($items, 0, 8))
+        );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function collectFormErrors(FormInterface $form, array $breadcrumbs = []): array
+    {
+        $items = [];
+        $staticLabels = [
+            'doc_aac'             => 'Document d\'appel à candidature',
+            'doc_plan'            => 'Répartition des espaces',
+            'doc_faq'             => 'F.A.Q',
+            'locations'           => 'Lieux proposés',
+            'price'               => 'Prix au m² mensuel',
+            'priceText'           => 'Prix personnalisé',
+            'type'                => 'Type de locaux',
+            'name'                => 'Nom de l\'espace',
+            'description'         => 'Description',
+            'activityDescription' => 'Activités recherchées',
+            'availability'        => 'Durée du projet',
+            'zipCode'             => 'Code postal',
+            'city'                => 'Commune ou territoire',
+            'suspensionMessage'   => 'Message de suspension',
+        ];
+
+        foreach ($form->getErrors() as $error) {
+            $prefix = $breadcrumbs !== [] ? implode(' › ', $breadcrumbs) . ' : ' : '';
+            $items[] = $prefix . $error->getMessage();
+        }
+
+        foreach ($form->all() as $name => $child) {
+            $bc = $breadcrumbs;
+            if (is_numeric((string) $name)) {
+                $bc[] = 'Lieu ' . ((int) $name + 1);
+            } else {
+                $label = $child->getConfig()->getOption('label');
+                if (is_string($label) && $label !== '') {
+                    $bc[] = $label;
+                } elseif (isset($staticLabels[$name])) {
+                    $bc[] = $staticLabels[$name];
+                }
+            }
+
+            $items = array_merge($items, $this->collectFormErrors($child, $bc));
+        }
+
+        return $items;
     }
 
     private function isPreviewClicked(FormInterface $form): bool

@@ -1,0 +1,306 @@
+
+<div class="white">
+    <div class="container">
+        <div class="bkg-img"></div>
+
+        <div class="row top-profil">
+            <div class="col-sm-12">
+                <div class="titre-page">
+                    <h1>{{ space.id ? 'Éditer un AAC multi-lieux' : 'Ajouter un AAC multi-lieux' }}</h1>
+                    <div class="img-aac"><img src="{{ asset('images/groupe_ajouter_espace.png') }}" alt="Plateau Urbain" /></div>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <p class="left">
+                    Cet appel à candidatures couvre plusieurs lieux. Les candidats pourront indiquer leurs préférences par lieu.
+                    L'appel reste ouvert sans date limite jusqu'à clôture manuelle.
+                    Enregistrez à tout moment, puis soumettez pour validation par un administrateur.
+                </p>
+            </div>
+        </div>
+
+        {% if app.flashes|length %}
+        <div class="container" style="margin-bottom: 10px;">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'success' ? 'success' : (label == 'warning' ? 'warning' : 'info')) }} alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Fermer"><span aria-hidden="true">&times;</span></button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if form.vars.submitted and not form.vars.valid %}
+        <div class="container" style="margin-bottom: 10px;">
+            {% include 'SpaceManagement/Partials/_form_errors_summary.html.twig' with { form: form } %}
+        </div>
+        {% endif %}
+
+        {% form_theme form 'Form/bootstrap_3_layout.html.twig' %}
+        <style>
+            #js-form-space .has-error .help-block {
+                display: block;
+                color: #FFF;
+                background-color: #e9473c;
+                font-size: 13px;
+                margin-top: 4px;
+                padding: 6px 10px;
+                border-radius: 4px;
+            }
+            #js-form-space .has-error .help-block ul { margin: 0; }
+            #js-form-space .has-error .form-control,
+            #js-form-space .has-error select.form-control { border-color: #e9473c; }
+            #js-form-space .trumbowyg-box,
+            #js-form-space .trumbowyg-editor-box { border: none; }
+            .location-item { margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; }
+            .location-item .panel-heading { background: #f5f5f5; padding: 10px 15px; }
+            .location-item.suspended-location { opacity: 0.85; border-color: #f0ad4e; }
+            .location-item.has-error-location { border-color: #e9473c; box-shadow: 0 0 0 1px #e9473c; }
+            .section-has-error > .form-contener { outline: 2px solid #e9473c; outline-offset: 4px; }
+            .publish-errors-summary ul { max-height: 280px; overflow-y: auto; }
+        </style>
+
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+        <div class="row">
+            <div class="col-xs-1 bkg">
+                <ul>
+                    <li><a class="indicator active" href="#one"></a></li>
+                    <li><a class="indicator" href="#two"></a></li>
+                    <li><a class="indicator" href="#three"></a></li>
+                    <li><a class="indicator" href="#four"></a></li>
+                    <li><a class="indicator" href="#five"></a></li>
+                    <li><a class="indicator" href="#six"></a></li>
+                </ul>
+            </div>
+
+            <div class="main col-xs-10">
+                <div id="one" class="section">
+                    <span class="section-title form-one"></span>
+                    <div class="form-contener bleu">
+                        <h3>Votre appel à candidatures</h3>
+                        {{ form_errors(form) }}
+
+                        <div class="alert alert-success" role="alert">
+                            <strong>Sans date limite</strong> — cet AAC reste ouvert jusqu'à clôture manuelle.
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group{% if not form.name.vars.valid %} has-error{% endif %}">
+                                {{ form_label(form.name) }}
+                                {{ form_widget(form.name) }}
+                                {{ form_errors(form.name) }}
+                            </div>
+                            <div class="col-md-6 form-group{% if not form.managedByLabel.vars.valid %} has-error{% endif %}">
+                                {{ form_label(form.managedByLabel) }}
+                                {{ form_widget(form.managedByLabel) }}
+                                {{ form_errors(form.managedByLabel) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group{% if not form.availability.vars.valid %} has-error{% endif %}">
+                                {{ form_label(form.availability) }}
+                                {{ form_widget(form.availability) }}
+                                {{ form_errors(form.availability) }}
+                            </div>
+                            <div class="col-md-6 form-group{% if not form.city.vars.valid %} has-error{% endif %}">
+                                {{ form_label(form.city) }}
+                                {{ form_widget(form.city) }}
+                                {{ form_errors(form.city) }}
+                                <p class="help-block" style="margin-bottom: 0;">Libellé affiché sur la fiche et la liste (plusieurs communes possibles).</p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group{% if not form.type.vars.valid %} has-error{% endif %}">
+                                {{ form_label(form.type) }}
+                                {{ form_widget(form.type) }}
+                                {{ form_errors(form.type) }}
+                            </div>
+                        </div>
+
+                        <div class="row" style="display: flex; align-items: center;">
+                            <div class="col-md-5 form-group{% if not form.price.vars.valid %} has-error{% endif %}">
+                                {{ form_label(form.price) }}
+                                {{ form_widget(form.price) }}
+                                {{ form_errors(form.price) }}
+                            </div>
+                            <div class="col-sm-2 text-center form-group ou-separator"><span>ou</span></div>
+                            <div class="col-md-5 form-group{% if not form.priceText.vars.valid %} has-error{% endif %}">
+                                {{ form_label(form.priceText) }}
+                                {{ form_widget(form.priceText, { 'attr': { 'placeholder': 'Sur devis, etc.', 'class': 'form-control' } }) }}
+                                {{ form_errors(form.priceText) }}
+                            </div>
+                        </div>
+
+                        {# Champs surfaces / nombre d'espaces : non pertinents pour un AAC multi-lieux
+                        <div class="row">
+                            <div class="col-sm-4 form-group">{{ form_row(form.nbSpaces) }}</div>
+                            <div class="col-sm-4 form-group">{{ form_row(form.minSpace) }}</div>
+                            <div class="col-sm-4 form-group">{{ form_row(form.maxSpace) }}</div>
+                        </div>
+                        #}
+
+                        <div class="row">
+                            <div class="col-sm-12 form-group{% if not form.description.vars.valid %} has-error{% endif %}">
+                                {{ form_label(form.description) }}
+                                {{ form_widget(form.description) }}
+                                {{ form_errors(form.description) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12 form-group{% if not form.activityDescription.vars.valid %} has-error{% endif %}">
+                                {{ form_label(form.activityDescription) }}
+                                {{ form_widget(form.activityDescription) }}
+                                {{ form_errors(form.activityDescription) }}
+                            </div>
+                        </div>
+
+                        {# Candidature au fil de l'eau : non utilisée pour les AAC multi-lieux
+                        {% if form.rollingApplications is defined %}
+                        <div class="row">
+                            <div class="col-sm-12 form-group">
+                                {{ form_row(form.rollingApplications) }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        #}
+
+                        {# ERP : géré lieu par lieu dans la section « Lieux proposés »
+                        {% if form.isErp is defined %}
+                        <div class="row">
+                            <div class="col-sm-12 form-group">
+                                {{ form_row(form.isErp) }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        #}
+                    </div>
+                </div>
+
+                <div id="two" class="section{% if form.locations is defined and not form.locations.vars.valid %} section-has-error{% endif %}">
+                    <span class="section-title form-two"></span>
+                    <div class="form-contener bleu">
+                        <h3>Lieux proposés</h3>
+                        {% if form.locations is defined %}
+                            {% include 'SpaceManagement/Partials/_space_locations_form.html.twig' with { 'form': form } %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="three" class="section">
+                    <span class="section-title form-three"></span>
+                    <div class="form-contener bleu">
+                        <h3>Photos</h3>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                {% include 'SpaceManagement/Partials/_space_images_form.html.twig' with { 'images': form.vars.data.pics, 'form': form.pics } %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="four" class="section">
+                    <span class="section-title form-four"></span>
+                    <div class="form-contener bleu">
+                        <h3>Pièce(s) demandée(s)</h3>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                {% include 'SpaceManagement/Partials/_space_documents_form.html.twig' with { 'documents': form.vars.data.documents, 'form': form.newDocument } %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="five" class="section{% if (form.doc_aac is defined and not form.doc_aac.vars.valid) or (space.getDocs('document_aac') | length == 0 and form.vars.submitted and not form.vars.valid) %} section-has-error{% endif %}">
+                    <span class="section-title form-five"></span>
+                    <div class="form-contener bleu">
+                        <h3>Documents ressources</h3>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                {% include 'SpaceManagement/Partials/_space_required_form.html.twig' with { 'form': form, 'space': space } %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="six" class="section">
+                    <span class="section-title form-six"></span>
+                    <div class="form-contener bleu">
+                        <h3>Visites organisées</h3>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                {% include 'SpaceManagement/Partials/_space_visits_form.html.twig' with { 'visits': form.vars.data.visits, 'form': form.newVisit, 'is_multi_location': true } %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row btns">
+                    <div class="col-sm-12">
+                        {{ form_widget(form.preview, { 'attr': { 'class': 'btn btn-line-s' } }) }}
+                        <input type="submit" value="Enregistrer" class="btn btn-line-s save no-ajax" data-save='{% if app.user and is_granted("ROLE_ADMIN") %}Vous pourrez compléter et publier votre AAC depuis la rubrique "Gestion des espaces".{% else %}Vous pourrez compléter votre saisie depuis la rubrique "Mes espaces", puis la soumettre pour validation.{% endif %}'>
+                        {{ form_widget(form.publish, {
+                            'label': is_granted('ROLE_ADMIN') ? 'Publier' : 'Soumettre pour validation',
+                            'attr': {
+                                'class': 'btn btn-line-s js-publish no-ajax',
+                                'data-confirm': is_granted('ROLE_ADMIN')
+                                    ? "ADMIN : Êtes-vous sûr de vouloir publier cet AAC multi-lieux ?\n\nIl sera immédiatement visible par tous les candidats."
+                                    : "Êtes-vous sûr de vouloir soumettre cet AAC pour validation ?\n\nUn administrateur vérifiera les lieux et le contenu avant publication."
+                            }
+                        }) }}
+                    </div>
+                </div>
+
+                <div style="display:none;">{{ form_rest(form) }}</div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content plusinfos margin">
+    <div class="container">
+        <div class="row pu-home-content info">
+            <div class="col-xs-12 col-md-8 col-lg-8">
+                <h4>Vous souhaitez obtenir plus d'informations</h4>
+            </div>
+            <div class="col-xs-12 col-md-4 col-lg-4 btn-right">
+                <a href='https://www.plateau-urbain.com/contactez-nous/' target="_blank" class='btn btn-line'><span>Contactez-nous</span></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var sections = ['one', 'two', 'three', 'four', 'five', 'six'];
+    var targetSection = null;
+    var targetIndex = -1;
+
+    for (var i = 0; i < sections.length; i++) {
+        var section = document.getElementById(sections[i]);
+        if (section && (section.querySelector('.has-error') || section.querySelector('.has-error-location') || section.querySelector('.space-doc-error') || section.classList.contains('section-has-error'))) {
+            targetSection = section;
+            targetIndex = i;
+            break;
+        }
+    }
+
+    if (!targetSection) {
+        return;
+    }
+
+    var indicators = document.querySelectorAll('.bkg .indicator');
+    indicators.forEach(function (el) { el.classList.remove('active'); });
+    if (indicators[targetIndex]) {
+        indicators[targetIndex].classList.add('active');
+    }
+
+    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+})();
+</script>

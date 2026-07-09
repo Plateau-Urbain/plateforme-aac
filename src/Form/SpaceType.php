@@ -9,6 +9,7 @@ use App\Entity\SpaceAttribute;
 use App\Entity\SpaceImage;
 use App\Entity\SpaceDocument;
 use App\Entity\SpaceVisit;
+use App\Entity\SpaceLocation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -86,6 +87,16 @@ class SpaceType extends AbstractType
             ->add('isErp', CheckboxType::class, [
                 'label' => 'Le lieu est un ERP (Établissement Recevant du Public)',
                 'required' => false,
+            ])
+            ->add('locations', CollectionType::class, [
+                'entry_type' => SpaceLocationType::class,
+                'label' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+                'required' => false,
+                'error_bubbling' => false,
+                'prototype' => true,
             ])
             ->add('tags', CollectionType::class, [
                 'entry_type' => SpaceAttributeType::class,
@@ -166,6 +177,49 @@ class SpaceType extends AbstractType
              * @var Space $data
              */
             $data = $event->getData();
+            $form = $event->getForm();
+
+            if ($data instanceof Space && $data->isMultiLocation()) {
+                foreach (['limitAvailability', 'zipCode', 'nbSpaces', 'minSpace', 'maxSpace', 'rollingApplications', 'isErp'] as $field) {
+                    if ($form->has($field)) {
+                        $form->remove($field);
+                    }
+                }
+
+                if ($form->has('city')) {
+                    $form->remove('city');
+                    $form->add('city', null, [
+                        'label' => 'Commune ou territoire',
+                        'attr' => [
+                            'class' => 'form-control',
+                            'placeholder' => 'Ex. : Paris, Petite couronne, Sud francilien…',
+                        ],
+                        'required' => true,
+                        'error_bubbling' => false,
+                    ]);
+                }
+
+                if ($form->has('newVisit')) {
+                    $form->remove('newVisit');
+                    $form->add('newVisit', SpaceVisitType::class, [
+                        'label' => 'Ajouter une visite',
+                        'mapped' => false,
+                        'data' => new SpaceVisit(),
+                        'required' => false,
+                        'validation_groups' => false,
+                        'multi_location' => true,
+                        'space' => $data,
+                    ]);
+                }
+            } else {
+                if ($form->has('locations')) {
+                    $form->remove('locations');
+                }
+            }
+
+            if (!$data instanceof Space) {
+                return;
+            }
 
             $currentAttributes = $data->getTags()->map(function ($spaceAttribute) {
                 return $spaceAttribute->getAttribute();
@@ -186,6 +240,14 @@ class SpaceType extends AbstractType
              * @var Space $space
              */
             $space = $event->getData();
+
+            if ($space instanceof Space && $space->isMultiLocation()) {
+                $order = 0;
+                foreach ($space->getLocations() as $location) {
+                    $location->setSpace($space);
+                    $location->setDisplayOrder($order++);
+                }
+            }
 
             // Handles new image (only when a file was uploaded)
             $newImage = $event->getForm()->get('pics')->getData();
@@ -256,11 +318,16 @@ class SpaceType extends AbstractType
             'constraints' => new \Symfony\Component\Validator\Constraints\Valid(),
             'validation_groups' => function (FormInterface $form) {
                 $publish = $form->has('publish') ? $form->get('publish') : null;
-                if ($publish instanceof ClickableInterface && $publish->isClicked()) {
-                    return ['save'];
+                $groups = ($publish instanceof ClickableInterface && $publish->isClicked()) ? ['save'] : ['draft'];
+
+                $space = $form->getData();
+                if ($space instanceof Space && $space->isMultiLocation()) {
+                    $groups[] = 'multi_location';
+                } else {
+                    $groups[] = 'standard';
                 }
 
-                return ['draft'];
+                return $groups;
             }
         ]);
     }

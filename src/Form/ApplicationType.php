@@ -6,6 +6,7 @@ namespace App\Form;
 use App\Entity\Application;
 use App\Entity\ApplicationFile;
 use App\Entity\Category;
+use App\Entity\Space;
 use App\Entity\User;
 use App\Form\ProjectOwnerType;
 use App\Form\ApplicationFileType;
@@ -140,19 +141,21 @@ class ApplicationType extends AbstractType
                 'placeholder' => 'Catégorie',
                 'attr' => ['placeholder' => 'Catégorie', 'class' => 'form-control input-box'],
                 'query_builder' => function (EntityRepository $repo) use ($application) {
-                    // Contexte ERP : déterminé par l'espace associé à la candidature.
+                    $space = ($application instanceof Application) ? $application->getSpace() : null;
+
+                    // AAC multi-lieux : tous les types d'usage actifs (y compris ERP).
+                    $showAllUsageTypes = $space instanceof Space && $space->isMultiLocation();
+
                     $spaceIsErp = false;
-                    if ($application instanceof Application && $application->getSpace() && method_exists($application->getSpace(), 'getIsErp')) {
-                        $spaceIsErp = (bool) $application->getSpace()->getIsErp();
+                    if (!$showAllUsageTypes && $space instanceof Space && method_exists($space, 'getIsErp')) {
+                        $spaceIsErp = (bool) $space->getIsErp();
                     }
 
-                    // Base : uniquement les types d'usage actifs.
-                    // Si le lieu n'est pas ERP, on masque aussi les types réservés aux ERP.
                     $qb = $repo->createQueryBuilder('c')
                         ->where('c.isActive = :active')
                         ->setParameter('active', true);
 
-                    if (!$spaceIsErp) {
+                    if (!$showAllUsageTypes && !$spaceIsErp) {
                         $qb->andWhere('c.requiresErp = :notErp')
                            ->setParameter('notErp', false);
                     }

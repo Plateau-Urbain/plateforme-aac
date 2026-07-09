@@ -68,7 +68,7 @@
        <h6><a href="{{ path('search_index') }}" class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Tous les appels à candidatures</a></h6>
     <div class="content ">
       <h6>en bref</h6>
-      <p class="pu-label">Commune&nbsp;: {{ space.city }} ({{ space.zipCode|slice(0,2)}})</p>
+      <p class="pu-label">Commune&nbsp;: {{ space.displayCity|default(space.city) }}{% if not space.isMultiLocation and space.displayZipCode|default(space.zipCode) %} ({{ (space.displayZipCode|default(space.zipCode))|slice(0,2) }}){% endif %}</p>
       <p class="pu-label">Type de locaux&nbsp;: {{ space.type }}</p>
        <p class="pu-label">Bailleur&nbsp;: {% if space.owner %}
         {% if space.owner.website %}
@@ -115,10 +115,15 @@
   
 
     <div class="pu-apply-zone">
+      {% if space.isMultiLocation %}
+      <p class="center">Candidatures ouvertes</p>
+      <h5 class="center apply-date-show">Sans date limite</h5>
+      {% else %}
       <p class="center">Date limite de candidature</p>
       <h5 class="center apply-date-show">
         {{ space.limitAvailability|localizeddate('long', 'none', 'fr') }} à {{ space.limitAvailability|date('H') }}h{{ space.limitAvailability|date('i') }}
       </h5>
+      {% endif %}
       <p class="center">
         {% if not space.isEnabled() %}
           <a href="{{ path('space_manager_edit', { 'id': space.id }) }}" class="btn btn-line-19">
@@ -248,6 +253,14 @@
       <p>{{ space.activityDescription | raw }}</p>
     </div>
 
+    {% if space.isMultiLocation and space.locations|length > 0 %}
+    <h4>Lieux proposés</h4>
+    <div class="pu-col-container content-block">
+        <p class="text-muted aac-map-hint"><i class="fa fa-map-marker"></i> Cliquez sur un repère pour afficher le détail du lieu.</p>
+        <div id="aac-locations-map"></div>
+    </div>
+    {% endif %}
+
     {% if space.visits | length %}
     <h4>
       Dates et horaires des visites prévues
@@ -256,7 +269,13 @@
       <p>À la clôture de l’AAC vous recevrez un mail pour vous inscrire à l’une de nos visites (la visite du site est obligatoire).</p>
       <ul class="property-amenities-list">
         {% for v in space.visits %}
-          <li><i class="fa fa-calendar" aria-hidden="true" style="margin-right:8px;"></i> {{ v.visitDate|date('d/m/Y') }} de {{ v.startTime|date('H:i') }} à {{ v.endTime|date('H:i') }}</li>
+          <li>
+            <i class="fa fa-calendar" aria-hidden="true" style="margin-right:8px;"></i>
+            {% if space.isMultiLocation and v.location %}
+              <strong>{{ v.location.name }}</strong> —
+            {% endif %}
+            {{ v.visitDate|date('d/m/Y') }} de {{ v.startTime|date('H:i') }} à {{ v.endTime|date('H:i') }}
+          </li>
         {% endfor %}
       </ul>
     </div>
@@ -502,7 +521,79 @@
             #spaceCarousel .item img { height: 220px; }
             .pu-gallery-thumb { width: 60px; height: 42px; }
         }
+
+        .aac-location-suspended {
+            opacity: 0.85;
+        }
+        .aac-map-hint {
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        #aac-locations-map {
+            height: 420px;
+            margin-bottom: 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f5f5f5;
+        }
+        #aac-locations-map .leaflet-container {
+            height: 100%;
+            width: 100%;
+            border-radius: 4px;
+        }
+        #aac-locations-map .leaflet-popup-content {
+            margin: 14px 18px;
+            line-height: 1.4;
+            min-width: 200px;
+            max-width: 320px;
+        }
+        #aac-locations-map .aac-map-popup-name {
+            display: block;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1C244B;
+            margin-bottom: 4px;
+        }
+        #aac-locations-map .aac-map-popup-address {
+            display: block;
+            font-size: 14px;
+            color: #666;
+        }
+        #aac-locations-map .aac-map-popup-description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+        #aac-locations-map .aac-map-popup-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 3px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            background: #eee;
+            border-radius: 3px;
+        }
+        #aac-locations-map .aac-map-popup-suspended {
+            margin-top: 12px;
+            padding: 8px 10px;
+            font-size: 13px;
+            color: #8a6d3b;
+            background: #fcf8e3;
+            border: 1px solid #faebcc;
+            border-radius: 4px;
+        }
     </style>
+    {% if space.isMultiLocation and space.locations|length > 0 %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    {% if space.isMultiLocation and space.locations|length > 0 %}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    {% endif %}
     <script>
         $(document).ready(function () {
             /* Sync vignettes → carousel */
@@ -517,6 +608,131 @@
                 var idx = active.index();
                 $('.pu-gallery-thumb').removeClass('active').eq(idx).addClass('active');
             });
+
+            {% if space.isMultiLocation and space.locations|length > 0 %}
+            initAacLocationsMap();
+            {% endif %}
         });
+
+        {% if space.isMultiLocation and space.locations|length > 0 %}
+        function initAacLocationsMap() {
+            var mapEl = document.getElementById('aac-locations-map');
+            if (typeof L === 'undefined' || !mapEl) {
+                return;
+            }
+
+            var locations = [
+                {% for location in space.locations %}
+                {
+                    name: {{ location.name|json_encode|raw }},
+                    lat: {{ location.latitude ?? 'null' }},
+                    lng: {{ location.longitude ?? 'null' }},
+                    address: {{ location.address|default('')|json_encode|raw }},
+                    zipCode: {{ location.zipCode|default('')|json_encode|raw }},
+                    city: {{ location.city|default('')|json_encode|raw }},
+                    fullAddress: {{ location.fullAddress|json_encode|raw }},
+                    description: {{ location.description|default('')|json_encode|raw }},
+                    isErp: {{ location.isErp ? 'true' : 'false' }},
+                    suspended: {{ location.suspended ? 'true' : 'false' }},
+                    suspensionMessage: {{ location.suspensionMessage|default('')|json_encode|raw }}
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            var map = L.map(mapEl).setView([46.6, 2.4], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            var bounds = [];
+            var pending = 0;
+
+            function escapeHtml(text) {
+                var div = document.createElement('div');
+                div.textContent = text || 'Lieu';
+                return div.innerHTML;
+            }
+
+            function formatMultiline(text) {
+                return escapeHtml(text).replace(/\n/g, '<br>');
+            }
+
+            function buildPopupContent(loc) {
+                var html = '<span class="aac-map-popup-name">' + escapeHtml(loc.name) + '</span>';
+
+                if (loc.fullAddress) {
+                    html += '<span class="aac-map-popup-address">' + escapeHtml(loc.fullAddress) + '</span>';
+                }
+
+                if (loc.description) {
+                    html += '<div class="aac-map-popup-description">' + formatMultiline(loc.description) + '</div>';
+                }
+
+                if (loc.isErp) {
+                    html += '<span class="aac-map-popup-badge">ERP</span>';
+                }
+
+                if (loc.suspended && loc.suspensionMessage) {
+                    html += '<div class="aac-map-popup-suspended"><i class="fa fa-pause-circle"></i> ' + formatMultiline(loc.suspensionMessage) + '</div>';
+                }
+
+                return html;
+            }
+
+            function addMarker(loc, lat, lng) {
+                var marker = L.marker([lat, lng], {
+                    opacity: loc.suspended ? 0.5 : 1
+                }).addTo(map);
+                marker.bindPopup(buildPopupContent(loc), { maxWidth: 340 });
+                bounds.push([lat, lng]);
+            }
+
+            function finalizeMap() {
+                if (bounds.length === 1) {
+                    map.setView(bounds[0], 14);
+                } else if (bounds.length > 1) {
+                    map.fitBounds(bounds, { padding: [30, 30] });
+                }
+                setTimeout(function () { map.invalidateSize(); }, 200);
+            }
+
+            locations.forEach(function (loc) {
+                if (loc.lat !== null && loc.lng !== null && !isNaN(loc.lat) && !isNaN(loc.lng)) {
+                    addMarker(loc, loc.lat, loc.lng);
+                    return;
+                }
+
+                if (!loc.city && !loc.zipCode && !loc.address) {
+                    return;
+                }
+
+                pending++;
+                $.ajax({
+                    url: '{{ path('api_geocode') }}',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        address: loc.address,
+                        zipCode: loc.zipCode,
+                        city: loc.city
+                    })
+                }).done(function (data) {
+                    if (data.lat && data.lng) {
+                        addMarker(loc, data.lat, data.lng);
+                    }
+                }).always(function () {
+                    pending--;
+                    if (pending === 0) {
+                        finalizeMap();
+                    }
+                });
+            });
+
+            if (pending === 0) {
+                finalizeMap();
+            }
+        }
+        {% endif %}
     </script>
 {% endblock %}

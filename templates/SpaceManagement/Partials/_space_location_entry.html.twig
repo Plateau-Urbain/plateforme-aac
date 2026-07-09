@@ -1,0 +1,80 @@
+<div class="panel-heading clearfix">
+    <strong>Lieu <span class="js-location-number">{{ index + 1 }}</span></strong>
+    <button type="button" class="btn btn-xs btn-danger pull-right js-remove-location" title="Supprimer ce lieu">
+        <i class="fa fa-times"></i> Supprimer
+    </button>
+</div>
+<div class="panel-body">
+    <div class="row">
+        <div class="col-md-6 form-group{% if not locationForm.name.vars.valid %} has-error{% endif %}">
+            {{ form_label(locationForm.name) }}
+            {{ form_widget(locationForm.name) }}
+            {{ form_errors(locationForm.name) }}
+        </div>
+        <div class="col-md-6 form-group{% if not locationForm.address.vars.valid %} has-error{% endif %}">
+            {{ form_label(locationForm.address) }}
+            {{ form_widget(locationForm.address) }}
+            {{ form_errors(locationForm.address) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 form-group{% if not locationForm.zipCode.vars.valid %} has-error{% endif %}">
+            {{ form_label(locationForm.zipCode) }}
+            {{ form_widget(locationForm.zipCode) }}
+            {{ form_errors(locationForm.zipCode) }}
+        </div>
+        <div class="col-md-4 form-group{% if not locationForm.city.vars.valid %} has-error{% endif %}">
+            {{ form_label(locationForm.city) }}
+            {{ form_widget(locationForm.city) }}
+            {{ form_errors(locationForm.city) }}
+        </div>
+        <div class="col-md-4 form-group">
+            <label>&nbsp;</label>
+            <button type="button" class="btn btn-default btn-block js-geocode-location">
+                <i class="fa fa-map-marker"></i> Géolocaliser
+            </button>
+        </div>
+    </div>
+
+    {{ form_widget(locationForm.latitude) }}
+    {{ form_widget(locationForm.longitude) }}
+    {{ form_widget(locationForm.displayOrder) }}
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="location-map js-location-map" style="height: 220px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 4px;"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 form-group{% if not locationForm.description.vars.valid %} has-error{% endif %}">
+            {{ form_label(locationForm.description) }}
+            {{ form_widget(locationForm.description) }}
+            {{ form_errors(locationForm.description) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 form-group">
+            <div class="alert alert-info" role="alert" style="margin-top: 0; margin-bottom: 8px; padding: 8px 12px; font-size: 13px;">
+                <strong>ERP :</strong> cochez si ce lieu est un Établissement Recevant du Public.
+            </div>
+            {{ form_row(locationForm.isErp) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 form-group">
+            {{ form_row(locationForm.suspended) }}
+        </div>
+    </div>
+
+    <div class="row js-suspension-message-row"{% if not locationForm.vars.data or not locationForm.vars.data.suspended %} style="display:none;"{% endif %}>
+        <div class="col-sm-12 form-group{% if not locationForm.suspensionMessage.vars.valid %} has-error{% endif %}">
+            {{ form_label(locationForm.suspensionMessage) }}
+            {{ form_widget(locationForm.suspensionMessage) }}
+            {{ form_errors(locationForm.suspensionMessage) }}
+        </div>
+    </div>
+</div>

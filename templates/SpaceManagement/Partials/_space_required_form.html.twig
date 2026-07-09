@@ -1,7 +1,17 @@
-{% if space.getDocs('document_aac') | length == 0 and form.doc_aac.vars.errors | length %}
-    <div class="space-doc-error has-error">
+{% if space.getDocs('document_aac') | length == 0 %}
+    {% if form.doc_aac is defined and form.doc_aac.vars.errors | length %}
+    <div class="space-doc-error alert alert-danger has-error" role="alert">
         {% for error in form.doc_aac.vars.errors %}{{ error.message }}{% endfor %}
     </div>
+    {% elseif form.vars.submitted and not form.vars.valid %}
+        {% for error in form.vars.errors %}
+            {% if 'appel à candidature' in error.message|lower %}
+            <div class="space-doc-error alert alert-danger has-error" role="alert">
+                <strong>Document d'appel à candidature :</strong> {{ error.message }}
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 {% endif %}
 {% if space.getDocs('document_plan') | length == 0 and form.doc_plan.vars.errors | length %}
     <div class="space-doc-error has-error">

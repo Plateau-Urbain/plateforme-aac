@@ -207,11 +207,13 @@
   }
   
   .visits-table td[data-label="Date"]:before { content: "Date :"; }
+  .visits-table td[data-label="Lieu"]:before { content: "Lieu :"; }
   .visits-table td[data-label="Heure de début"]:before { content: "Début :"; }
   .visits-table td[data-label="Heure de fin"]:before { content: "Fin :"; }
   .visits-table td[data-label="Actions"]:before { content: "Actions :"; }
   
   .add-visit-table td[data-label="Date de visite"]:before { content: "Date :"; }
+  .add-visit-table td[data-label="Lieu"]:before { content: "Lieu :"; }
   .add-visit-table td[data-label="Heure de début"]:before { content: "Début :"; }
   .add-visit-table td[data-label="Heure de fin"]:before { content: "Fin :"; }
   .add-visit-table td[data-label="Action"]:before { content: "Action :"; }
@@ -247,6 +249,9 @@
 }
 </style>
 
+{% set is_multi_location = is_multi_location|default(false) %}
+{% set visits_colspan = is_multi_location ? 5 : 4 %}
+
 <div class="visits-section">
   <!-- En-tête principal -->
   <div class="visits-header">
@@ -258,6 +263,7 @@
     <thead>
       <tr>
         <th>Date</th>
+        {% if is_multi_location %}<th>Lieu</th>{% endif %}
         <th>Heure de début</th>
         <th>Heure de fin</th>
         <th>Actions</th>
@@ -268,6 +274,9 @@
           {% if visit.id is not empty %}
               <tr>
                   <td data-label="Date">{{ visit.visitDate|date('d/m/Y') }}</td>
+                  {% if is_multi_location %}
+                  <td data-label="Lieu">{{ visit.location ? visit.location.name : '—' }}</td>
+                  {% endif %}
                   <td data-label="Heure de début">{{ visit.startTime|date('H:i') }}</td>
                   <td data-label="Heure de fin">{{ visit.endTime|date('H:i') }}</td>
                   <td data-label="Actions">
@@ -283,7 +292,7 @@
           {% endif %}
       {% else %}
           <tr>
-              <td colspan="4" class="no-visits-cell">
+              <td colspan="{{ visits_colspan }}" class="no-visits-cell">
                   Pas de visites
               </td>
           </tr>
@@ -304,6 +313,7 @@
     <thead>
       <tr>
         <th>Date de visite</th>
+        {% if is_multi_location %}<th>Lieu</th>{% endif %}
         <th>Heure de début</th>
         <th>Heure de fin</th>
         <th>Action</th>
@@ -317,6 +327,14 @@
             {{ form_errors(form.visitDate) }}
           </div>
         </td>
+        {% if is_multi_location and form.location is defined %}
+        <td data-label="Lieu">
+          <div class="form-field">
+            {{ form_widget(form.location, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.location) }}
+          </div>
+        </td>
+        {% endif %}
         <td data-label="Heure de début">
           <div class="form-field">
             {{ form_widget(form.startTime, {'attr': {'class': 'form-control'}}) }}

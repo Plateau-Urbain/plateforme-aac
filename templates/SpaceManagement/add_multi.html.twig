@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block breadcrumb_items %}
+    <li><a href="{{ path('security_profil') }}">Mon compte</a></li>
+    <li><span>Ajouter un AAC multi-lieux</span></li>
+{% endblock %}
+
+{% block body %}
+<div id="js-form-space">
+    {% include "SpaceManagement/Partials/edit_spaces_multi_location.html.twig" with {'form': form, 'space': space} %}
+</div>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script>
+        window.spaceLocationsConfig = { geocodeUrl: '{{ path('api_geocode') }}' };
+    </script>
+    <script src="{{ asset('bundles/app/js/space.js') }}"></script>
+    <script src="{{ asset('bundles/app/js/space_locations.js') }}"></script>
+{% endblock %}

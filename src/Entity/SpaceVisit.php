@@ -42,6 +42,10 @@ class SpaceVisit
     #[ORM\JoinColumn(name: 'space_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private $space;
 
+    #[ORM\ManyToOne(targetEntity: SpaceLocation::class)]
+    #[ORM\JoinColumn(name: 'location_id', referencedColumnName: 'id', onDelete: 'SET NULL', nullable: true)]
+    private ?SpaceLocation $location = null;
+
     /**
      * @return int
      */
@@ -120,6 +124,18 @@ class SpaceVisit
     public function getSpace()
     {
         return $this->space;
+    }
+
+    public function getLocation(): ?SpaceLocation
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?SpaceLocation $location): self
+    {
+        $this->location = $location;
+
+        return $this;
     }
 }
 

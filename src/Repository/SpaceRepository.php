@@ -50,7 +50,14 @@ class SpaceRepository extends ServiceEntityRepository
             $qb->andWhere('s.enabled = :enabled')->setParameter('enabled', $params['enabled']);
             $qb->andWhere('s.submitted = :submitted')->setParameter('submitted', true);
             $qb->andWhere('s.closed = :closed')->setParameter('closed', false);
-            $qb->andWhere('s.limitAvailability >= :limitAvailability')->setParameter('limitAvailability', new \DateTime('today'));
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    's.workflowType = :multiLocationWorkflow',
+                    's.limitAvailability >= :limitAvailability'
+                )
+            )
+                ->setParameter('multiLocationWorkflow', Space::WORKFLOW_MULTI_LOCATION)
+                ->setParameter('limitAvailability', new \DateTime('today'));
         }
 
         if (!empty($params['submitted'])) {
@@ -58,11 +65,29 @@ class SpaceRepository extends ServiceEntityRepository
         }
 
         if (isset($params['closed'])) {
-            $qb->andWhere('s.closed = :closed OR s.limitAvailability < :limitAvailability')->setParameter('closed', $params['closed'])->setParameter('limitAvailability', new \DateTime('today'));
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    's.closed = :closed',
+                    $qb->expr()->andX(
+                        's.workflowType != :multiLocationClosed',
+                        's.limitAvailability < :limitAvailability'
+                    )
+                )
+            )
+                ->setParameter('closed', $params['closed'])
+                ->setParameter('multiLocationClosed', Space::WORKFLOW_MULTI_LOCATION)
+                ->setParameter('limitAvailability', new \DateTime('today'));
         }
 
         if (!empty($params['limitAvailability'])) {
-            $qb->andWhere('s.limitAvailability >= :limitAvailability')->setParameter('limitAvailability', $params['limitAvailability']);
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    's.workflowType = :multiLocationOpen',
+                    's.limitAvailability >= :limitAvailability'
+                )
+            )
+                ->setParameter('multiLocationOpen', Space::WORKFLOW_MULTI_LOCATION)
+                ->setParameter('limitAvailability', $params['limitAvailability']);
         }
 
         if (!empty($params['zipCode'])) {
@@ -92,7 +117,18 @@ class SpaceRepository extends ServiceEntityRepository
         if (!empty($params['unavailable'])) {
             $qb->andWhere('s.enabled = :enabled')->setParameter('enabled', true);
             $qb->andWhere('s.submitted = :submitted')->setParameter('submitted', true);
-            $qb->andWhere('s.closed = :closed OR s.limitAvailability < :limitAvailability')->setParameter('closed', true)->setParameter('limitAvailability', new \DateTime('today'));
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    's.closed = :closed',
+                    $qb->expr()->andX(
+                        's.workflowType != :multiLocationUnavailable',
+                        's.limitAvailability < :limitAvailability'
+                    )
+                )
+            )
+                ->setParameter('closed', true)
+                ->setParameter('multiLocationUnavailable', Space::WORKFLOW_MULTI_LOCATION)
+                ->setParameter('limitAvailability', new \DateTime('today'));
         }
 
         if (!empty($params['orderBy'])) {

@@ -1,0 +1,79 @@
+<div class="space-locations-section" id="space-locations-section">
+    <div class="alert alert-info" role="alert">
+        <strong>AAC multi-lieux :</strong> ajoutez les lieux proposés aux candidats.
+        Vous pouvez suspendre un lieu et afficher un message si plus aucune disponibilité n'est proposée.
+        Cet appel reste ouvert sans date limite jusqu'à clôture manuelle.
+    </div>
+
+    {% set prototype %}
+        <div class="panel-heading clearfix">
+            <strong>Lieu <span class="js-location-number">__number__</span></strong>
+            <button type="button" class="btn btn-xs btn-danger pull-right js-remove-location" title="Supprimer ce lieu">
+                <i class="fa fa-times"></i> Supprimer
+            </button>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6 form-group">{{ form_row(form.locations.vars.prototype.name) }}</div>
+                <div class="col-md-6 form-group">{{ form_row(form.locations.vars.prototype.address) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 form-group">{{ form_row(form.locations.vars.prototype.zipCode) }}</div>
+                <div class="col-md-4 form-group">{{ form_row(form.locations.vars.prototype.city) }}</div>
+                <div class="col-md-4 form-group">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn btn-default btn-block js-geocode-location">
+                        <i class="fa fa-map-marker"></i> Géolocaliser
+                    </button>
+                </div>
+            </div>
+            {{ form_widget(form.locations.vars.prototype.latitude) }}
+            {{ form_widget(form.locations.vars.prototype.longitude) }}
+            {{ form_widget(form.locations.vars.prototype.displayOrder) }}
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="location-map js-location-map" style="height: 220px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 4px;"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 form-group">{{ form_row(form.locations.vars.prototype.description) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 form-group">{{ form_row(form.locations.vars.prototype.isErp) }}</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 form-group">{{ form_row(form.locations.vars.prototype.suspended) }}</div>
+            </div>
+            <div class="row js-suspension-message-row" style="display:none;">
+                <div class="col-sm-12 form-group">{{ form_row(form.locations.vars.prototype.suspensionMessage) }}</div>
+            </div>
+        </div>
+    {% endset %}
+
+    <div class="locations-collection"
+         id="locations-collection"
+         data-prototype="{{ prototype|e('html_attr') }}"
+         data-index="{{ form.locations|length }}">
+
+        {% for locationForm in form.locations %}
+            <div class="location-item panel panel-default{% if not locationForm.vars.valid %} has-error-location{% endif %}" data-location-index="{{ loop.index0 }}">
+                {% include 'SpaceManagement/Partials/_space_location_entry.html.twig' with {
+                    'locationForm': locationForm,
+                    'index': loop.index0
+                } %}
+            </div>
+        {% else %}
+            <p class="text-muted js-no-locations-msg">Aucun lieu ajouté pour le moment.</p>
+        {% endfor %}
+    </div>
+
+    {{ form_errors(form.locations) }}
+
+    <div class="row" style="margin-top: 15px;">
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-line-s" id="js-add-location">
+                + Ajouter un lieu
+            </button>
+        </div>
+    </div>
+</div>

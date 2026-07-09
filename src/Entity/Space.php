@@ -22,6 +22,10 @@ class Space implements \Stringable
 {
     const MAX_PICTURES_UPLOAD = 20;
 
+    public const WORKFLOW_STANDARD = 'standard';
+
+    public const WORKFLOW_MULTI_LOCATION = 'multi_location';
+
     /**
      * @var int
      */
@@ -97,16 +101,16 @@ class Space implements \Stringable
      *
      */
     #[ORM\Column(name: 'zip_code', type: 'string', length: 255, nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
-    #[Assert\Length(max: 5, min: 5, minMessage: 'Code postal invalide', maxMessage: 'Code postal invalide', groups: ['draft', 'save'])]
-    #[Assert\Regex(pattern: '/[0-9]{2}[0-9]{3}/', message: 'Code postal invalide', groups: ['draft', 'save'])]
+    #[Assert\NotBlank(groups: ['standard'])]
+    #[Assert\Length(max: 5, min: 5, minMessage: 'Code postal invalide', maxMessage: 'Code postal invalide', groups: ['draft', 'standard'])]
+    #[Assert\Regex(pattern: '/[0-9]{2}[0-9]{3}/', message: 'Code postal invalide', groups: ['draft', 'standard'])]
     private $zipCode;
 
     /**
      * @var string
      */
     #[ORM\Column(name: 'city', type: 'string', length: 255, nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
+    #[Assert\NotBlank(groups: ['standard', 'multi_location'])]
     private $city;
 
     /**
@@ -126,8 +130,15 @@ class Space implements \Stringable
      * @var \DateTime
      */
     #[ORM\Column(name: 'limitAvailability', type: 'datetime', nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
+    #[Assert\NotBlank(groups: ['standard'])]
     private $limitAvailability;
+
+    #[ORM\Column(name: 'workflow_type', type: 'string', length: 30, options: ['default' => 'standard'])]
+    private string $workflowType = self::WORKFLOW_STANDARD;
+
+    #[ORM\OneToMany(targetEntity: SpaceLocation::class, mappedBy: 'space', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['displayOrder' => 'ASC', 'id' => 'ASC'])]
+    private $locations;
 
     /**
      * @var string
@@ -207,21 +218,21 @@ class Space implements \Stringable
      * @var int
      */
     #[ORM\Column(name: 'nb_spaces', type: 'integer', nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
+    #[Assert\NotBlank(groups: ['standard'])]
     private $nbSpaces;
 
     /**
      * @var int
      */
     #[ORM\Column(name: 'min_space', type: 'integer', nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
+    #[Assert\NotBlank(groups: ['standard'])]
     private $minSpace;
 
     /**
      * @var int
      */
     #[ORM\Column(name: 'max_space', type: 'integer', nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
+    #[Assert\NotBlank(groups: ['standard'])]
     private $maxSpace;
 
     /**
@@ -274,6 +285,7 @@ class Space implements \Stringable
         $this->tags = new ArrayCollection();
         $this->documents = new ArrayCollection();
         $this->visits = new ArrayCollection();
+        $this->locations = new ArrayCollection();
     }
     /**
      * Get id.
@@ -767,12 +779,103 @@ class Space implements \Stringable
         if ($this->closed) {
             return true;
         }
+        if ($this->isMultiLocation()) {
+            return false;
+        }
         $limit = $this->getLimitAvailability();
         if ($limit !== null && $limit < new \DateTime('today')) {
             return true;
         }
 
         return false;
+    }
+
+    public function getWorkflowType(): string
+    {
+        return $this->workflowType;
+    }
+
+    public function setWorkflowType(string $workflowType): self
+    {
+        $this->workflowType = $workflowType;
+
+        return $this;
+    }
+
+    public function isMultiLocation(): bool
+    {
+        return $this->workflowType === self::WORKFLOW_MULTI_LOCATION;
+    }
+
+    public function getListingCardClass(): string
+    {
+        if ($this->isMultiLocation()) {
+            return 'space-card--multi-location';
+        }
+
+        return $this->isProposedByAdmin() ? 'space-card--by-admin' : 'space-card--by-proprio';
+    }
+
+    /**
+     * @return ArrayCollection<int, SpaceLocation>
+     */
+    public function getLocations()
+    {
+        return $this->locations;
+    }
+
+    public function addLocation(SpaceLocation $location): self
+    {
+        if (!$this->locations->contains($location)) {
+            $location->setSpace($this);
+            $this->locations->add($location);
+            $this->setUpdated(new \DateTime());
+        }
+
+        return $this;
+    }
+
+    public function removeLocation(SpaceLocation $location): void
+    {
+        if ($this->locations->removeElement($location)) {
+            $this->setUpdated(new \DateTime());
+        }
+    }
+
+    /**
+     * @return SpaceLocation[]
+     */
+    public function getActiveLocations(): array
+    {
+        return $this->locations->filter(static fn (SpaceLocation $location) => !$location->isSuspended())->toArray();
+    }
+
+    public function getDisplayCity(): ?string
+    {
+        if ($this->isMultiLocation()) {
+            return $this->city ?: null;
+        }
+
+        if ($this->city) {
+            return $this->city;
+        }
+        $first = $this->locations->first();
+
+        return $first instanceof SpaceLocation ? $first->getCity() : null;
+    }
+
+    public function getDisplayZipCode(): ?string
+    {
+        if ($this->isMultiLocation()) {
+            return $this->zipCode ?: null;
+        }
+
+        if ($this->zipCode) {
+            return $this->zipCode;
+        }
+        $first = $this->locations->first();
+
+        return $first instanceof SpaceLocation ? $first->getZipCode() : null;
     }
 
     /**
@@ -1068,7 +1171,11 @@ class Space implements \Stringable
      * @return string
      */
     public function getDepCode() {
-        return substr($this->zipCode, 0, 2);
+        $zipCode = $this->getDisplayZipCode();
+        if (!$zipCode) {
+            return '';
+        }
+        return substr($zipCode, 0, 2);
     }
 
     #[Assert\Callback(groups: ['save'])]
@@ -1406,6 +1513,27 @@ class Space implements \Stringable
         //             //->setParameter('{{ value }}', $invalidValue)
         //             ->addViolation();
         // }
+    }
+
+    #[Assert\Callback(groups: ['save'])]
+    public function validateMultiLocationLocations(ExecutionContextInterface $context): void
+    {
+        if (!$this->isMultiLocation()) {
+            return;
+        }
+
+        $activeLocations = 0;
+        foreach ($this->locations as $location) {
+            if ($location instanceof SpaceLocation && trim((string) $location->getName()) !== '') {
+                $activeLocations++;
+            }
+        }
+
+        if ($activeLocations < 1) {
+            $context->buildViolation('Au moins un lieu complet (nom, ville, code postal) est requis pour publier.')
+                ->atPath('locations')
+                ->addViolation();
+        }
     }
 
     /**

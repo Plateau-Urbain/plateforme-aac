@@ -10975,13 +10975,172 @@ div.dark_square #pp_full_res .pp_inline {
   margin-bottom: 40px;
 }
 
+#property-listing.management-list .application-space .space-card-side-link {
+  text-align: right !important;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  width: 100%;
+  padding-right: 15px;
+  box-sizing: border-box;
+}
+
+#property-listing.management-list .application-space .space-card-side-link p {
+  margin-bottom: 0;
+  text-align: right !important;
+  width: 100%;
+}
+
+#property-listing.management-list .application-space .space-card-side-link a.red {
+  display: inline-block;
+}
+
+#property-listing.management-list .application-space .space-card-location-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+#property-listing.management-list .application-space .space-card-location-row .ville {
+  margin-bottom: 0;
+  flex: 0 1 auto;
+}
+
+#property-listing.management-list .application-space .space-card-view-link {
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
+  text-align: right;
+}
+
+#property-listing.management-list .application-space .space-card-side-link--inline {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-right: 0;
+  width: auto;
+}
+
+#property-listing.management-list .application-space .space-card-top-row h5 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+#property-listing.management-list .application-space .space-card-size {
+  margin-bottom: 8px;
+}
+
+#property-listing.management-list .application-space .space-card-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+#property-listing.management-list .application-space .space-card-deadline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+#property-listing.management-list .application-space .space-card-deadline .apply-date {
+  width: auto;
+  flex: 1;
+  min-width: 0;
+  padding-left: 0;
+}
+
+#property-listing.management-list .application-space .space-card-actions.align-btn {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  text-align: right !important;
+  flex: 0 1 auto;
+  width: auto;
+  float: none;
+  margin-left: auto;
+}
+
+#property-listing.management-list .application-space .space-card-actions.align-btn form {
+  display: inline-block;
+  margin: 0;
+}
+
+#property-listing.management-list .application-space .space-card-actions.align-btn .btn {
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.application-space .space-card-territory {
+  color: #333;
+  font-size: 14px;
+  margin: -8px 0 12px;
+}
+
+#property-listing.management-list .application-space p.ville,
+#property-listing.management-list .application-space span.ville {
+  display: inline-block;
+  background: #fff;
+  color: #000;
+  padding: 2px 8px;
+  font-weight: 600;
+  border-radius: 2px;
+}
+
+@media (min-width: 768px) {
+  #property-listing.management-list .application-space .space-card-action-row {
+    flex-wrap: nowrap;
+  }
+}
+
 @media (max-width: 767px) {
-  .application-space .info .right {
+  #property-listing.management-list .application-space .space-card-side-link {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-top: 10px;
+  }
+
+  #property-listing.management-list .application-space .space-card-location-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  #property-listing.management-list .application-space .space-card-view-link {
+    margin-left: auto;
+    padding-right: 15px;
+  }
+
+  #property-listing.management-list .application-space .space-card-side-link--inline {
+    margin-left: auto;
+    padding-right: 15px;
+  }
+
+  #property-listing.management-list .application-space .block-content .space-card-side-link {
     margin-top: 15px;
   }
 
-  .application-space .block-content .right {
-    margin-top: 15px;
+  #property-listing.management-list .application-space .space-card-actions.align-btn {
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    box-sizing: border-box;
+    margin-top: 8px;
+  }
+
+  #property-listing.management-list .application-space .space-card-actions.align-btn .btn {
+    margin-bottom: 8px !important;
   }
 }
 
@@ -11558,6 +11717,70 @@ form .main .section-title {
 #property-listing .space_item_suspended.space-card--by-proprio .availability-overlay,
 #property-listing .space_item_suspended.space-card--by-proprio #overlay-suspended {
   background: rgba(242, 190, 106, 0.2) !important;
+}
+
+/* AAC multi-lieux (vert #69bd93) */
+#js-results .space_item.space-card--multi-location,
+#js-results .space_item_unavailable.space-card--multi-location {
+  background-color: #69bd93 !important;
+}
+
+#js-results .space_item.space-card--multi-location .availability-overlay,
+#js-results .space_item_unavailable.space-card--multi-location .availability-overlay {
+  background-color: #69bd93 !important;
+}
+
+#js-results .space_item.space-card--multi-location:hover,
+#js-results .space_item_unavailable.space-card--multi-location:hover {
+  background-color: rgba(105, 189, 147, 0.4) !important;
+}
+
+#property-listing .space_item.space-card--multi-location,
+#property-listing .space_item_unavailable.space-card--multi-location {
+  background-color: #69bd93 !important;
+}
+
+#property-listing .space_item.space-card--multi-location .availability-overlay,
+#property-listing .space_item_unavailable.space-card--multi-location .availability-overlay {
+  background-color: #69bd93 !important;
+}
+
+#property-listing .space_item.space-card--multi-location:hover,
+#property-listing .space_item_unavailable.space-card--multi-location:hover {
+  background-color: rgba(105, 189, 147, 0.4) !important;
+}
+
+#property-listing.management-list .space-card.space-card--multi-location {
+  background-color: #69bd93 !important;
+}
+
+#property-listing.management-list .space-card.space-card--multi-location:hover {
+  background-color: rgba(105, 189, 147, 0.6) !important;
+}
+
+#property-listing .space_item_suspended.space-card--multi-location {
+  background: rgba(105, 189, 147, 0.12) !important;
+}
+
+#property-listing .space_item_suspended.space-card--multi-location .foot-suspended {
+  background: rgba(105, 189, 147, 0.12) !important;
+}
+
+#property-listing .space_item_suspended.space-card--multi-location .availability-overlay,
+#property-listing .space_item_suspended.space-card--multi-location #overlay-suspended {
+  background: rgba(105, 189, 147, 0.2) !important;
+}
+
+.pu-multi-location-badge {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  z-index: 2;
+  background: rgba(105, 189, 147, 0.95);
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 3px;
 }
 
 /* Badge "Géré par Plateau Urbain" affiché en absolu sur les cartes admin */
@@ -13260,13 +13483,16 @@ input.form-save {
 /*page mes espaces et liste des aac*/
 .align-btn {
   display: flex;
-  justify-content: right;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
 }
 
 @media (min-width: 768px) {
   .align-btn {
-    display: block;
-    justify-content: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
   }
 
   .align-btn .btn {
