@@ -446,7 +446,7 @@
                         {# Erreurs des champs du formulaire (enfants, petits-enfants, arrière-petits-enfants) #}
                         {# Les champs rendus inline avec leur erreur sont exclus pour éviter le doublon #}
                         {% for child in form %}
-                            {% if child.vars.name not in ['contribution', 'companyStatus'] and child.vars.errors is defined and child.vars.errors|length > 0 %}
+                            {% if child.vars.name not in ['contribution', 'companyStatus', 'category'] and child.vars.errors is defined and child.vars.errors|length > 0 %}
                                 {% for error in child.vars.errors %}
                                     <div>{{ error.message }}</div>
                                 {% endfor %}
@@ -584,15 +584,16 @@
                                                 }) }}
                                             </div>
                                             <div class="col-sm-6 form-group{% if not form.category.vars.valid %} has-error{% endif %}">
-                                                {{ form_row(form.category, {
-                                                    'label_attr': {'class': 'required'},
-                                                    'placeholder': 'Sélectionner un type d\'usage',
+                                                {{ form_label(form.category, null, {'label_attr': {'class': 'required'}}) }}
+                                                {{ form_widget(form.category, {
                                                     'attr': {
-                                                        'class': 'form-control',
+                                                        'class': 'form-control input-box',
                                                         'required': 'required',
+                                                        'aria-required': 'true',
                                                         'data-error-message': 'Veuillez sélectionner un type d\'usage'
                                                     }
                                                 }) }}
+                                                {{ form_errors(form.category) }}
                                             </div>
 
                                         </div>
@@ -915,19 +916,6 @@
                 submitButton.addClass('disabled');
             }
             {% endif %}
-            
-            // Masquer les conteneurs Chosen pour le champ category
-            function hideChosenForCategory() {
-                const $native = $('#appbundle_application_category');
-                const $chosen = $('#appbundle_application_category_chosen, #appbundle_application_category_chzn, #appbundle_application_category + .chzn-container, #appbundle_application_category + .chosen-container');
-                if ($chosen.length) {
-                    $chosen.hide();
-                }
-                if ($native.length) {
-                    $native.show();
-                }
-            }
-            hideChosenForCategory();
             
             // Fonction de validation pour les champs - avec messages d'erreur en temps réel
             function validateField($field) {

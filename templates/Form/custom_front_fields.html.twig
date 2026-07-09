@@ -62,7 +62,7 @@
     <div class="sort">
         <ul>
         {% for childForm in form %}
-            <li>
+            <li class="{{ childForm.vars.checked ? 'active' : '' }}">
                 <label for="{{ childForm.vars.id }}" class="{{ childForm.vars.checked ? 'checked' : '' }}">
                     <i data-toggle="tooltip" data-placement="top" title="{{ childForm.vars.label }}" class="fa {{ childForm.vars.value == 'asc' ? 'fa-chevron-up' : 'fa-chevron-down' }}"></i>
                     <input type="radio" id="{{ childForm.vars.id }}" {{ childForm.vars.checked ? 'checked' : '' }} value="{{ childForm.vars.value }}" name="{{ childForm.vars.full_name }}" style="display: none;" />

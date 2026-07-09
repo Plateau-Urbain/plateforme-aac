@@ -140,8 +140,8 @@ class ApplicationType extends AbstractType
                 'class' => Category::class,
                 'label' => "Type d'usage",
                 'required' => true,
-                'placeholder' => 'Catégorie',
-                'attr' => ['placeholder' => 'Catégorie', 'class' => 'form-control input-box'],
+                'placeholder' => 'Sélectionnez un type d\'usage',
+                'attr' => ['class' => 'form-control input-box'],
                 'query_builder' => function (EntityRepository $repo) use ($application) {
                     $space = ($application instanceof Application) ? $application->getSpace() : null;
 

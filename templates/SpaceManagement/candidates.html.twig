@@ -9,22 +9,309 @@
 {% block stylesheets %}
     {{ parent() }}
 
-    <link rel="stylesheet" href="{{ asset('bundles/app/css/print.css') }}" type="text/css" media="print" />
-    
     <style>
         .selection-controls {
-            margin-top: 10px;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
         }
-        .selection-controls .btn {
-            margin-right: 5px;
-            margin-bottom: 5px;
+        .selection-controls__label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #5a7a5c;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .selection-btn-group {
+            display: inline-flex;
+            flex-wrap: wrap;
+            border: 1px solid #c5dcc6;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .selection-btn-group .btn {
+            margin: 0;
+            border: 0;
+            border-radius: 0;
+            border-right: 1px solid #c5dcc6;
+            padding: 5px 10px;
+            font-size: 12px;
+            line-height: 1.3;
+            background: #fff;
+            color: #444;
+        }
+        .selection-btn-group .btn:last-child {
+            border-right: 0;
+        }
+        .selection-btn-group .btn:hover {
+            background: #eef7ee;
+        }
+        .selection-controls .btn-preset.is-active {
+            background-color: #2e7d32;
+            border-color: #2e7d32;
+            color: #fff;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+        }
+        .selection-count-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2e7d32;
+            margin: 0;
+        }
+        .export-selection-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-rows: auto auto;
+            gap: 8px 16px;
+            align-items: center;
+        }
+        .export-selection-row__presets {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        .export-selection-row__status {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        .export-zip-wrap {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: stretch;
+            gap: 4px;
+            min-width: 210px;
+        }
+        #exportSelectedBtn {
+            white-space: nowrap;
+            width: 100%;
+        }
+        .export-zip-hint {
+            margin: 0;
+            font-size: 11px;
+            color: #888;
+            line-height: 1.3;
+            text-align: center;
+        }
+        .export-zip-hint.is-hidden {
+            display: none;
+        }
+        #exportSelectedBtn.is-empty {
+            opacity: 0.65;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+        .panel-export .export-help {
+            margin: 0 0 12px 0;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.45;
+        }
+        .panel-export .export-option {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            background: #fff;
+            border: 1px solid #d8ead9;
+            border-radius: 6px;
+        }
+        .panel-export .export-option:last-of-type {
+            margin-bottom: 0;
+        }
+        .panel-export .export-option__text {
+            flex: 1;
+            min-width: 220px;
+            font-size: 13px;
+            color: #444;
+            line-height: 1.4;
+        }
+        .panel-export .export-option__text strong {
+            display: block;
+            color: #2e7d32;
+            margin-bottom: 2px;
+        }
+        .panel-filters .filter-row-site {
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(160, 90, 8, 0.35);
+        }
+        .panel-filters .filter-row-site .small.section-label {
+            display: block;
+            font-weight: 700;
+            color: #a05a08;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.4px;
+        }
+        .ctrl-panel-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 0 -10px;
+        }
+        .ctrl-panel-row > .col-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 0 10px;
+        }
+        .toolbar-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 14px;
+            align-items: start;
+        }
+        .toolbar-grid__actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 0;
+        }
+        .toolbar-grid__filters {
+            min-width: 0;
+        }
+        .toolbar-grid__filters .ctrl-panel {
+            height: 100%;
+        }
+        .toolbar-grid__filters .filter-field {
+            margin-bottom: 8px;
+        }
+        .toolbar-grid .ctrl-panel {
+            margin-bottom: 0;
+            padding: 12px 14px;
+        }
+        .toolbar-grid .ctrl-panel h5 {
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        .toolbar-grid .ctrl-panel .toolbar-hint {
+            margin: -4px 0 10px 0;
+            font-size: 12px;
+            color: #777;
+            line-height: 1.35;
+        }
+        .toolbar-export-zone {
+            border: 1px solid #b8ddb9;
+            border-top: 4px solid #4CAF50;
+            background-color: #f3fbf3;
+            border-radius: 8px;
+            padding: 12px 14px;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.12);
+        }
+        .toolbar-export-zone__title {
+            margin: 0 0 12px 0;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toolbar-export-zone__block + .toolbar-export-zone__block {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(46, 125, 50, 0.28);
+        }
+        .toolbar-export-zone__subtitle {
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #388e3c;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .toolbar-export-zone .export-selection-row {
+            gap: 8px 16px;
+        }
+        .toolbar-export-zone .export-selection-row .selection-controls {
+            margin: 0;
+        }
+        @media (max-width: 640px) {
+            .export-selection-row {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .export-selection-row__presets,
+            .export-selection-row__status,
+            .export-zip-wrap {
+                grid-column: 1;
+                grid-row: auto;
+            }
+            .export-zip-wrap {
+                min-width: 0;
+            }
+        }
+        .toolbar-grid .export-compact,
+        .toolbar-export-zone .export-compact {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        .toolbar-grid .export-compact__text {
+            flex: 1;
+            min-width: 180px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.35;
+            margin: 0;
+        }
+        @media (max-width: 992px) {
+            .toolbar-grid {
+                grid-template-columns: 1fr;
+            }
+            .toolbar-grid__filters .ctrl-panel {
+                height: auto;
+            }
         }
         .exportCheck {
             margin: 4px -6px 0 !important;
         }
         #exportSelectedBtn:disabled {
-            opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .panel-filters .sort {
+            float: none !important;
+            height: auto;
+            margin-bottom: 0;
+        }
+        .panel-filters .sort ul {
+            margin: 0;
+        }
+        .panel-filters .sort ul > li i {
+            color: #adb2b6;
+            background: #fff;
+            border-color: #ccc;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .panel-filters .sort ul > li:hover i {
+            border-color: #2D74BA;
+            color: #2D74BA;
+        }
+        .panel-filters .sort label.checked i,
+        .panel-filters .sort ul > li.active i {
+            color: #fff;
+            background-color: #2D74BA;
+            border-color: #2D74BA;
+            box-shadow: 0 1px 3px rgba(45, 116, 186, 0.35);
         }
         .actions {
             padding: 10px;
@@ -32,48 +319,25 @@
         #secondChart {
             padding: 20px 0;
         }
-        /* Correction pour l'ouverture des selects */
-        #listing-header .row {
+        /* Correction pour l'ouverture des selects (toolbar filtres) */
+        #management-toolbar,
+        #management-toolbar .toolbar-grid,
+        #management-toolbar .toolbar-grid__actions,
+        #management-toolbar .toolbar-grid__filters,
+        #management-toolbar .ctrl-panel,
+        #management-toolbar form,
+        #management-toolbar .filter-field,
+        #management-toolbar .filter-row-site,
+        #management-toolbar .form-control-large,
+        #management-toolbar .toolbar-export-zone {
             overflow: visible !important;
+        }
+        /* Le chzn-drop doit sortir de tout contexte d'empilement — z-index très élevé */
+        #management-toolbar .chzn-drop {
+            z-index: 9999 !important;
+        }
+        #management-toolbar .chzn-container {
             position: relative;
-        }
-        #listing-header .form-control-small,
-        #listing-header .col-sm-6,
-        #listing-header .col-sm-4,
-        #listing-header .col-sm-2,
-        #listing-header .col-sm-12 {
-            overflow: visible !important;
-        }
-        /* Z-index élevé pour les dropdowns Chosen */
-        .chzn-container {
-            z-index: 999 !important;
-        }
-        .chzn-drop {
-            z-index: 10000 !important;
-        }
-        /* S'assurer que les selects peuvent s'ouvrir */
-        #listing-header {
-            overflow: visible !important;
-        }
-        /* Forcer l'overflow visible sur tous les conteneurs */
-        #listing-header form,
-        #listing-header .results-numbers {
-            overflow: visible !important;
-        }
-        /* Assurer que le dropdown peut dépasser */
-        .chzn-container,
-        .chzn-container .chzn-drop {
-            overflow: visible !important;
-        }
-        /* Pour les grands écrans, s'assurer que rien ne coupe le dropdown */
-        @media (min-width: 768px) {
-            #listing-header,
-            #listing-header * {
-                overflow: visible !important;
-            }
-            .chzn-drop {
-                max-height: none !important;
-            }
         }
         /* ===== Dashboard Charts Styles ===== */
         .chart-section {
@@ -263,23 +527,24 @@
             align-items: center;
             gap: 8px;
         }
-        .panel-export {
-            border-top: 3px solid #4CAF50;
-            background-color: #f9fff9;
-        }
-        .panel-export h5 { color: #2e7d32; }
         
-        .panel-actions {
-            border-top: 3px solid #2D74BA;
-            background-color: #f5f9ff;
+        .ctrl-panel.panel-actions {
+            border: 1px solid #b8cfe8;
+            border-top: 4px solid #2D74BA;
+            background-color: #f0f6ff;
+            box-shadow: 0 2px 8px rgba(45, 116, 186, 0.12);
         }
-        .panel-actions h5 { color: #1a548e; }
+        .ctrl-panel.panel-actions h5 { color: #1a548e; }
         
-        .panel-filters {
-            border-top: 3px solid #f0ad4e;
-            background-color: #fffdf5;
+        .ctrl-panel.panel-filters {
+            border: 1px solid #e8c36a;
+            border-top: 4px solid #e67e22;
+            background-color: #fff6e0;
+            box-shadow: 0 2px 8px rgba(230, 126, 34, 0.14);
         }
-        .panel-filters h5 { color: #8a6d3b; }
+        .ctrl-panel.panel-filters h5 {
+            color: #a05a08;
+        }
 
         .btn-toolbar {
             display: flex;
@@ -297,14 +562,7 @@
             flex: 1;
             min-width: 300px;
         }
-        
-        /* Print Optimization */
-        .print-header { display: none; }
-        @media print {
-            .print-header { display: block !important; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-        }
     </style>
-    {# Styles d'impression gérés par bundles/app/css/print.css #}
 {% endblock %}
 
 {% block body %}
@@ -539,94 +797,109 @@
       </div>
     </div>
 
-    <div id="management-toolbar">
-      <div class="row row-flex-panels">
-        <!-- 1. SECTION GESTION / ACTIONS GROUPÉES -->
-        <div class="col-panel">
-          <div class="ctrl-panel panel-actions" style="height: calc(100% - 20px);">
-            <h5><i class="fa fa-cogs"></i> Gestion des candidatures</h5>
-            <p class="small text-muted" style="margin-bottom: 3px;">
-              <i class="fa fa-info-circle"></i> Sélectionnez les candidat·es via les cases à cocher dans la liste ci-dessous.
-            </p>
-            <div style="display: flex; gap: 10px; align-items: flex-start;">
-              <div class="form-control-large" style="margin: 0; flex: 1;">
-                <select id="groupActionSelect" data-placeholder="Appliquer une action aux sélectionnés...">
-                  <option value=""> </option>
-                  <option value="accept">Accepter les candidatures</option>
-                  <option value="refuse">Refuser les candidatures</option>
-                </select>
-              </div>
-              <div class="btn-appli">
-                <a href="#accept_content" class="btn btn-line-19 btn-form" id="groupActionBtn" style="margin-top: 0;">Appliquer</a>
-              </div>
+    <div class="candidates-workspace">
+    <div id="management-toolbar" class="toolbar-grid">
+
+      <div class="toolbar-grid__actions">
+        <div class="ctrl-panel panel-actions">
+          <h5><i class="fa fa-cogs"></i> Actions groupées</h5>
+          <div style="display: flex; gap: 8px; align-items: flex-start;">
+            <div class="form-control-large" style="margin: 0; flex: 1;">
+              <select id="groupActionSelect" data-placeholder="Choisir une action...">
+                <option value=""> </option>
+                <option value="accept">Accepter les candidatures</option>
+                <option value="refuse">Refuser les candidatures</option>
+              </select>
+            </div>
+            <div class="btn-appli">
+              <a href="#accept_content" class="btn btn-line-19 btn-form" id="groupActionBtn" style="margin-top: 0;">Appliquer</a>
             </div>
           </div>
         </div>
 
-        <!-- 2. SECTION FILTRES ET TRI -->
-        <div class="col-panel">
-          <div class="ctrl-panel panel-filters" style="height: calc(100% - 20px);">
-            <h5><i class="fa fa-filter"></i> Filtres et Tri</h5>
-            {% form_theme filterForm 'Form/custom_front_fields.html.twig' %}
-            {{ form_start(filterForm, { 'attr': { 'data-submit': true } } ) }}
-            <div class="row">
-              <div class="col-xs-12 col-sm-4" style="margin-bottom: 5px;">
-                <label class="small">Statut :</label>
-                {{ form_widget(filterForm.status_filter) }}
+        <div class="toolbar-export-zone">
+          <h5 class="toolbar-export-zone__title"><i class="fa fa-download"></i> Export</h5>
+
+          <div class="toolbar-export-zone__block">
+            <h6 class="toolbar-export-zone__subtitle"><i class="fa fa-file-archive-o"></i> Dossier complet des candidatures cochées</h6>
+            <div class="export-selection-row">
+              <div class="export-selection-row__presets selection-controls">
+                <span class="selection-controls__label">Sélection</span>
+                <div class="selection-btn-group">
+                  <button type="button" class="btn btn-sm btn-line-16 btn-preset" id="selectAllBtn" data-preset="all" aria-pressed="false">
+                    <i class="fa fa-check-square-o"></i> Tout
+                  </button>
+                  <button type="button" class="btn btn-sm btn-line-16 btn-preset" id="selectNoneBtn" data-preset="none" aria-pressed="false">
+                    <i class="fa fa-square-o"></i> Aucun
+                  </button>
+                  <button type="button" class="btn btn-sm btn-line-16 btn-preset" id="selectAcceptedBtn" data-preset="accepted" aria-pressed="false">
+                    Acceptées
+                  </button>
+                  <button type="button" class="btn btn-sm btn-line-16 btn-preset" id="selectRejectedBtn" data-preset="rejected" aria-pressed="false">
+                    Refusées
+                  </button>
+                </div>
               </div>
-              <div class="col-xs-12 col-sm-5" style="margin-bottom: 5px;">
-                <label class="small">Trier par :</label>
-                {{ form_widget(filterForm.sort_field) }}
+              <div class="export-selection-row__status">
+                <span class="selection-count-label" id="selectionCountLabel">0 sélectionnée</span>
+                <p class="export-zip-hint" id="exportZipHint">Cochez une ou plusieurs candidatures dans la liste pour activer le téléchargement.</p>
               </div>
-              <div class="col-xs-12 col-sm-3" style="margin-bottom: 5px;">
-                <label class="small">Ordre :</label>
-                <br>
-                {{ form_widget(filterForm.sort_order) }}
+              <div class="export-zip-wrap">
+                <button type="button" class="btn btn-line-16 btn-sm is-empty" id="exportSelectedBtn" disabled>
+                  <i class="fa fa-file-archive-o"></i>
+                  <span id="exportSelectedBtnLabel">Télécharger le ZIP</span><span id="exportSelectedBtnCount"></span>
+                </button>
               </div>
             </div>
-            {% if space.isMultiLocation and filterForm.location_filter is defined %}
-            <div class="row">
-              <div class="col-xs-12 col-sm-6" style="margin-bottom: 5px;">
-                <label class="small">Filtrer par site :</label>
-                {{ form_widget(filterForm.location_filter) }}
-              </div>
-              <div class="col-xs-12 col-sm-6" style="margin-bottom: 5px;">
-                <label class="small">Au rang :</label>
-                {{ form_widget(filterForm.location_filter_rank) }}
-              </div>
+          </div>
+
+          <div class="toolbar-export-zone__block">
+            <h6 class="toolbar-export-zone__subtitle"><i class="fa fa-star"></i> Export personnalisé</h6>
+            <div class="export-compact">
+              <p class="export-compact__text">Colonnes au choix, selon les filtres (CSV ou ZIP).</p>
+              <a href="{{ path('space_manager_select_export_fields', { 'id': space.id }) }}" class="btn btn-success btn-line-16 btn-sm" style="background-color: #4CAF50; border-color: #4CAF50; color: white !important; white-space: nowrap;">
+                Configurer et exporter
+              </a>
             </div>
-            {% endif %}
-            {{ form_end(filterForm) }}
           </div>
         </div>
       </div>
 
-      <!-- 3. SECTION EXPORT -->
-      <div class="ctrl-panel panel-export">
-        <h5><i class="fa fa-download"></i> Export des données</h5>
-        <div class="btn-toolbar">
-          <a href="{{ path('space_manager_select_export_fields', { 'id': space.id }) }}" class="btn btn-success btn-line-16" style="background-color: #4CAF50; border-color: #4CAF50; color: white !important;">
-            <i class="fa fa-star"></i>
-            Export personnalisé
-          </a>
-          <a href="{{ path('space_manager_candidatesexport', { 'id': space.id }) }}" class="btn btn-line-16">
-            <i class="fa fa-download"></i>
-            Export CSV sans tri
-          </a>
-          <a href="{{ path('space_manager_candidatesexportzip', { 'id': space.id }) }}" class="btn btn-line-16">
-            <i class="fa fa-file-archive-o"></i>
-            Export complet (avec documents)
-          </a>
-          <button type="button" class="btn btn-line-16" id="exportSelectedBtn" disabled>
-            <i class="fa fa-check-square-o"></i>
-            Export sélection (avec documents) (<span id="selectedCount">0</span>)
-          </button>
-          <a href="javascript:print();" class="btn btn-line-16">
-            <i class="fa fa-print"></i>
-            Imprimer
-          </a>
+      <div class="toolbar-grid__filters">
+        <div class="ctrl-panel panel-filters">
+          <h5><i class="fa fa-filter"></i> Filtres et tri</h5>
+          {% form_theme filterForm 'Form/custom_front_fields.html.twig' %}
+          {{ form_start(filterForm, { 'attr': { 'data-submit': true, 'data-scroll-key': 'candidates_scroll_' ~ space.id } } ) }}
+          <div class="filter-field">
+            <label class="small">Statut :</label>
+            {{ form_widget(filterForm.status_filter) }}
+          </div>
+          <div class="filter-field">
+            <label class="small">Trier par :</label>
+            {{ form_widget(filterForm.sort_field) }}
+          </div>
+          {% if space.isMultiLocation and filterForm.location_filter is defined %}
+          <div class="filter-row-site" style="margin-top: 4px; padding-top: 10px;">
+            <span class="small section-label"><i class="fa fa-map-marker"></i> AAC multi-sites</span>
+            <div class="filter-field">
+              <label class="small">Site :</label>
+              {{ form_widget(filterForm.location_filter) }}
+            </div>
+            <div class="filter-field">
+              <label class="small">Rang :</label>
+              {{ form_widget(filterForm.location_filter_rank) }}
+            </div>
+          </div>
+          {% endif %}
+          <div class="filter-field" style="margin-top: 6px; padding-top: 8px; border-top: 1px dashed #e0c070; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+            <label class="small" style="margin: 0; white-space: nowrap;">Ordre :</label>
+            {{ form_widget(filterForm.sort_order) }}
+          </div>
+          {{ form_end(filterForm) }}
         </div>
       </div>
+
+    </div>
     </div>
  
  
@@ -635,18 +908,6 @@
   
 
 
-{# En-tête visible uniquement à l'impression #}
-<div class="print-header">
-    <h2>{{ space.name }}</h2>
-    <p style="font-size: 11pt; color: #333; margin: 5px 0;">
-        <strong>{{ space.nbValidApplication }}</strong> candidature(s) au total &nbsp;&mdash;&nbsp;
-        <span style="color: #8a6d3b;">{{ space.nbApplication(constant('App\\Entity\\Application::WAIT_STATUS')) }} en attente</span> &nbsp;&mdash;&nbsp;
-        <span style="color: #2d6a2d;">{{ space.nbApplication(constant('App\\Entity\\Application::ACCEPT_STATUS')) }} acceptée(s)</span> &nbsp;&mdash;&nbsp;
-        <span style="color: #a94442;">{{ space.nbApplication(constant('App\\Entity\\Application::REJECT_STATUS')) }} refusée(s)</span>
-    </p>
-    <p style="font-size: 10pt; color: #666; margin: 3px 0;">Imprimé le {{ "now"|date("d/m/Y à H:i") }}</p>
-</div>
-
 <div class="application-list">
   {% for application in pagination %}
     <div class="item candidate-item" id="application-{{ application.id }}">
@@ -654,7 +915,12 @@
         <div class=" col-xs-12 col-md-12 border-box">
           
            <div class="actions" {% if application.category %}data-category="{{ application.category.id }}"{% endif %}>
-            <input type="checkbox" class="exportCheck" value="{{ application.id }}" data-status="{{ application.status }}" />
+            <input type="checkbox"
+                   class="exportCheck"
+                   value="{{ application.id }}"
+                   data-status="{{ application.status }}"
+                   aria-label="Sélectionner la candidature {{ application.name }}"
+                   title="Sélectionner pour export ZIP ou action groupée" />
         </div>
         <div class="candidate-argus">
           <div class="cell-content ">
@@ -694,17 +960,29 @@
           <div class="cell-content-right ">
             <ul class="application-desc">
               <li>Candidature déposée le : <strong>{{ application.created | date('d/m/Y') }}</strong></li>
-              <li>Type de projet : <strong>{{ application.projectHolder.useType }}</strong></li>
+              <li>Secteur d'activité : <strong>{{ application.projectHolder.useType }}</strong></li>
               <li>Type d'usage : <strong>{{ application.category }}</strong></li>
-              <li>Départements souhaités : <strong>{% if application.projectHolder.preferredDepartmentsLabels|length %}{{ application.projectHolder.preferredDepartmentsLabels|join(', ') }}{% else %}—{% endif %}</strong></li>
-              <li>Statut juridique (profil) : <strong>{% if application.projectHolder.companyStatus %}{{ application.projectHolder.companyStatus }}{% else %}—{% endif %}</strong></li>
-              <li>Statut juridique (candidature) : <strong>{% if application.companyStatus %}{{ application.companyStatus }}{% else %}—{% endif %}</strong></li>
-              <li>Surface souhaitée (profil) : <strong>{% if application.projectHolder.wishedSize %}{{ application.projectHolder.wishedSize }}{% else %}—{% endif %} m²</strong></li>
-              <li>Surface souhaitée (candidature) : <strong>{% if application.wishedSize %}{{ application.wishedSize }}{% else %}—{% endif %} m²</strong></li>
+
+              <li>Statut juridique : <strong>{% if application.companyStatus %}{{ application.companyStatus }}{% else %}—{% endif %}</strong></li>
+              <li>Surface souhaitée : <strong>{% if application.wishedSize %}{{ application.wishedSize }}{% else %}—{% endif %} m²</strong></li>
               {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
               {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
               <li>Durée d'occupation : <strong>{% if _lengthValue %}{{ _lengthValue }}{% if _lengthType %} {{ _lengthType }}{% endif %}{% else %}—{% endif %}</strong></li>
               <li>Date d'entrée souhaitée : <strong>{{ application.startOccupation|localizeddate('long', 'none', 'fr') }}</strong></li>
+              {% if space.isMultiLocation and application.locationPreferences|length %}
+              <li style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed #ddd;">
+                Choix de sites :
+                <ul style="margin: 4px 0 0 0; padding: 0; list-style: none;">
+                  {% for pref in application.locationPreferencesOrdered %}
+                    {% if pref.location and not pref.location.suspended %}
+                      <li><strong>{{ pref.rank }}.</strong>
+                        {{ pref.location.name }}{% if pref.location.city %} — {{ pref.location.city }}{% endif %}
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              </li>
+              {% endif %}
             </ul>
 
             <a href="{{ path('application_show', { 'id': application.id }) }}" class="btn btn-line-19"><span>Voir la candidature</span></a>
@@ -801,6 +1079,65 @@
     <script type="text/javascript" src="{{ asset('bundles/app/js/chart.min.js') }}"></script>
 
     <script type="text/javascript">
+        (function () {
+            var scrollKey = document.querySelector('form[data-scroll-key]')
+                ? document.querySelector('form[data-scroll-key]').getAttribute('data-scroll-key')
+                : ('candidates_scroll' + window.location.pathname);
+
+            function getScrollY() {
+                return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+            }
+
+            window.saveCandidatesScroll = function () {
+                sessionStorage.setItem(scrollKey, String(getScrollY()));
+            };
+
+            function restoreCandidatesScroll(clearStorage) {
+                var scrollPos = sessionStorage.getItem(scrollKey);
+                if (!scrollPos) {
+                    return;
+                }
+
+                var y = parseInt(scrollPos, 10);
+                if (isNaN(y)) {
+                    sessionStorage.removeItem(scrollKey);
+                    return;
+                }
+
+                if ('scrollRestoration' in history) {
+                    history.scrollRestoration = 'manual';
+                }
+
+                window.scrollTo(0, y);
+
+                if (clearStorage) {
+                    sessionStorage.removeItem(scrollKey);
+                    sessionStorage.removeItem('candidates_filter_pending');
+                }
+            }
+
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+            }
+
+            restoreCandidatesScroll(false);
+            document.addEventListener('DOMContentLoaded', function () {
+                restoreCandidatesScroll(false);
+            });
+            window.addEventListener('load', function () {
+                restoreCandidatesScroll(false);
+            });
+            setTimeout(function () { restoreCandidatesScroll(false); }, 150);
+            setTimeout(function () { restoreCandidatesScroll(true); }, 500);
+
+            window.addEventListener('beforeunload', function () {
+                if (sessionStorage.getItem('candidates_filter_pending')) {
+                    window.saveCandidatesScroll();
+                    sessionStorage.removeItem('candidates_filter_pending');
+                }
+            });
+        })();
+
         $(document).ready(function() {
 
             $("#groupActionBtn").click(function(e) {
@@ -821,36 +1158,38 @@
                 }
             });
 
-            // Manage sort field
+            function submitFilterForm($form) {
+                if (!$form.length) {
+                    return;
+                }
+                sessionStorage.setItem('candidates_filter_pending', '1');
+                window.saveCandidatesScroll();
+                $form.get(0).submit();
+            }
+
+            // Manage sort field (visuel uniquement)
             $(function () {
                 $('.sort').on('click', 'label', function () {
-                    var $input = $(this).find('input');
+                    var $input = $(this).find('input[type="radio"]');
+                    var $sort = $(this).closest('.sort');
 
-                    $('.sort').find('label').removeClass('checked');
-
-                    if ($input.is(':checked')) {
-                        $(this).addClass('checked');
-                    }
+                    window.setTimeout(function () {
+                        $sort.find('label').removeClass('checked');
+                        $sort.find('li').removeClass('active');
+                        if ($input.is(':checked')) {
+                            $input.closest('label').addClass('checked');
+                            $input.closest('li').addClass('active');
+                        }
+                    }, 0);
                 });
             });
 
-            // Submit form
-            $('form[data-submit]').on('change', function () {
-                // Sauvegarder la position du scroll avant la soumission
-                var scrollKey = 'scroll_' + window.location.pathname;
-                sessionStorage.setItem(scrollKey, window.pageYOffset);
-                $(this).trigger('submit');
+            // Submit form sur changement de n'importe quel champ du formulaire filtre
+            // (selects via Chosen, radios sort_order maintenant dans le <form>)
+            $('form[data-submit]').on('change', 'select, input[type="radio"]', function () {
+                submitFilterForm($(this).closest('form[data-submit]'));
             });
 
-            // Restaurer la position du scroll si elle est présente en session
-            (function() {
-                var scrollKey = 'scroll_' + window.location.pathname;
-                var scrollPos = sessionStorage.getItem(scrollKey);
-                if (scrollPos) {
-                    window.scrollTo(0, scrollPos);
-                    sessionStorage.removeItem(scrollKey);
-                }
-            })();
 
             var colors = ['#F7464A', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360'];
             var hightLightColors = ['#FF5A5E', '#5AD3D1', '#FFC870', '#A8B3C5', '#616774'];
@@ -1230,40 +1569,71 @@
 
         // Gestion de la sélection pour l'export
         $(document).ready(function() {
+            function setSelectionPreset(preset) {
+                $('.btn-preset').removeClass('is-active').attr('aria-pressed', 'false');
+                if (preset) {
+                    $('.btn-preset[data-preset="' + preset + '"]').addClass('is-active').attr('aria-pressed', 'true');
+                }
+            }
+
             // Mettre à jour le compteur de sélection
-            function updateSelectionCount() {
+            function updateSelectionCount(clearPreset) {
+                if (clearPreset !== false) {
+                    setSelectionPreset(null);
+                }
+
                 var selectedCount = $('.exportCheck:checked').length;
-                $('#selectedCount').text(selectedCount);
-                $('#exportSelectedBtn').prop('disabled', selectedCount === 0);
+                var countLabel = selectedCount + ' sélectionnée' + (selectedCount > 1 ? 's' : '');
+                $('#selectionCountLabel').text(countLabel);
+
+                var $btn = $('#exportSelectedBtn');
+                var $count = $('#exportSelectedBtnCount');
+                var $hint = $('#exportZipHint');
+
+                if (selectedCount === 0) {
+                    $count.text('');
+                    $btn.prop('disabled', true).addClass('is-empty');
+                    $hint.removeClass('is-hidden');
+                } else {
+                    $count.text(' (' + selectedCount + ')');
+                    $btn.prop('disabled', false).removeClass('is-empty');
+                    $hint.addClass('is-hidden');
+                }
             }
 
             // Écouter les changements sur les cases à cocher
-            $(document).on('change', '.exportCheck', updateSelectionCount);
+            $(document).on('change', '.exportCheck', function() {
+                updateSelectionCount();
+            });
 
             // Bouton "Tout sélectionner"
             $('#selectAllBtn').click(function() {
                 $('.exportCheck').prop('checked', true);
-                updateSelectionCount();
+                setSelectionPreset('all');
+                updateSelectionCount(false);
             });
 
             // Bouton "Tout désélectionner"
             $('#selectNoneBtn').click(function() {
                 $('.exportCheck').prop('checked', false);
-                updateSelectionCount();
+                setSelectionPreset('none');
+                updateSelectionCount(false);
             });
 
             // Bouton "Sélectionner acceptées"
             $('#selectAcceptedBtn').click(function() {
                 $('.exportCheck').prop('checked', false);
                 $('.exportCheck[data-status="accepted"]').prop('checked', true);
-                updateSelectionCount();
+                setSelectionPreset('accepted');
+                updateSelectionCount(false);
             });
 
             // Bouton "Sélectionner refusées"
             $('#selectRejectedBtn').click(function() {
                 $('.exportCheck').prop('checked', false);
                 $('.exportCheck[data-status="rejected"]').prop('checked', true);
-                updateSelectionCount();
+                setSelectionPreset('rejected');
+                updateSelectionCount(false);
             });
 
             // Export des candidatures sélectionnées
@@ -1274,7 +1644,7 @@
                 });
 
                 if (selectedIds.length === 0) {
-                    alert('Veuillez sélectionner au moins une candidature à exporter.');
+                    alert('Veuillez cocher au moins une candidature pour l\'export ZIP.');
                     return;
                 }
 
