@@ -1238,11 +1238,6 @@ class SpaceManagementController extends AbstractController
                 'property' => 'projectHolder.siret',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
-            'projectHolder_companyStatus' => [
-                'label' => '[Profil] Statut de la structure',
-                'property' => 'projectHolder.companyStatus',
-                'category' => 'Profil - Structure du porteur de projet'
-            ],
             'projectHolder_companyCreationDate' => [
                 'label' => '[Profil] Date de création de la structure',
                 'property' => 'projectHolder.companyCreationDate',
@@ -1341,20 +1336,9 @@ class SpaceManagementController extends AbstractController
                 'category' => 'Profil - Réseaux sociaux'
             ],
             
-            // Profil - Mon projet
-            'projectHolder_wishedSize' => [
-                'label' => '[Profil] Surface souhaitée (m²)',
-                'property' => 'projectHolder.wishedSize',
-                'category' => 'Profil - Mon projet'
-            ],
             'projectHolder_useType' => [
-                'label' => '[Profil] Type de projet',
+                'label' => '[Profil] Secteur d\'activité',
                 'property' => 'projectHolder.useType',
-                'category' => 'Profil - Mon projet'
-            ],
-            'projectHolder_preferredDepartments' => [
-                'label' => '[Profil] Zone géographique',
-                'property' => 'projectHolder.preferredDepartmentsLabelsForExport',
                 'category' => 'Profil - Mon projet'
             ],
             'projectHolder_usageDate' => [

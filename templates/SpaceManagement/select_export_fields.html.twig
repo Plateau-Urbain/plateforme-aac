@@ -524,7 +524,7 @@
                             Trié par : 
                             <strong>
                                 {% if filterData.sort_field == 'created' %}Date de candidature
-                                {% elseif filterData.sort_field == 'wishedSize' %}Surface souhaitée (candidature)
+                                {% elseif filterData.sort_field == 'wishedSize' %}Surface souhaitée
                                 {% elseif filterData.sort_field == 'startOccupation' %}Date d'entrée souhaitée
                                 {% elseif filterData.sort_field == 'lengthOccupation' %}Durée d'occupation
                                 {% elseif filterData.sort_field == 'locationFirstChoice' %}1er site préféré
@@ -697,8 +697,9 @@ $(document).ready(function() {
         'projectHolder_tiktokUrl',        // Tiktok
         'projectHolder_projectDescription', // Description
         'created',                        // Date de dépôt de la candidature
-        'category',                       // Type d'usage (candidature)
-        'projectHolder_wishedSize',       // Surface recherchée
+        'category',                       // Type d'usage
+        'companyStatus',                  // Statut juridique
+        'wishedSize',                     // Surface souhaitée
         'projectHolder_usageDuration',    // Durée d'occupation souhaitée
         'startOccupation',                // Date d'entrée souhaitée
         'localUsageDescription'           // Quel sera l'usage du local
