@@ -348,14 +348,14 @@ class ApplicationAdminController extends CRUDController
                 'property' => 'id',
                 'category' => 'Informations générales'
             ],
-            'name' => [
-                'label' => '[Candidature] Nom du projet',
-                'property' => 'name',
-                'category' => 'Informations générales'
-            ],
             'status' => [
                 'label' => '[Candidature] Statut',
                 'property' => 'statusLabel',
+                'category' => 'Informations générales'
+            ],
+            'name' => [
+                'label' => '[Candidature] Nom du projet',
+                'property' => 'name',
                 'category' => 'Informations générales'
             ],
             'selected' => [
@@ -364,71 +364,36 @@ class ApplicationAdminController extends CRUDController
                 'category' => 'Informations générales'
             ],
             'created' => [
-                'label' => '[Candidature] Date de création',
+                'label' => '[Candidature] Date de dépôt de la candidature',
                 'property' => 'created',
                 'category' => 'Informations générales'
             ],
-            'updated' => [
-                'label' => '[Candidature] Date de mise à jour',
-                'property' => 'updated',
-                'category' => 'Informations générales'
-            ],
 
-            // Profil - Porteur de projet
+            // Mes informations
             'projectHolder_fullName' => [
-                'label' => '[Profil] Nom complet du porteur',
+                'label' => '[Profil] Nom du porteur',
                 'property' => 'projectHolder.fullName',
-                'category' => 'Profil - Porteur de projet'
+                'category' => 'Mes informations'
+            ],
+            'projectHolder_phone' => [
+                'label' => '[Profil] Téléphone personnel',
+                'property' => 'projectHolder.phone',
+                'category' => 'Mes informations'
             ],
             'projectHolder_email' => [
-                'label' => '[Profil] Email du porteur',
+                'label' => '[Profil] Email',
                 'property' => 'projectHolder.email',
-                'category' => 'Profil - Porteur de projet'
-            ],
-            'projectHolder_civility' => [
-                'label' => '[Profil] Civilité',
-                'property' => 'projectHolder.civility',
-                'category' => 'Profil - Porteur de projet'
+                'category' => 'Mes informations'
             ],
             'projectHolder_birthday' => [
                 'label' => '[Profil] Date de naissance',
                 'property' => 'projectHolder.birthday',
-                'category' => 'Profil - Porteur de projet'
+                'category' => 'Mes informations'
             ],
             'projectHolder_newsletter' => [
                 'label' => '[Profil] Newsletter',
                 'property' => 'projectHolder.newsletter',
-                'category' => 'Profil - Porteur de projet'
-            ],
-            'projectHolder_requiredIdDoc' => [
-                'label' => '[Profil] Doc obligatoire - Pièce d\'identité (chemin local)',
-                'property' => 'computed.profileRequiredIdDocPath',
-                'category' => 'Profil - Documents obligatoires'
-            ],
-            'projectHolder_requiredKbisDoc' => [
-                'label' => '[Profil] Doc obligatoire - Justificatif d\'activité (chemin local)',
-                'property' => 'computed.profileRequiredKbisDocPath',
-                'category' => 'Profil - Documents obligatoires'
-            ],
-
-            // Profil - Structure du porteur de projet
-            
-            'projectHolder_firstname' => [
-                'label' => '[Profil] Prénom',
-                'property' => 'projectHolder.firstname',
-                'category' => 'Profil - Mes informations'
-            ],
-            'projectHolder_lastname' => [
-                'label' => '[Profil] Nom',
-                'property' => 'projectHolder.lastname',
-                'category' => 'Profil - Mes informations'
-            ],
-            
-            
-            'projectHolder_phone' => [
-                'label' => '[Profil] Téléphone personnel',
-                'property' => 'projectHolder.phone',
-                'category' => 'Profil - Mes informations'
+                'category' => 'Mes informations'
             ],
 
             // Profil - Structure du porteur de projet
@@ -437,19 +402,39 @@ class ApplicationAdminController extends CRUDController
                 'property' => 'projectHolder.company',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
-            'projectHolder_siret' => [
-                'label' => '[Profil] SIRET',
-                'property' => 'projectHolder.siret',
+            'projectHolder_companyDescription' => [
+                'label' => '[Profil] Présentation de la structure',
+                'property' => 'projectHolder.companyDescription',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
             'projectHolder_companyStatus' => [
-                'label' => '[Profil] Statut de la structure',
+                'label' => '[Profil] Statut juridique',
                 'property' => 'projectHolder.companyStatus',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_useType' => [
+                'label' => '[Profil] Secteur d\'activité',
+                'property' => 'projectHolder.useType',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_isSubjectToVat' => [
+                'label' => '[Profil] Assujetti à la TVA',
+                'property' => 'projectHolder.isSubjectToVat',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
             'projectHolder_companyCreationDate' => [
                 'label' => '[Profil] Date de création de la structure',
                 'property' => 'projectHolder.companyCreationDate',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_siret' => [
+                'label' => '[Profil] SIRET',
+                'property' => 'projectHolder.siret',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_isPuShareholder' => [
+                'label' => '[Profil] Déjà sociétaire Plateau urbain',
+                'property' => 'projectHolder.isPuShareholder',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
             'projectHolder_address' => [
@@ -462,13 +447,18 @@ class ApplicationAdminController extends CRUDController
                 'property' => 'projectHolder.zipcode',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
+            'projectHolder_city' => [
+                'label' => '[Profil] Ville',
+                'property' => 'projectHolder.city',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
             'projectHolder_companyPhone' => [
-                'label' => '[Profil] Téléphone structure',
+                'label' => '[Profil] Téléphone fixe',
                 'property' => 'projectHolder.companyPhone',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
             'projectHolder_companyMobile' => [
-                'label' => '[Profil] Mobile',
+                'label' => '[Profil] Téléphone mobile',
                 'property' => 'projectHolder.companyMobile',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
@@ -482,154 +472,151 @@ class ApplicationAdminController extends CRUDController
                 'property' => 'projectHolder.companyStructures',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
+
+            // Site internet & Réseaux sociaux
             'projectHolder_companySite' => [
                 'label' => '[Profil] Site web',
                 'property' => 'projectHolder.companySite',
-                'category' => 'Profil - Structure du porteur de projet'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
-            'projectHolder_companyDescription' => [
-                'label' => '[Profil] Présentation de la structure',
-                'property' => 'projectHolder.companyDescription',
-                'category' => 'Profil - Structure du porteur de projet'
-            ],
-            'projectHolder_isPuShareholder' => [
-                'label' => '[Profil] Déjà sociétaire Plateau urbain',
-                'property' => 'projectHolder.isPuShareholder',
-                'category' => 'Profil - Structure du porteur de projet'
-            ],
-            'projectHolder_isSubjectToVat' => [
-                'label' => '[Profil] Assujetti à la TVA',
-                'property' => 'projectHolder.isSubjectToVat',
-                'category' => 'Profil - Structure du porteur de projet'
-            ],
-
-            // Profil - Réseaux sociaux
             'projectHolder_facebookUrl' => [
                 'label' => '[Profil] Facebook',
                 'property' => 'projectHolder.facebookUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_twitterUrl' => [
                 'label' => '[Profil] Twitter',
                 'property' => 'projectHolder.twitterUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_instagramUrl' => [
                 'label' => '[Profil] Instagram',
                 'property' => 'projectHolder.instagramUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_googleUrl' => [
                 'label' => '[Profil] Bluesky',
                 'property' => 'projectHolder.googleUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_linkedinUrl' => [
                 'label' => '[Profil] LinkedIn',
                 'property' => 'projectHolder.linkedinUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_youtubeUrl' => [
                 'label' => '[Profil] YouTube',
                 'property' => 'projectHolder.youtubeUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_tiktokUrl' => [
                 'label' => '[Profil] TikTok',
                 'property' => 'projectHolder.tiktokUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_otherUrl' => [
                 'label' => '[Profil] Autre URL',
                 'property' => 'projectHolder.otherUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
 
-            // Profil - Mon projet
+            // Profil - Documents obligatoires
+            'projectHolder_requiredIdDoc' => [
+                'label' => '[Profil] Doc obligatoire - Pièce d\'identité (chemin local)',
+                'property' => 'computed.profileRequiredIdDocPath',
+                'category' => 'Profil - Documents obligatoires'
+            ],
+            'projectHolder_requiredKbisDoc' => [
+                'label' => '[Profil] Doc obligatoire - Justificatif d\'activité (chemin local)',
+                'property' => 'computed.profileRequiredKbisDocPath',
+                'category' => 'Profil - Documents obligatoires'
+            ],
+
+            // Profil - Mes souhaits
             'projectHolder_wishedSize' => [
-                'label' => '[Profil] Surface souhaitée (m²)',
+                'label' => '[Profil] Surface souhaitée',
                 'property' => 'projectHolder.wishedSize',
-                'category' => 'Profil - Mon projet'
-            ],
-            'projectHolder_useType' => [
-                'label' => '[Profil] Type de projet',
-                'property' => 'projectHolder.useType',
-                'category' => 'Profil - Mon projet'
-            ],
-            'projectHolder_preferredDepartments' => [
-                'label' => '[Profil] Zone géographique',
-                'property' => 'projectHolder.preferredDepartmentsLabelsForExport',
-                'category' => 'Profil - Mon projet'
-            ],
-            'projectHolder_usageDate' => [
-                'label' => '[Profil] Date de disponibilité',
-                'property' => 'projectHolder.usageDate',
-                'category' => 'Profil - Mon projet'
-            ],
-            'projectHolder_usageDuration' => [
-                'label' => '[Profil] Durée d\'occupation',
-                'property' => 'projectHolder.usageDuration',
-                'category' => 'Profil - Mon projet'
+                'category' => 'Profil - Mes souhaits'
             ],
             'projectHolder_monthlyBudgetMax' => [
                 'label' => '[Profil] Budget mensuel total maximum (€)',
                 'property' => 'projectHolder.monthlyBudgetMax',
-                'category' => 'Profil - Mon projet'
+                'category' => 'Profil - Mes souhaits'
+            ],
+            'projectHolder_preferredDepartments' => [
+                'label' => '[Profil] Zone géographique souhaitée',
+                'property' => 'projectHolder.preferredDepartmentsLabelsForExport',
+                'category' => 'Profil - Mes souhaits'
+            ],
+            'projectHolder_usageDate' => [
+                'label' => '[Profil] Date de disponibilité',
+                'property' => 'projectHolder.usageDate',
+                'category' => 'Profil - Mes souhaits'
+            ],
+            'projectHolder_usageDuration' => [
+                'label' => '[Profil] Durée d\'occupation',
+                'property' => 'projectHolder.usageDuration',
+                'category' => 'Profil - Mes souhaits'
             ],
             'projectHolder_projectDescription' => [
                 'label' => '[Profil] Présentation du projet',
                 'property' => 'projectHolder.projectDescription',
-                'category' => 'Profil - Mon projet'
+                'category' => 'Profil - Mes souhaits'
             ],
 
-            // Candidature - Informations sur le projet
-            'description' => [
-                'label' => '[Candidature] Présentation du projet',
-                'property' => 'description',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'localUsageDescription' => [
-                'label' => '[Candidature] Quel sera l\'usage du local ?',
-                'property' => 'localUsageDescription',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'category' => [
-                'label' => '[Candidature] Type d\'usage',
-                'property' => 'category',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'companyStatus' => [
-                'label' => '[Candidature] Statut juridique',
-                'property' => 'companyStatus',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'contribution' => [
-                'label' => '[Candidature] Quelles idées avez-vous pour participer au projet collectif ?',
-                'property' => 'contribution',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'openToGlobalProject' => [
-                'label' => '[Candidature] Ouvert au projet collectif',
-                'property' => 'openToGlobalProject',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'locationPreferences' => [
-                'label' => '[Candidature] Classement des sites',
-                'property' => 'locationPreferencesLabelsForExport',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-
-            // Candidature - Occupation
+            // Candidature - Mon projet
             'wishedSize' => [
                 'label' => '[Candidature] Surface souhaitée (m²)',
                 'property' => 'wishedSize',
-                'category' => 'Candidature - Occupation'
+                'category' => 'Candidature - Mon projet'
+            ],
+            'lengthOccupation' => [
+                'label' => '[Candidature] Durée d\'occupation',
+                'property' => 'fullLengthOccupation',
+                'category' => 'Candidature - Mon projet'
             ],
             'startOccupation' => [
                 'label' => '[Candidature] Date d\'entrée souhaitée',
                 'property' => 'startOccupation',
-                'category' => 'Candidature - Occupation'
+                'category' => 'Candidature - Mon projet'
             ],
+            'category' => [
+                'label' => '[Candidature] Type d\'usage',
+                'property' => 'category',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'localUsageDescription' => [
+                'label' => '[Candidature] Quel sera l\'usage du local ?',
+                'property' => 'localUsageDescription',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'contribution' => [
+                'label' => '[Candidature] Quelles idées avez-vous pour participer au projet collectif ?',
+                'property' => 'contribution',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'description' => [
+                'label' => '[Candidature] Présentation du projet',
+                'property' => 'description',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'companyStatus' => [
+                'label' => '[Candidature] Statut juridique',
+                'property' => 'companyStatus',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'openToGlobalProject' => [
+                'label' => '[Candidature] Ouvert au projet collectif',
+                'property' => 'openToGlobalProject',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'locationPreferences' => [
+                'label' => '[Candidature] Classement des sites',
+                'property' => 'locationPreferencesLabelsForExport',
+                'category' => 'Candidature - Mon projet'
+            ],
+
+            // Candidature - Documents déposés
             'application_documents_paths' => [
                 'label' => '[Candidature] Documents déposés (chemins locaux)',
                 'property' => 'computed.applicationDocumentsPaths',

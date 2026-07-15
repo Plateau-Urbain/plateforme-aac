@@ -877,15 +877,23 @@ class Application
     }
 
     /**
-     * @return string
+     * Durée d'occupation affichée/exportée (candidature, avec repli profil).
      */
-    public function getFullLengthOccupation()
+    public function getFullLengthOccupation(): string
     {
-        return sprintf(
-            '%s %s',
-            $this->lengthOccupation,
-            $this->lengthTypeOccupation
-        );
+        $holder = $this->getProjectHolder();
+        $value = $this->lengthOccupation ?? ($holder ? $holder->getUsageDuration() : null);
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        $type = $this->lengthTypeOccupation;
+        if (($type === null || $type === '') && $holder) {
+            $type = $holder->getLengthTypeOccupation();
+        }
+        $type = $type ?: 'mois';
+
+        return trim((string) $value . ' ' . $type);
     }
 
     /**

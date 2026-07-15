@@ -5,6 +5,7 @@ namespace App\Admin;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use App\Entity\Space;
+use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Form\FormMapper;
@@ -19,6 +20,9 @@ use App\Form\SpaceDocumentType;
 use App\Form\SpaceImageType;
 use App\Form\SpaceVisitType;
 use App\Form\SpaceDocAdminType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 
 /** @extends AbstractAdmin<Space> */
 class SpaceAdmin extends AbstractAdmin
@@ -31,6 +35,13 @@ class SpaceAdmin extends AbstractAdmin
     protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         $collection->remove('show');
+    }
+
+    protected function configure(): void
+    {
+        $this->setTemplates([
+            'outer_list_rows_list' => 'Admin/Space/list_outer_rows_list.html.twig',
+        ]);
     }
 
     protected function configureQuery(ProxyQueryInterface $query): ProxyQueryInterface
@@ -90,12 +101,27 @@ class SpaceAdmin extends AbstractAdmin
     protected $baseRouteName = 'property';
     protected $baseRoutePattern = 'property';
 
-    // setup the default sort column and order
-    /** @var array<string, mixed> */
-    protected array $datagridValues = [
-        '_sort_order' => 'DESC',
-        '_sort_by' => 'limitAvailability',
-    ];
+    protected function configureDefaultSortValues(array &$sortValues): void
+    {
+        $sortValues[DatagridInterface::SORT_ORDER] = 'DESC';
+        $sortValues[DatagridInterface::SORT_BY] = 'created';
+    }
+
+    protected function configureFormOptions(array &$formOptions): void
+    {
+        $formOptions['validation_groups'] = static function (FormInterface $form): array {
+            $space = $form->getData();
+            $groups = ['save'];
+
+            if ($space instanceof Space && $space->isMultiLocation()) {
+                $groups[] = 'multi_location';
+            } else {
+                $groups[] = 'standard';
+            }
+
+            return $groups;
+        };
+    }
 
     // Fields to be shown on create/edit forms
     protected function configureFormFields(FormMapper $formMapper): void
@@ -115,9 +141,9 @@ class SpaceAdmin extends AbstractAdmin
                 'label' => "Propriétaire de l'espace",
                 'admin_code' => 'app.admin.owner',
             ])
-            ->add('zipCode', null, ['label' => "Code postal"])
-            ->add('city', null, ['label' => "Ville"])
-            ->add('limitAvailability', null, ['label' => 'Date limite de candidature'])
+            ->add('zipCode', null, ['label' => 'Code postal', 'required' => false])
+            ->add('city', null, ['label' => 'Ville'])
+            ->add('limitAvailability', null, ['label' => 'Date limite de candidature', 'required' => false])
             ->add('availability', null, ['label' => 'Durée du projet'])
             ->add('type', null, ['label' => 'Type de locaux', 'required' => true])
             ->add('description', null, ['label' => 'Description', 'attr' => ['class' => 'trumbowyg']])
@@ -227,8 +253,30 @@ class SpaceAdmin extends AbstractAdmin
                 ->add('closed', ChoiceType::class, ['label' => 'Clôturé', 'required' => false, 'choices' => ['Oui' => true, 'Non' => false], 'placeholder' => false])
             ->end()
 
-
         ;
+
+        $formMapper->getFormBuilder()->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            $space = $event->getData();
+            $form = $event->getForm();
+
+            if (!$space instanceof Space || !$space->isMultiLocation()) {
+                return;
+            }
+
+            foreach (['zipCode', 'limitAvailability', 'nbSpaces', 'minSpace', 'maxSpace'] as $field) {
+                if ($form->has($field)) {
+                    $form->remove($field);
+                }
+            }
+
+            if ($form->has('city')) {
+                $form->remove('city');
+                $form->add('city', null, [
+                    'label' => 'Commune ou territoire',
+                    'required' => true,
+                ]);
+            }
+        });
     }
 
     // Fields to be shown on filter forms
@@ -265,7 +313,7 @@ class SpaceAdmin extends AbstractAdmin
             ->add('city', null, ['label' => 'Ville'])
             ->add('limitAvailability', null, [
                 'label' => 'Date limite de candidature',
-                'format' => 'd/m/Y',
+                'template' => 'Admin/Space/list_limit_availability.html.twig',
                 'sortable' => true,
             ])
             ->add('enabled', null, ['label' => 'En ligne'])

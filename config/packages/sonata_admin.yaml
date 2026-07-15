@@ -8,7 +8,8 @@ sonata_admin:
         use_icheck: false
     assets:
         extra_javascripts: []
-        extra_stylesheets: []
+        extra_stylesheets:
+            - /css/admin-space-list.css
     dashboard:
         groups:
             plateau_urbain.admin.group.spaces:

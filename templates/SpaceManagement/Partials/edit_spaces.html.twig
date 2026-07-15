@@ -187,18 +187,6 @@
                 </div>
             </div>
 
-            {% if form.rollingApplications is defined %}
-            <div class="row">
-                <div class="col-sm-12 form-group">
-                    <div class="alert alert-info" role="alert" style="margin-top: 8px;">
-                        <strong>Candidature au fil de l’eau :</strong> active l’affichage (et l’obligation) du champ
-                        <strong>“Date d’entrée souhaitée”</strong> côté candidat.
-                    </div>
-                    {{ form_row(form.rollingApplications) }}
-                </div>
-            </div>
-            {% endif %}
-
             {% if form.isErp is defined %}
             <div class="row">
                 <div class="col-sm-12 form-group">

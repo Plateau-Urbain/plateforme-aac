@@ -1,4 +1,42 @@
 $(document).ready(function () {
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+
+    var partialAddScrollTop = null;
+    var partialAddSectionId = null;
+    var partialAddActions = ['add_photo', 'add_visit', 'add_document'];
+
+    function scrollToSection(sectionId, fallbackScrollTop) {
+        if (sectionId) {
+            var $section = $('#' + sectionId);
+            if ($section.length) {
+                $('html, body').scrollTop($section.offset().top - 80);
+                return;
+            }
+        }
+
+        if (fallbackScrollTop !== null) {
+            $('html, body').scrollTop(fallbackScrollTop);
+        }
+    }
+
+    function syncFormActionUrl() {
+        var $form = $('#js-form-space form').first();
+        if (!$form.length) {
+            return;
+        }
+
+        var action = $form.attr('action') || '';
+        if (!action) {
+            return;
+        }
+
+        var nextPath = $('<a>').attr('href', action)[0].pathname;
+        if (nextPath && window.location.pathname !== nextPath) {
+            history.replaceState(null, '', action);
+        }
+    }
     function scrollToFirstError() {
         var $first = $('#js-form-space .has-error:visible').first();
         if ($first.length) {
@@ -90,7 +128,14 @@ $(document).ready(function () {
             $.colorbox({ html: $('#saveBox').html().replace('%%savemsg%%', saving) });
         }
 
-        scrollToFirstError();
+        var scrolledToError = scrollToFirstError();
+        if (!scrolledToError) {
+            scrollToSection(partialAddSectionId, partialAddScrollTop);
+        }
+
+        partialAddScrollTop = null;
+        partialAddSectionId = null;
+        syncFormActionUrl();
     }
 
     function initLinkListener() {
@@ -159,6 +204,13 @@ $(document).ready(function () {
 
             var formData = new FormData(form[0]);
             var submitButton = $(this);
+            var submitName = submitButton.attr('name');
+
+            if (partialAddActions.indexOf(submitName) !== -1) {
+                partialAddScrollTop = $(window).scrollTop();
+                partialAddSectionId = submitButton.closest('.section').attr('id') || null;
+            }
+
             var previewing = submitButton.attr('name') === 'appbundle_space[preview]';
 
             if (previewing) {
@@ -277,5 +329,12 @@ $(document).ready(function () {
     });
 
     scrollToFirstError();
-    $(window).on('load', scrollToFirstError);
+    $(window).on('load', function () {
+        if (window.location.hash) {
+            scrollToSection(window.location.hash.replace('#', ''), null);
+            return;
+        }
+
+        scrollToFirstError();
+    });
 });

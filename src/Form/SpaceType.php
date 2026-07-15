@@ -80,10 +80,6 @@ class SpaceType extends AbstractType
             ->add('maxSpace', IntegerType::class, ['label' => 'Surface maximale (m²)', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
             ->add('description', null, ['label' => 'Description', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
             ->add('activityDescription', null, ['label' => 'Activités recherchées', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
-            ->add('rollingApplications', CheckboxType::class, [
-                'label' => 'Candidature au fil de l’eau (affiche la “date d’entrée souhaitée” côté candidat)',
-                'required' => false,
-            ])
             ->add('isErp', CheckboxType::class, [
                 'label' => 'Le site est un ERP (Établissement Recevant du Public)',
                 'required' => false,
@@ -180,7 +176,7 @@ class SpaceType extends AbstractType
             $form = $event->getForm();
 
             if ($data instanceof Space && $data->isMultiLocation()) {
-                foreach (['limitAvailability', 'zipCode', 'nbSpaces', 'minSpace', 'maxSpace', 'rollingApplications', 'isErp'] as $field) {
+                foreach (['limitAvailability', 'zipCode', 'nbSpaces', 'minSpace', 'maxSpace', 'isErp'] as $field) {
                     if ($form->has($field)) {
                         $form->remove($field);
                     }

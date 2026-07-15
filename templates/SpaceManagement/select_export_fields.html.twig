@@ -492,9 +492,9 @@
                 <div class="col-sm-6" style="margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div class="export-options-section" style="flex: 1; margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between; border-color: #2D74BA; background: #fafcff;">
                         <div>
-                            <h4 style="color: #2D74BA; margin-top: 0; margin-bottom: 12px; font-size: 15px;">
+                            <h5 style="color: #2D74BA; margin-top: 0; margin-bottom: 12px; font-size: 15px;text-transform: uppercase;">
                                 <i class="fa fa-info-circle"></i> Paramètres de l'export
-                            </h4>
+                            </h5>
                             <ul style="margin: 0; padding-left: 15px; font-size: 13px; line-height: 1.6; color: #444;">
                                 {% if filterData.status_filter %}
                                     <li>Statut : 
@@ -550,9 +550,9 @@
                 <div class="col-sm-6" style="margin-bottom: 20px; display: flex; flex-direction: column;">
                     <div class="export-options-section" style="flex: 1; margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
-                            <h4 style="margin-top: 0; margin-bottom: 12px; font-size: 15px;">
+                            <h5 style="margin-top: 0; margin-bottom: 12px; font-size: 15px;text-transform: uppercase;">
                                 <i class="fa fa-cog"></i> Options d'export
-                            </h4>
+                            </h5>
                             <label class="docs-option-main" style="margin-bottom: 5px; padding: 6px 10px; font-size: 14px;">
                                 <input type="checkbox" id="includeDocsCheckbox" name="include_documents" value="1" style="width: 16px; height: 16px; margin: 0 8px 0 0;">
                                 Inclure les documents des candidats
@@ -685,32 +685,30 @@ $(document).ready(function() {
         updateCounter();
     });
 
-    // Sélection type : champs essentiels prédéfinis
+    // Sélection type : champs essentiels issus de la candidature
     var presetFields = [
         'space',                          // Espace
         'status',                         // Statut
-        'name',                           // Nom
-        'projectHolder_company',          // Structure
+        'name',                           // Nom du projet
         'projectHolder_fullName',         // Nom du porteur
+        'projectHolder_company',          // Structure
+        'projectHolder_companyDescription', // Présentation de la structure
+        'projectHolder_useType',          // Secteur d'activité (profil)
+        'projectHolder_isSubjectToVat',   // Assujetti à la TVA
+        'projectHolder_isPuShareholder',  // Déjà sociétaire Plateau urbain
         'projectHolder_phone',            // Téléphone
         'projectHolder_email',            // Email
-        'projectHolder_companyDescription', // Présentation
-        'projectHolder_facebookUrl',      // Facebook
-        'projectHolder_twitterUrl',       // Twitter
+        'projectHolder_companySite',      // Site web
         'projectHolder_instagramUrl',     // Instagram
-        'projectHolder_youtubeUrl',       // You tube
-        'projectHolder_linkedinUrl',      // Linkedin
-        'projectHolder_tiktokUrl',        // Tiktok
-        'projectHolder_projectDescription', // Description
+        'projectHolder_linkedinUrl',      // LinkedIn
+        'description',                    // Présentation du projet (candidature)
         'created',                        // Date de dépôt de la candidature
-        'category',                       // Type d'usage
-        'companyStatus',                  // Statut juridique
         'wishedSize',                     // Surface souhaitée
-        'projectHolder_usageDuration',    // Durée d'occupation souhaitée
+        'lengthOccupation',               // Durée d'occupation
         'startOccupation',                // Date d'entrée souhaitée
-        'localUsageDescription'           // Quel sera l'usage du local
+        'category',                       // Type d'usage
+        'contribution'                    // Idées pour le projet collectif
         {% if space.isMultiLocation %},
-        'locationPreferences'             // Classement des sites (résumé)
         {% for rank in 1..space.orderedActiveLocations|length %},
         'locationPreference_rank_{{ rank }}' // Choix {{ rank }}
         {% endfor %}

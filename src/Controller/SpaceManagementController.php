@@ -825,34 +825,53 @@ class SpaceManagementController extends AbstractController
             'projectHolder_company',
             'projectHolder_fullName',
             'projectHolder_phone',
-            'projectHolder_companyPhone',
             'projectHolder_email',
             'projectHolder_companyDescription',
+            'projectHolder_useType',
+            'projectHolder_isSubjectToVat',
+            'projectHolder_isPuShareholder',
             'projectHolder_companySite',
-            'projectHolder_facebookUrl',
-            'projectHolder_twitterUrl',
             'projectHolder_instagramUrl',
-            'projectHolder_youtubeUrl',
             'projectHolder_linkedinUrl',
-            'projectHolder_googleUrl',
-            'projectHolder_tiktokUrl',
-            'projectHolder_otherUrl',
-            'projectHolder_projectDescription',
+            'description',
             'created',
-            'category',
-            'projectHolder_wishedSize',
-            'projectHolder_usageDuration',
+            'wishedSize',
+            'lengthOccupation',
             'startOccupation',
-            'localUsageDescription',
-            'locationPreferences',
+            'category',
+            'contribution',
         ];
 
-        usort($selectedFieldKeys, function ($a, $b) use ($orderPreset) {
-            $posA = array_search($a, $orderPreset);
-            $posB = array_search($b, $orderPreset);
-            if ($posA === false) return 1; // les clés inconnues vont à la fin
-            if ($posB === false) return -1;
-            return $posA <=> $posB;
+        if ($space->isMultiLocation()) {
+            $rankCount = count($space->getOrderedActiveLocations());
+            for ($rank = 1; $rank <= $rankCount; $rank++) {
+                $orderPreset[] = sprintf('locationPreference_rank_%d', $rank);
+            }
+        }
+
+        $orderPreset = array_merge($orderPreset, [
+            'localUsageDescription',
+            'locationPreferences',
+        ]);
+
+        $resolveExportFieldSortIndex = static function (string $key) use ($orderPreset): int {
+            $index = array_search($key, $orderPreset, true);
+            if ($index !== false) {
+                return (int) $index;
+            }
+            if (preg_match('/^locationPreference_rank_(\d+)$/', $key, $matches)) {
+                return 9000 + (int) $matches[1];
+            }
+
+            return 10000;
+        };
+
+        usort($selectedFieldKeys, static function ($a, $b) use ($resolveExportFieldSortIndex): int {
+            if (!is_string($a) || !is_string($b)) {
+                return 0;
+            }
+
+            return $resolveExportFieldSortIndex($a) <=> $resolveExportFieldSortIndex($b);
         });
 
         // Construire le tableau des champs à exporter
@@ -1144,14 +1163,14 @@ class SpaceManagementController extends AbstractController
                 'property' => 'id',
                 'category' => 'Informations générales'
             ],
-            'name' => [
-                'label' => '[Candidature] Nom du projet',
-                'property' => 'name',
-                'category' => 'Informations générales'
-            ],
             'status' => [
                 'label' => '[Candidature] Statut',
                 'property' => 'statusLabel',
+                'category' => 'Informations générales'
+            ],
+            'name' => [
+                'label' => '[Candidature] Nom du projet',
+                'property' => 'name',
                 'category' => 'Informations générales'
             ],
             'selected' => [
@@ -1160,77 +1179,67 @@ class SpaceManagementController extends AbstractController
                 'category' => 'Informations générales'
             ],
             'created' => [
-                'label' => '[Candidature] Date de création',
+                'label' => '[Candidature] Date de dépôt de la candidature',
                 'property' => 'created',
                 'category' => 'Informations générales'
             ],
-            'updated' => [
-                'label' => '[Candidature] Date de mise à jour',
-                'property' => 'updated',
-                'category' => 'Informations générales'
-            ],
             
-            // Profil - Porteur de projet
+            // Mes informations
             'projectHolder_fullName' => [
-                'label' => '[Profil] Nom complet du porteur',
+                'label' => '[Profil] Nom du porteur',
                 'property' => 'projectHolder.fullName',
-                'category' => 'Profil - Porteur de projet'
+                'category' => 'Mes informations'
+            ],
+            'projectHolder_phone' => [
+                'label' => '[Profil] Téléphone personnel',
+                'property' => 'projectHolder.phone',
+                'category' => 'Mes informations'
             ],
             'projectHolder_email' => [
-                'label' => '[Profil] Email du porteur',
+                'label' => '[Profil] Email',
                 'property' => 'projectHolder.email',
-                'category' => 'Profil - Porteur de projet'
-            ],
-            'projectHolder_civility' => [
-                'label' => '[Profil] Civilité',
-                'property' => 'projectHolder.civility',
-                'category' => 'Profil - Porteur de projet'
+                'category' => 'Mes informations'
             ],
             'projectHolder_birthday' => [
                 'label' => '[Profil] Date de naissance',
                 'property' => 'projectHolder.birthday',
-                'category' => 'Profil - Porteur de projet'
+                'category' => 'Mes informations'
             ],
             'projectHolder_newsletter' => [
                 'label' => '[Profil] Newsletter',
                 'property' => 'projectHolder.newsletter',
-                'category' => 'Profil - Porteur de projet'
-            ],
-            'projectHolder_requiredIdDoc' => [
-                'label' => '[Profil] Doc obligatoire - Pièce d\'identité (chemin local)',
-                'property' => 'computed.profileRequiredIdDocPath',
-                'category' => 'Profil - Documents obligatoires'
-            ],
-            'projectHolder_requiredKbisDoc' => [
-                'label' => '[Profil] Doc obligatoire - Justificatif d\'activité (chemin local)',
-                'property' => 'computed.profileRequiredKbisDocPath',
-                'category' => 'Profil - Documents obligatoires'
+                'category' => 'Mes informations'
             ],
             
-            // Profil - Structure du porteur de projet
-            
-            'projectHolder_firstname' => [
-                'label' => '[Profil] Prénom',
-                'property' => 'projectHolder.firstname',
-                'category' => 'Profil - Mes informations'
-            ],
-            'projectHolder_lastname' => [
-                'label' => '[Profil] Nom',
-                'property' => 'projectHolder.lastname',
-                'category' => 'Profil - Mes informations'
-            ],
-            
-            
-            'projectHolder_phone' => [
-                'label' => '[Profil] Téléphone personnel',
-                'property' => 'projectHolder.phone',
-                'category' => 'Profil - Mes informations'
-            ],
-
             // Profil - Structure du porteur de projet
             'projectHolder_company' => [
                 'label' => '[Profil] Nom de la structure',
                 'property' => 'projectHolder.company',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_companyDescription' => [
+                'label' => '[Profil] Présentation de la structure',
+                'property' => 'projectHolder.companyDescription',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_companyStatus' => [
+                'label' => '[Profil] Statut juridique',
+                'property' => 'projectHolder.companyStatus',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_useType' => [
+                'label' => '[Profil] Secteur d\'activité',
+                'property' => 'projectHolder.useType',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_isSubjectToVat' => [
+                'label' => '[Profil] Assujetti à la TVA',
+                'property' => 'projectHolder.isSubjectToVat',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
+            'projectHolder_companyCreationDate' => [
+                'label' => '[Profil] Date de création de la structure',
+                'property' => 'projectHolder.companyCreationDate',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
             'projectHolder_siret' => [
@@ -1238,9 +1247,9 @@ class SpaceManagementController extends AbstractController
                 'property' => 'projectHolder.siret',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
-            'projectHolder_companyCreationDate' => [
-                'label' => '[Profil] Date de création de la structure',
-                'property' => 'projectHolder.companyCreationDate',
+            'projectHolder_isPuShareholder' => [
+                'label' => '[Profil] Déjà sociétaire Plateau urbain',
+                'property' => 'projectHolder.isPuShareholder',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
             'projectHolder_address' => [
@@ -1253,13 +1262,18 @@ class SpaceManagementController extends AbstractController
                 'property' => 'projectHolder.zipcode',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
+            'projectHolder_city' => [
+                'label' => '[Profil] Ville',
+                'property' => 'projectHolder.city',
+                'category' => 'Profil - Structure du porteur de projet'
+            ],
             'projectHolder_companyPhone' => [
-                'label' => '[Profil] Téléphone structure',
+                'label' => '[Profil] Téléphone fixe',
                 'property' => 'projectHolder.companyPhone',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
             'projectHolder_companyMobile' => [
-                'label' => '[Profil] Mobile',
+                'label' => '[Profil] Téléphone mobile',
                 'property' => 'projectHolder.companyMobile',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
@@ -1273,143 +1287,151 @@ class SpaceManagementController extends AbstractController
                 'property' => 'projectHolder.companyStructures',
                 'category' => 'Profil - Structure du porteur de projet'
             ],
+            
+            // Site internet & Réseaux sociaux
             'projectHolder_companySite' => [
                 'label' => '[Profil] Site web',
                 'property' => 'projectHolder.companySite',
-                'category' => 'Profil - Structure du porteur de projet'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
-            'projectHolder_companyDescription' => [
-                'label' => '[Profil] Présentation de la structure',
-                'property' => 'projectHolder.companyDescription',
-                'category' => 'Profil - Structure du porteur de projet'
-            ],
-            'projectHolder_isPuShareholder' => [
-                'label' => '[Profil] Déjà sociétaire Plateau urbain',
-                'property' => 'projectHolder.isPuShareholder',
-                'category' => 'Profil - Structure du porteur de projet'
-            ],
-            'projectHolder_isSubjectToVat' => [
-                'label' => '[Profil] Assujetti à la TVA',
-                'property' => 'projectHolder.isSubjectToVat',
-                'category' => 'Profil - Structure du porteur de projet'
-            ],
-            
-            // Profil - Réseaux sociaux
             'projectHolder_facebookUrl' => [
                 'label' => '[Profil] Facebook',
                 'property' => 'projectHolder.facebookUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_twitterUrl' => [
                 'label' => '[Profil] Twitter',
                 'property' => 'projectHolder.twitterUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_instagramUrl' => [
                 'label' => '[Profil] Instagram',
                 'property' => 'projectHolder.instagramUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_googleUrl' => [
                 'label' => '[Profil] Bluesky',
                 'property' => 'projectHolder.googleUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_linkedinUrl' => [
                 'label' => '[Profil] LinkedIn',
                 'property' => 'projectHolder.linkedinUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_youtubeUrl' => [
                 'label' => '[Profil] YouTube',
                 'property' => 'projectHolder.youtubeUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_tiktokUrl' => [
                 'label' => '[Profil] TikTok',
                 'property' => 'projectHolder.tiktokUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
             ],
             'projectHolder_otherUrl' => [
                 'label' => '[Profil] Autre URL',
                 'property' => 'projectHolder.otherUrl',
-                'category' => 'Profil - Réseaux sociaux'
+                'category' => 'Site internet & Réseaux sociaux'
+            ],
+
+            // Profil - Documents obligatoires
+            'projectHolder_requiredIdDoc' => [
+                'label' => '[Profil] Doc obligatoire - Pièce d\'identité (chemin local)',
+                'property' => 'computed.profileRequiredIdDocPath',
+                'category' => 'Profil - Documents obligatoires'
+            ],
+            'projectHolder_requiredKbisDoc' => [
+                'label' => '[Profil] Doc obligatoire - Justificatif d\'activité (chemin local)',
+                'property' => 'computed.profileRequiredKbisDocPath',
+                'category' => 'Profil - Documents obligatoires'
             ],
             
-            'projectHolder_useType' => [
-                'label' => '[Profil] Secteur d\'activité',
-                'property' => 'projectHolder.useType',
-                'category' => 'Profil - Mon projet'
-            ],
-            'projectHolder_usageDate' => [
-                'label' => '[Profil] Date de disponibilité',
-                'property' => 'projectHolder.usageDate',
-                'category' => 'Profil - Mon projet'
-            ],
-            'projectHolder_usageDuration' => [
-                'label' => '[Profil] Durée d\'occupation',
-                'property' => 'projectHolder.usageDuration',
-                'category' => 'Profil - Mon projet'
+            // Profil - Mes souhaits
+            'projectHolder_wishedSize' => [
+                'label' => '[Profil] Surface souhaitée',
+                'property' => 'projectHolder.wishedSize',
+                'category' => 'Profil - Mes souhaits'
             ],
             'projectHolder_monthlyBudgetMax' => [
                 'label' => '[Profil] Budget mensuel total maximum (€)',
                 'property' => 'projectHolder.monthlyBudgetMax',
-                'category' => 'Profil - Mon projet'
+                'category' => 'Profil - Mes souhaits'
+            ],
+            'projectHolder_preferredDepartments' => [
+                'label' => '[Profil] Zone géographique souhaitée',
+                'property' => 'projectHolder.preferredDepartmentsLabelsForExport',
+                'category' => 'Profil - Mes souhaits'
+            ],
+            'projectHolder_usageDate' => [
+                'label' => '[Profil] Date de disponibilité',
+                'property' => 'projectHolder.usageDate',
+                'category' => 'Profil - Mes souhaits'
+            ],
+            'projectHolder_usageDuration' => [
+                'label' => '[Profil] Durée d\'occupation',
+                'property' => 'projectHolder.usageDuration',
+                'category' => 'Profil - Mes souhaits'
             ],
             'projectHolder_projectDescription' => [
                 'label' => '[Profil] Présentation du projet',
                 'property' => 'projectHolder.projectDescription',
-                'category' => 'Profil - Mon projet'
+                'category' => 'Profil - Mes souhaits'
             ],
 
-            // Candidature - Informations sur le projet
-            'description' => [
-                'label' => '[Candidature] Présentation du projet',
-                'property' => 'description',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'localUsageDescription' => [
-                'label' => '[Candidature] Quel sera l\'usage du local ?',
-                'property' => 'localUsageDescription',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'category' => [
-                'label' => '[Candidature] Type d\'usage',
-                'property' => 'category',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'companyStatus' => [
-                'label' => '[Candidature] Statut juridique',
-                'property' => 'companyStatus',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'contribution' => [
-                'label' => '[Candidature] Quelles idées avez-vous pour participer au projet collectif ?',
-                'property' => 'contribution',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'openToGlobalProject' => [
-                'label' => '[Candidature] Ouvert au projet collectif',
-                'property' => 'openToGlobalProject',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            'locationPreferences' => [
-                'label' => '[Candidature] Classement des sites',
-                'property' => 'locationPreferencesLabelsForExport',
-                'category' => 'Candidature - Informations sur le projet'
-            ],
-            
-            // Candidature - Occupation
+            // Candidature - Mon projet
             'wishedSize' => [
                 'label' => '[Candidature] Surface souhaitée (m²)',
                 'property' => 'wishedSize',
-                'category' => 'Candidature - Occupation'
+                'category' => 'Candidature - Mon projet'
+            ],
+            'lengthOccupation' => [
+                'label' => '[Candidature] Durée d\'occupation',
+                'property' => 'fullLengthOccupation',
+                'category' => 'Candidature - Mon projet'
             ],
             'startOccupation' => [
                 'label' => '[Candidature] Date d\'entrée souhaitée',
                 'property' => 'startOccupation',
-                'category' => 'Candidature - Occupation'
+                'category' => 'Candidature - Mon projet'
             ],
+            'category' => [
+                'label' => '[Candidature] Type d\'usage',
+                'property' => 'category',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'localUsageDescription' => [
+                'label' => '[Candidature] Quel sera l\'usage du local ?',
+                'property' => 'localUsageDescription',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'contribution' => [
+                'label' => '[Candidature] Quelles idées avez-vous pour participer au projet collectif ?',
+                'property' => 'contribution',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'description' => [
+                'label' => '[Candidature] Présentation du projet',
+                'property' => 'description',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'companyStatus' => [
+                'label' => '[Candidature] Statut juridique',
+                'property' => 'companyStatus',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'openToGlobalProject' => [
+                'label' => '[Candidature] Ouvert au projet collectif',
+                'property' => 'openToGlobalProject',
+                'category' => 'Candidature - Mon projet'
+            ],
+            'locationPreferences' => [
+                'label' => '[Candidature] Classement des sites',
+                'property' => 'locationPreferencesLabelsForExport',
+                'category' => 'Candidature - Mon projet'
+            ],
+
+            // Candidature - Documents déposés
             'application_documents_paths' => [
                 'label' => '[Candidature] Documents déposés (chemins locaux)',
                 'property' => 'computed.applicationDocumentsPaths',
@@ -1423,7 +1445,7 @@ class SpaceManagementController extends AbstractController
                 $fields[sprintf('locationPreference_rank_%d', $rank)] = [
                     'label' => sprintf('[Candidature] Choix %d', $rank),
                     'property' => sprintf('computed.locationPreference.rank.%d', $rank),
-                    'category' => 'Candidature - Classement des sites',
+                    'category' => 'Candidature - Mon projet',
                 ];
             }
         } else {
@@ -2512,11 +2534,11 @@ class SpaceManagementController extends AbstractController
         }
 
         if ($request->request->has('add_visit')) {
-            return $this->handleAddVisitSubmission($form, $space);
+            return $this->handleAddVisitSubmission($request, $form, $space);
         }
 
         if ($request->request->has('add_document')) {
-            return $this->handleAddDocumentSubmission($form, $space);
+            return $this->handleAddDocumentSubmission($request, $form, $space);
         }
 
         if ($request->request->has('add_photo')) {
@@ -2526,50 +2548,54 @@ class SpaceManagementController extends AbstractController
         return null;
     }
 
-    private function handleAddVisitSubmission(FormInterface $form, Space $space): Response
+    private function handleAddVisitSubmission(Request $request, FormInterface $form, Space $space): Response
     {
+        $anchor = $this->getFormSectionAnchor($space, 'visits');
+
         if (!$form->has('newVisit')) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire de visite indisponible.', $this->getFormSectionAnchor($space, 'visits'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Formulaire de visite indisponible.', $anchor);
         }
 
         $newVisit = $form->get('newVisit')->getData();
         if (!$newVisit instanceof SpaceVisit) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Données de visite invalides.', $this->getFormSectionAnchor($space, 'visits'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Données de visite invalides.', $anchor);
         }
 
         if ($newVisit->getVisitDate() === null) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez renseigner une date de visite.', $this->getFormSectionAnchor($space, 'visits'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Veuillez renseigner une date de visite.', $anchor);
         }
 
         if ($newVisit->getStartTime() === null || $newVisit->getEndTime() === null) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez renseigner les heures de début et de fin.', $this->getFormSectionAnchor($space, 'visits'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Veuillez renseigner les heures de début et de fin.', $anchor);
         }
 
         if ($space->isMultiLocation() && $newVisit->getLocation() === null) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez sélectionner un site pour cette visite.', $this->getFormSectionAnchor($space, 'visits'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Veuillez sélectionner un site pour cette visite.', $anchor);
         }
 
         if (!$space->getVisits()->contains($newVisit)) {
             $space->addVisit($newVisit);
         }
 
-        return $this->persistSpaceAndRedirectToEdit($space, 'La visite a été ajoutée.', $this->getFormSectionAnchor($space, 'visits'));
+        return $this->persistSpaceAndCompletePartialAction($request, $space, 'La visite a été ajoutée.', $anchor);
     }
 
-    private function handleAddDocumentSubmission(FormInterface $form, Space $space): Response
+    private function handleAddDocumentSubmission(Request $request, FormInterface $form, Space $space): Response
     {
+        $anchor = $this->getFormSectionAnchor($space, 'documents');
+
         if (!$form->has('newDocument')) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire de document indisponible.', $this->getFormSectionAnchor($space, 'documents'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Formulaire de document indisponible.', $anchor);
         }
 
         $newDocument = $form->get('newDocument')->getData();
         if (!$newDocument instanceof \App\Entity\SpaceDocument) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Données de document invalides.', $this->getFormSectionAnchor($space, 'documents'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Données de document invalides.', $anchor);
         }
 
         $name = trim((string) $newDocument->getName());
         if ($name === '') {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez saisir le nom de la pièce à joindre.', $this->getFormSectionAnchor($space, 'documents'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Veuillez saisir le nom de la pièce à joindre.', $anchor);
         }
 
         $newDocument->setName($name);
@@ -2578,18 +2604,20 @@ class SpaceManagementController extends AbstractController
             $space->addDocument($newDocument);
         }
 
-        return $this->persistSpaceAndRedirectToEdit($space, 'La pièce demandée a été ajoutée.', $this->getFormSectionAnchor($space, 'documents'));
+        return $this->persistSpaceAndCompletePartialAction($request, $space, 'La pièce demandée a été ajoutée.', $anchor);
     }
 
     private function handleAddPhotoSubmission(Request $request, FormInterface $form, Space $space): Response
     {
+        $anchor = $this->getFormSectionAnchor($space, 'photos');
+
         if (!$form->has('pics')) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Formulaire photo indisponible.', $this->getFormSectionAnchor($space, 'photos'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Formulaire photo indisponible.', $anchor);
         }
 
         $newImage = $this->extractSpaceImageFromPhotoForm($form, $request);
         if ($newImage === null || $newImage->getFile() === null) {
-            return $this->redirectAfterSpaceFormAction($space, 'error', 'Veuillez sélectionner une photo à ajouter.', $this->getFormSectionAnchor($space, 'photos'));
+            return $this->completePartialSpaceFormAction($request, $space, 'error', 'Veuillez sélectionner une photo à ajouter.', $anchor);
         }
 
         if (!\in_array($newImage, $space->getPics(), true)) {
@@ -2597,7 +2625,7 @@ class SpaceManagementController extends AbstractController
             $space->addPic($newImage);
         }
 
-        return $this->persistSpaceAndRedirectToEdit($space, 'La photo a été ajoutée.', $this->getFormSectionAnchor($space, 'photos'));
+        return $this->persistSpaceAndCompletePartialAction($request, $space, 'La photo a été ajoutée.', $anchor);
     }
 
     private function extractSpaceImageFromPhotoForm(FormInterface $form, Request $request): ?SpaceImage
@@ -2659,6 +2687,66 @@ class SpaceManagementController extends AbstractController
         }
 
         return $this->redirectToRoute('space_manager_add');
+    }
+
+    private function getSpaceFormActionUrl(Space $space): string
+    {
+        if ($space->getId() !== null) {
+            return $this->generateUrl('space_manager_edit', ['id' => $space->getId()]);
+        }
+
+        return $space->isMultiLocation()
+            ? $this->generateUrl('space_manager_add_multi')
+            : $this->generateUrl('space_manager_add');
+    }
+
+    private function renderRefreshedSpaceForm(Space $space): Response
+    {
+        $form = $this->createSpaceForm($space, [
+            'action' => $this->getSpaceFormActionUrl($space),
+            'method' => 'post',
+        ]);
+
+        return $this->render($this->getSpaceFormTemplate($space), [
+            'form' => $form->createView(),
+            'space' => $space,
+        ]);
+    }
+
+    private function completePartialSpaceFormAction(
+        Request $request,
+        Space $space,
+        string $label,
+        string $message,
+        string $anchor = ''
+    ): Response {
+        $this->addFlash($label, $message);
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->renderRefreshedSpaceForm($space);
+        }
+
+        $spaceId = $space->getId();
+        if ($spaceId !== null) {
+            return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . $anchor);
+        }
+
+        return $this->redirectToRoute($space->isMultiLocation() ? 'space_manager_add_multi' : 'space_manager_add');
+    }
+
+    private function persistSpaceAndCompletePartialAction(
+        Request $request,
+        Space $space,
+        string $successMessage,
+        string $anchor = ''
+    ): Response {
+        if ($space->getId() === null) {
+            $this->em->persist($space);
+        }
+
+        $this->em->flush();
+
+        return $this->completePartialSpaceFormAction($request, $space, 'success', $successMessage, $anchor);
     }
 
     private function persistSpaceAndRedirectToEdit(Space $space, string $successMessage, string $anchor = ''): Response

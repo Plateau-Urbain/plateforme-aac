@@ -818,10 +818,9 @@
         </div>
 
         <div class="toolbar-export-zone">
-          <h5 class="toolbar-export-zone__title"><i class="fa fa-download"></i> Export</h5>
+          <h5 class="toolbar-export-zone__title"><i class="fa fa-download"></i> Export du dossier complet des candidatures</h5>
 
           <div class="toolbar-export-zone__block">
-            <h6 class="toolbar-export-zone__subtitle"><i class="fa fa-file-archive-o"></i> Dossier complet des candidatures cochées</h6>
             <div class="export-selection-row">
               <div class="export-selection-row__presets selection-controls">
                 <span class="selection-controls__label">Sélection</span>
@@ -842,7 +841,7 @@
               </div>
               <div class="export-selection-row__status">
                 <span class="selection-count-label" id="selectionCountLabel">0 sélectionnée</span>
-                <p class="export-zip-hint" id="exportZipHint">Cochez une ou plusieurs candidatures dans la liste pour activer le téléchargement.</p>
+                <p class="export-zip-hint" id="exportZipHint">Utilisez « Tout », « Acceptées » ou « Refusées » pour exporter toutes les pages, ou cochez des candidatures sur la page affichée.</p>
               </div>
               <div class="export-zip-wrap">
                 <button type="button" class="btn btn-line-16 btn-sm is-empty" id="exportSelectedBtn" disabled>
@@ -854,7 +853,7 @@
           </div>
 
           <div class="toolbar-export-zone__block">
-            <h6 class="toolbar-export-zone__subtitle"><i class="fa fa-star"></i> Export personnalisé</h6>
+            <h5 class="toolbar-export-zone__subtitle"><i class="fa fa-star"></i> Export personnalisé</h5>
             <div class="export-compact">
               <p class="export-compact__text">Colonnes au choix, selon les filtres (CSV ou ZIP).</p>
               <a href="{{ path('space_manager_select_export_fields', { 'id': space.id }) }}" class="btn btn-success btn-line-16 btn-sm" style="background-color: #4CAF50; border-color: #4CAF50; color: white !important; white-space: nowrap;">
@@ -1542,11 +1541,63 @@
 
         // Gestion de la sélection pour l'export
         $(document).ready(function() {
+            var exportZipAllUrl = '{{ path("space_manager_candidatesexportzip", {"id": space.id}) }}';
+            var exportPresetCounts = {
+                all: {{ pagination.getTotalItemCount() }},
+                accepted: {{ space.nbApplication(constant('App\\Entity\\Application::ACCEPT_STATUS')) }},
+                rejected: {{ space.nbApplication(constant('App\\Entity\\Application::REJECT_STATUS')) }}
+            };
+            var activeExportPreset = null;
+
             function setSelectionPreset(preset) {
                 $('.btn-preset').removeClass('is-active').attr('aria-pressed', 'false');
-                if (preset) {
+                activeExportPreset = null;
+                if (preset && preset !== 'none') {
                     $('.btn-preset[data-preset="' + preset + '"]').addClass('is-active').attr('aria-pressed', 'true');
+                    activeExportPreset = preset;
                 }
+            }
+
+            function buildExportZipUrl(preset) {
+                var params = new URLSearchParams(window.location.search);
+
+                if (preset === 'accepted') {
+                    params.set('filter[status_filter]', 'accepted');
+                } else if (preset === 'rejected') {
+                    params.set('filter[status_filter]', 'rejected');
+                }
+
+                params.delete('page');
+
+                var query = params.toString();
+                return query ? exportZipAllUrl + '?' + query : exportZipAllUrl;
+            }
+
+            function updateExportUi(selectedCount) {
+                var $btn = $('#exportSelectedBtn');
+                var $count = $('#exportSelectedBtnCount');
+                var $hint = $('#exportZipHint');
+                var exportCount = selectedCount;
+
+                if (activeExportPreset && exportPresetCounts[activeExportPreset] !== undefined) {
+                    exportCount = exportPresetCounts[activeExportPreset];
+                }
+
+                if (exportCount === 0) {
+                    $('#selectionCountLabel').text('0 sélectionnée');
+                    $count.text('');
+                    $btn.prop('disabled', true).addClass('is-empty');
+                    $hint.removeClass('is-hidden');
+                    return;
+                }
+
+                $('#selectionCountLabel').text(
+                    exportCount + ' sélectionnée' + (exportCount > 1 ? 's' : '')
+                    + (activeExportPreset ? ' (toutes les pages)' : '')
+                );
+                $count.text(' (' + exportCount + ')');
+                $btn.prop('disabled', false).removeClass('is-empty');
+                $hint.addClass('is-hidden');
             }
 
             // Mettre à jour le compteur de sélection
@@ -1556,22 +1607,7 @@
                 }
 
                 var selectedCount = $('.exportCheck:checked').length;
-                var countLabel = selectedCount + ' sélectionnée' + (selectedCount > 1 ? 's' : '');
-                $('#selectionCountLabel').text(countLabel);
-
-                var $btn = $('#exportSelectedBtn');
-                var $count = $('#exportSelectedBtnCount');
-                var $hint = $('#exportZipHint');
-
-                if (selectedCount === 0) {
-                    $count.text('');
-                    $btn.prop('disabled', true).addClass('is-empty');
-                    $hint.removeClass('is-hidden');
-                } else {
-                    $count.text(' (' + selectedCount + ')');
-                    $btn.prop('disabled', false).removeClass('is-empty');
-                    $hint.addClass('is-hidden');
-                }
+                updateExportUi(selectedCount);
             }
 
             // Écouter les changements sur les cases à cocher
@@ -1579,38 +1615,46 @@
                 updateSelectionCount();
             });
 
-            // Bouton "Tout sélectionner"
+            // Bouton "Tout sélectionner" — export serveur de toutes les pages (filtres actifs)
             $('#selectAllBtn').click(function() {
-                $('.exportCheck').prop('checked', true);
+                $('.exportCheck').prop('checked', false);
                 setSelectionPreset('all');
-                updateSelectionCount(false);
+                updateExportUi(0);
             });
 
             // Bouton "Tout désélectionner"
             $('#selectNoneBtn').click(function() {
                 $('.exportCheck').prop('checked', false);
-                setSelectionPreset('none');
-                updateSelectionCount(false);
+                setSelectionPreset(null);
+                updateExportUi(0);
             });
 
-            // Bouton "Sélectionner acceptées"
+            // Bouton "Sélectionner acceptées" — toutes les pages
             $('#selectAcceptedBtn').click(function() {
                 $('.exportCheck').prop('checked', false);
-                $('.exportCheck[data-status="accepted"]').prop('checked', true);
                 setSelectionPreset('accepted');
-                updateSelectionCount(false);
+                updateExportUi(0);
             });
 
-            // Bouton "Sélectionner refusées"
+            // Bouton "Sélectionner refusées" — toutes les pages
             $('#selectRejectedBtn').click(function() {
                 $('.exportCheck').prop('checked', false);
-                $('.exportCheck[data-status="rejected"]').prop('checked', true);
                 setSelectionPreset('rejected');
-                updateSelectionCount(false);
+                updateExportUi(0);
             });
 
             // Export des candidatures sélectionnées
             $('#exportSelectedBtn').click(function() {
+                if (activeExportPreset) {
+                    if (exportPresetCounts[activeExportPreset] === 0) {
+                        alert('Aucune candidature à exporter pour cette sélection.');
+                        return;
+                    }
+
+                    window.location.href = buildExportZipUrl(activeExportPreset);
+                    return;
+                }
+
                 var selectedIds = [];
                 $('.exportCheck:checked').each(function() {
                     selectedIds.push($(this).val());
@@ -1621,13 +1665,12 @@
                     return;
                 }
 
-                // Créer un formulaire pour envoyer les IDs sélectionnés
+                // Créer un formulaire pour envoyer les IDs sélectionnés (page courante uniquement)
                 var form = $('<form>', {
                     'method': 'POST',
                     'action': '{{ path("space_manager_candidatesexportzip_selected", {"id": space.id}) }}'
                 });
 
-                // Ajouter les IDs sélectionnés comme champs cachés
                 selectedIds.forEach(function(id) {
                     form.append($('<input>', {
                         'type': 'hidden',
@@ -1636,20 +1679,17 @@
                     }));
                 });
 
-                // Ajouter le token CSRF
                 form.append($('<input>', {
                     'type': 'hidden',
                     'name': '_token',
                     'value': '{{ csrf_token("export_selected") }}'
                 }));
 
-                // Soumettre le formulaire
                 $('body').append(form);
                 form.submit();
                 form.remove();
             });
 
-            // Initialiser le compteur
             updateSelectionCount();
         });
 
