@@ -46,7 +46,7 @@ class SpaceType extends AbstractType
         $builder
             ->add('name', null, ['label' => 'Nom de l\'espace', 'attr' => ['class' => 'form-control'], 'error_bubbling' => false])
             ->add('managedByLabel', null, [
-                'label' => 'Texte du badge (ex: "Géré", "Commercialisé", "Proposé")',
+                'label' => 'Texte du badge',
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Géré'],
                 'required' => false,
                 'empty_data' => 'Géré',

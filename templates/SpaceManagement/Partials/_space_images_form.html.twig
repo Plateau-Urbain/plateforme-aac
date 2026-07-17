@@ -44,9 +44,9 @@
 </div>
 
 <!-- Zone d'affichage des erreurs de validation -->
-<div id="file-validation-errors" class="alert alert-danger" style="display: none;">
+<div id="file-validation-errors" class="alert alert-danger"{% if photoUploadError is not defined or not photoUploadError %} style="display: none;"{% endif %}>
     <i class="fa fa-exclamation-triangle"></i>
-    <span id="file-error-message"></span>
+    <span id="file-error-message">{% if photoUploadError is defined and photoUploadError %}{{ photoUploadError }}{% endif %}</span>
 </div>
 
 <div class="space-form-add-row">

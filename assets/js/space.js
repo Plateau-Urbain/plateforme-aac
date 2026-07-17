@@ -138,6 +138,42 @@ $(document).ready(function () {
         syncFormActionUrl();
     }
 
+    function getPhotoFileInputs() {
+        return $('#js-form-space .space-form-add-row input[type="file"]');
+    }
+
+    function getPhotoFileValidationError(file) {
+        var maxSize = 600 * 1024;
+
+        if (/[^a-zA-Z0-9._-]/.test(file.name)) {
+            return 'Le fichier "' + file.name + '" a un nom non valide. Utilisez uniquement des lettres sans accent, chiffres, points, tirets et underscores.';
+        }
+
+        if (file.size > maxSize) {
+            return 'Le fichier "' + file.name + '" est trop volumineux (' + Math.round(file.size / 1024) + ' Ko). Taille maximale autorisée : 600 Ko.';
+        }
+
+        return '';
+    }
+
+    function showPhotoFileValidationError(message) {
+        var errorDiv = $('#file-validation-errors');
+        var errorSpan = $('#file-error-message');
+
+        if (!errorDiv.length) {
+            return;
+        }
+
+        if (!message) {
+            errorSpan.text('');
+            errorDiv.hide();
+            return;
+        }
+
+        errorSpan.text(message);
+        errorDiv.show();
+    }
+
     function initLinkListener() {
         $('.js-btn-space').off('click.spacelink').on('click.spacelink', function () {
             var href = $(this).attr('href');
@@ -163,33 +199,28 @@ $(document).ready(function () {
         $('button[type="submit"]:not(.no-ajax), input[type="submit"]:not(.no-ajax)')
             .off('click.formlistener')
             .on('click.formlistener', function (e) {
-            var maxSize = 600 * 1024;
-            var fileInputs = $('input[type="file"]').not(function () {
-                return $(this).closest('.js-doc-upload').length > 0;
-            });
             var hasError = false;
             var errorMessage = '';
-            var errorDiv = $('#file-validation-errors');
-            var errorSpan = $('#file-error-message');
 
-            errorDiv.hide();
-
-            fileInputs.each(function () {
+            getPhotoFileInputs().each(function () {
                 var files = this.files;
                 for (var i = 0; i < files.length; i++) {
-                    if (files[i].size > maxSize) {
-                        errorMessage += 'Le fichier "' + files[i].name + '" est trop volumineux (' + Math.round(files[i].size / 1024) + ' Ko). Taille maximale autorisée : 600 Ko.';
+                    var fileError = getPhotoFileValidationError(files[i]);
+                    if (fileError) {
+                        errorMessage = fileError;
                         hasError = true;
+                        break;
                     }
                 }
             });
 
             if (hasError) {
-                errorSpan.text(errorMessage);
-                errorDiv.show();
+                showPhotoFileValidationError(errorMessage);
                 e.preventDefault();
                 return false;
             }
+
+            showPhotoFileValidationError('');
 
             var saving = false;
 
@@ -262,28 +293,26 @@ $(document).ready(function () {
     }
 
     function initFileValidation() {
-        $('input[type="file"]').not(function () {
-            return $(this).closest('.js-doc-upload').length > 0;
-        }).on('change', function () {
-            var maxSize = 600 * 1024;
+        $(document)
+            .off('change.photofilevalidation', '#js-form-space .space-form-add-row input[type="file"]')
+            .on('change.photofilevalidation', '#js-form-space .space-form-add-row input[type="file"]', function () {
             var files = this.files;
             var errorMessage = '';
-            var errorDiv = $('#file-validation-errors');
-            var errorSpan = $('#file-error-message');
-
-            errorDiv.hide();
 
             for (var i = 0; i < files.length; i++) {
-                if (files[i].size > maxSize) {
-                    errorMessage += 'Le fichier "' + files[i].name + '" est trop volumineux (' + Math.round(files[i].size / 1024) + ' Ko). Taille maximale autorisée : 600 Ko.';
+                errorMessage = getPhotoFileValidationError(files[i]);
+                if (errorMessage) {
+                    break;
                 }
             }
 
             if (errorMessage) {
-                errorSpan.text(errorMessage);
-                errorDiv.show();
+                showPhotoFileValidationError(errorMessage);
                 $(this).val('');
+                return;
             }
+
+            showPhotoFileValidationError('');
         });
     }
 

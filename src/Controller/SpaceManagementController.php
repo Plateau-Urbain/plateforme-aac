@@ -2620,6 +2620,18 @@ class SpaceManagementController extends AbstractController
             return $this->completePartialSpaceFormAction($request, $space, 'error', 'Veuillez sélectionner une photo à ajouter.', $anchor);
         }
 
+        $newImage->setFileType(SpaceImage::FILETYPE_IMAGE);
+        $violations = $this->validator->validate($newImage);
+        if ($violations->count() > 0) {
+            return $this->completePartialSpaceFormAction(
+                $request,
+                $space,
+                'photo_upload',
+                $violations->get(0)->getMessage(),
+                $anchor
+            );
+        }
+
         if (!\in_array($newImage, $space->getPics(), true)) {
             $newImage->setPosition(\count($space->getPics()));
             $space->addPic($newImage);

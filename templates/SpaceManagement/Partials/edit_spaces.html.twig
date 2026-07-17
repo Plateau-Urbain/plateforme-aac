@@ -20,15 +20,19 @@
     </div>
 </div>
 
+{% set photoUploadError = app.flashes('photo_upload')|last|default(null) %}
+
 {% if app.flashes|length %}
 <div class="container" style="margin-bottom: 10px;">
     {% for label, messages in app.flashes %}
+        {% if label != 'photo_upload' %}
         {% for message in messages %}
             <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'success' ? 'success' : (label == 'warning' ? 'warning' : 'info')) }} alert-dismissible" role="alert">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Fermer"><span aria-hidden="true">&times;</span></button>
                 {{ message }}
             </div>
         {% endfor %}
+        {% endif %}
     {% endfor %}
 </div>
 {% endif %}
@@ -116,6 +120,7 @@
         flex-wrap: wrap;
         align-items: flex-end;
         gap: 10px;
+        margin-bottom:15px;
     }
     #js-form-space .space-surfaces-row > .form-group {
         flex: 1 1 100%;
@@ -125,6 +130,7 @@
     @media (min-width: 768px) {
         #js-form-space .space-surfaces-row {
             flex-wrap: nowrap;
+           
         }
         #js-form-space .space-surfaces-row > .form-group {
             flex: 1 1 33%;
@@ -134,6 +140,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+         margin-bottom:15px;
     }
     #js-form-space .space-price-row__fields {
         display: flex;
@@ -337,7 +344,7 @@
             </h3>
             <div class="row">
                 <div class="col-sm-12">
-                    {% include 'SpaceManagement/Partials/_space_images_form.html.twig' with { 'images': form.vars.data.pics,'form': form.pics } %}
+                    {% include 'SpaceManagement/Partials/_space_images_form.html.twig' with { 'images': form.vars.data.pics,'form': form.pics, 'photoUploadError': photoUploadError } %}
                 </div>
             </div>
         </div>

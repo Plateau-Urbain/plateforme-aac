@@ -206,6 +206,13 @@ class SpaceImage
             $allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
             $maxSize = 600 * 1024; // 600 Ko en octets
             $errorMessage = 'Seuls les formats JPEG, PNG et WebP sont acceptés pour les photos (max 600 Ko)';
+
+            $originalName = $this->file->getClientOriginalName();
+            if ($originalName !== null && preg_match('/[^a-zA-Z0-9._-]/', $originalName)) {
+                $context->buildViolation('Le fichier "' . $originalName . '" a un nom non valide. Utilisez uniquement des lettres sans accent, chiffres, points, tirets et underscores.')
+                    ->atPath('file')
+                    ->addViolation();
+            }
         }
         // Validation pour les documents (section 4 - Documents ressources)
         else if ($fileType === self::FILETYPE_DOCUMENT_AAC || $fileType === self::FILETYPE_DOCUMENT_PLAN || $fileType === self::FILETYPE_DOCUMENT_FAQ) {

@@ -19,15 +19,19 @@
             </div>
         </div>
 
+        {% set photoUploadError = app.flashes('photo_upload')|last|default(null) %}
+
         {% if app.flashes|length %}
         <div class="container" style="margin-bottom: 10px;">
             {% for label, messages in app.flashes %}
+                {% if label != 'photo_upload' %}
                 {% for message in messages %}
                     <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'success' ? 'success' : (label == 'warning' ? 'warning' : 'info')) }} alert-dismissible" role="alert">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Fermer"><span aria-hidden="true">&times;</span></button>
                         {{ message }}
                     </div>
                 {% endfor %}
+                {% endif %}
             {% endfor %}
         </div>
         {% endif %}
@@ -152,13 +156,15 @@
             .publish-errors-summary ul { max-height: 280px; overflow-y: auto; }
             #js-form-space .form-contener.bleu .text-muted,
             #js-form-space .form-contener.bleu p.help-block {
-                color: rgba(255, 255, 255, 0.95);
+                color: rgba(0, 0, 0, 0.70);
+                font-size:16px;
             }
             #js-form-space .form-contener.bleu .alert-info,
             #js-form-space .form-contener.bleu .alert-success {
                 color: #1f2937;
                 background-color: #fff;
                 border: 1px solid rgba(255, 255, 255, 0.7);
+                font-size:16px;
             }
             #js-form-space .form-contener.bleu .alert-info strong,
             #js-form-space .form-contener.bleu .alert-success strong {
@@ -300,7 +306,7 @@
                         <h3>Photos</h3>
                         <div class="row">
                             <div class="col-sm-12">
-                                {% include 'SpaceManagement/Partials/_space_images_form.html.twig' with { 'images': form.vars.data.pics, 'form': form.pics } %}
+                                {% include 'SpaceManagement/Partials/_space_images_form.html.twig' with { 'images': form.vars.data.pics, 'form': form.pics, 'photoUploadError': photoUploadError } %}
                             </div>
                         </div>
                     </div>
