@@ -3,20 +3,21 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        /* Garantit que la modale d'alerte reste au-dessus de tout overlay local */
+        /* Modale suspension : au-dessus des overlays locaux (colorbox, cookie, nav…) */
         #depublished-warning-modal {
-            z-index: 20000 !important;
+            z-index: 20050 !important;
+            pointer-events: none;
         }
         #depublished-warning-modal .modal-dialog {
-            z-index: 20001 !important;
+            z-index: 20051 !important;
             position: relative;
+            pointer-events: auto;
         }
         #depublished-warning-modal .modal-content {
-            z-index: 20002 !important;
             position: relative;
         }
-        .modal-backdrop {
-            z-index: 19990 !important;
+        body.depublished-modal-open .modal-backdrop {
+            z-index: 20040 !important;
         }
 
         .pu-dept-combobox {
@@ -366,37 +367,6 @@
             </h1>
         </div>
         
-        
-        <!-- Pop-up d'avertissement -->
-        <div id="depublished-warning-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="depublished-warning-title" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="depublished-warning-title">
-                            <i class="fa fa-exclamation-triangle text-warning"></i>
-                            Espace temporairement dépublié
-                        </h4>
-                    </div>
-                    <div class="modal-body">
-                        <p>Cet espace a été temporairement suspendu par le propriétaire pour modification.</p>
-                        <ul>
-                            <li><strong>Vous pouvez continuer à remplir votre candidature</strong> et l'enregistrer en brouillon</li>
-                            <li><strong>Vous ne pourrez pas soumettre définitivement</strong> votre candidature tant que l'espace n'est pas republié</li>
-                            <li><strong>Une fois l'espace republié</strong>, vous pourrez compléter et soumettre votre candidature depuis "Mes candidatures"</li>
-                            <li><strong>Vous serez notifié</strong> quand l'espace sera de nouveau disponible</li>
-                        </ul>
-                        <div class="alert alert-warning">
-                            <strong>Important :</strong> Le bouton "Soumettre" est désactivé. Utilisez le bouton "Enregistrer en brouillon" pour sauvegarder votre travail.
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-line-19 btn-grey" data-dismiss="modal">
-                            J'ai compris
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
         {% if app.user %}
         <h6>
             <i class="fa-solid fa-chevron-right"></i>
@@ -798,6 +768,37 @@
 </div>
 </div>
 </div>
+
+{# Modale hors du conteneur formulaire pour éviter les conflits de z-index / stacking context #}
+<div id="depublished-warning-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="depublished-warning-title" aria-hidden="true" data-backdrop="static" data-keyboard="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="depublished-warning-title">
+                    <i class="fa fa-exclamation-triangle text-warning"></i>
+                    Espace temporairement dépublié
+                </h4>
+            </div>
+            <div class="modal-body">
+                <p>Cet espace a été temporairement suspendu par le propriétaire pour modification.</p>
+                <ul>
+                    <li><strong>Vous pouvez continuer à remplir votre candidature</strong> et l'enregistrer en brouillon</li>
+                    <li><strong>Vous ne pourrez pas soumettre définitivement</strong> votre candidature tant que l'espace n'est pas republié</li>
+                    <li><strong>Une fois l'espace republié</strong>, vous pourrez compléter et soumettre votre candidature depuis "Mes candidatures"</li>
+                    <li><strong>Vous serez notifié</strong> quand l'espace sera de nouveau disponible</li>
+                </ul>
+                <div class="alert alert-warning">
+                    <strong>Important :</strong> Le bouton "Soumettre" est désactivé. Utilisez le bouton "Enregistrer en brouillon" pour sauvegarder votre travail.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-line-19 btn-grey" data-dismiss="modal">
+                    J'ai compris
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock body %}
 
 
@@ -845,12 +846,35 @@
             let modalAlreadyShown = false;
             let spaceCheckInterval = null;
             
+            function cleanupDepublishedModalOverlays() {
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open depublished-modal-open').css('padding-right', '');
+            }
+
             // Fonction pour afficher le pop-up d'avertissement
             function showDepublishedModal() {
                 if (modalAlreadyShown) return;
                 modalAlreadyShown = true;
-                $('#depublished-warning-modal').modal({
-                    backdrop: false,
+
+                const $modal = $('#depublished-warning-modal');
+                cleanupDepublishedModalOverlays();
+
+                if (!$modal.parent().is('body')) {
+                    $modal.appendTo('body');
+                }
+
+                $modal.off('shown.bs.modal.depublished hidden.bs.modal.depublished');
+                $modal.on('shown.bs.modal.depublished', function () {
+                    $('body').addClass('depublished-modal-open');
+                    $modal.css('z-index', 20050);
+                    $('.modal-backdrop').css('z-index', 20040);
+                });
+                $modal.on('hidden.bs.modal.depublished', function () {
+                    cleanupDepublishedModalOverlays();
+                });
+
+                $modal.modal({
+                    backdrop: 'static',
                     keyboard: true
                 });
             }
@@ -895,6 +919,8 @@
                             
                             // Masquer le modal s'il est ouvert
                             $('#depublished-warning-modal').modal('hide');
+                            modalAlreadyShown = false;
+                            cleanupDepublishedModalOverlays();
                         }
                     },
                     error: function() {

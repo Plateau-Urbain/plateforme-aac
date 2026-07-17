@@ -1,5 +1,8 @@
-{% if is_granted('EXPORT', admin.class) or is_granted('ROLE_ADMIN') %}
-    <a class="btn btn-success" href="{{ admin.generateUrl('select_export_fields', admin.filterParameters is not empty ? {filter: admin.filterParameters} : {}) }}" title="Exporter avec sélection des colonnes">
-        <i class="fa fa-table"></i> Export personnalisé
-    </a>
+{% if admin.hasRoute('select_export_fields') and admin.hasAccess('list') %}
+    <li>
+        <a class="sonata-action-element" href="{{ admin.generateUrl('select_export_fields', admin.filterParameters is not empty ? {filter: admin.filterParameters} : {}) }}" title="Exporter avec sélection des colonnes">
+            <i class="fa fa-table" aria-hidden="true"></i>
+            Export personnalisé
+        </a>
+    </li>
 {% endif %}

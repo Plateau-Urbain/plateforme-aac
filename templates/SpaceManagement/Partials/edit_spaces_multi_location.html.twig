@@ -54,12 +54,116 @@
             #js-form-space .has-error select.form-control { border-color: #e9473c; }
             #js-form-space .trumbowyg-box,
             #js-form-space .trumbowyg-editor-box { border: none; }
+            #js-form-space .space-form-add-row {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 10px;
+            }
+            #js-form-space .space-form-add-row__field {
+                flex: 1 1 58%;
+                min-width: 0;
+            }
+            #js-form-space .space-form-add-row__action {
+                flex: 0 1 38%;
+                min-width: 140px;
+            }
+            @media (min-width: 768px) {
+                #js-form-space .space-form-add-row {
+                    flex-wrap: nowrap;
+                }
+            }
+            #js-form-space .space-form-add-row__field .form-control,
+            #js-form-space .space-form-add-row__field .overflow {
+                height: 42px;
+                margin-bottom: 0;
+            }
+            #js-form-space .space-form-add-row__action .btn {
+                margin-bottom: 0;
+                width: 100%;
+            }
+            #js-form-space .space-surfaces-row {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-end;
+                gap: 10px;
+            }
+            #js-form-space .space-surfaces-row > .form-group {
+                flex: 1 1 100%;
+                min-width: 0;
+                margin-bottom: 0;
+            }
+            @media (min-width: 768px) {
+                #js-form-space .space-surfaces-row {
+                    flex-wrap: nowrap;
+                }
+                #js-form-space .space-surfaces-row > .form-group {
+                    flex: 1 1 33%;
+                }
+            }
+            #js-form-space .space-price-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            #js-form-space .space-price-row__fields {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-end;
+                gap: 10px;
+                flex: 1 1 100%;
+                min-width: 0;
+            }
+            #js-form-space .space-price-row__fields > .form-group {
+                flex: 1 1 100%;
+                min-width: 0;
+                margin-bottom: 0;
+            }
+            #js-form-space .space-price-row__fields > .form-group .help-block {
+                display: none;
+            }
+            #js-form-space .space-price-row__separator {
+                flex: 1 1 100%;
+                align-self: center;
+                text-align: center;
+                margin-bottom: 0;
+            }
+            #js-form-space .space-price-row__errors {
+                flex: 1 1 100%;
+                width: 100%;
+            }
+            @media (min-width: 768px) {
+                #js-form-space .space-price-row__fields {
+                    flex-wrap: nowrap;
+                }
+                #js-form-space .space-price-row__fields > .form-group {
+                    flex: 1 1 0;
+                }
+                #js-form-space .space-price-row__separator {
+                    flex: 0 0 auto;
+                    padding: 0 6px 10px;
+                }
+            }
             .location-item { margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; }
             .location-item .panel-heading { background: #f5f5f5; padding: 10px 15px; }
             .location-item.suspended-location { opacity: 0.85; border-color: #f0ad4e; }
             .location-item.has-error-location { border-color: #e9473c; box-shadow: 0 0 0 1px #e9473c; }
             .section-has-error > .form-contener { outline: 2px solid #e9473c; outline-offset: 4px; }
             .publish-errors-summary ul { max-height: 280px; overflow-y: auto; }
+            #js-form-space .form-contener.bleu .text-muted,
+            #js-form-space .form-contener.bleu p.help-block {
+                color: rgba(255, 255, 255, 0.95);
+            }
+            #js-form-space .form-contener.bleu .alert-info,
+            #js-form-space .form-contener.bleu .alert-success {
+                color: #1f2937;
+                background-color: #fff;
+                border: 1px solid rgba(255, 255, 255, 0.7);
+            }
+            #js-form-space .form-contener.bleu .alert-info strong,
+            #js-form-space .form-contener.bleu .alert-success strong {
+                color: #111;
+            }
         </style>
 
         {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
@@ -122,18 +226,26 @@
                             </div>
                         </div>
 
-                        <div class="row" style="display: flex; align-items: center;">
-                            <div class="col-md-5 form-group{% if not form.price.vars.valid %} has-error{% endif %}">
-                                {{ form_label(form.price) }}
-                                {{ form_widget(form.price) }}
-                                {{ form_errors(form.price) }}
+                        {% set priceHasError = not form.price.vars.valid %}
+                        {% set priceTextHasError = not form.priceText.vars.valid %}
+                        <div class="space-price-row">
+                            <div class="space-price-row__fields">
+                                <div class="form-group{% if priceHasError or priceTextHasError %} has-error{% endif %}">
+                                    {{ form_label(form.price) }}
+                                    {{ form_widget(form.price) }}
+                                </div>
+                                <div class="space-price-row__separator ou-separator"><span>ou</span></div>
+                                <div class="form-group{% if priceHasError or priceTextHasError %} has-error{% endif %}">
+                                    {{ form_label(form.priceText) }}
+                                    {{ form_widget(form.priceText, { 'attr': { 'placeholder': 'Sur devis, etc.', 'class': 'form-control' } }) }}
+                                </div>
                             </div>
-                            <div class="col-sm-2 text-center form-group ou-separator"><span>ou</span></div>
-                            <div class="col-md-5 form-group{% if not form.priceText.vars.valid %} has-error{% endif %}">
-                                {{ form_label(form.priceText) }}
-                                {{ form_widget(form.priceText, { 'attr': { 'placeholder': 'Sur devis, etc.', 'class': 'form-control' } }) }}
+                            {% if priceHasError or priceTextHasError %}
+                            <div class="space-price-row__errors has-error">
+                                {{ form_errors(form.price) }}
                                 {{ form_errors(form.priceText) }}
                             </div>
+                            {% endif %}
                         </div>
 
                         {# Champs surfaces / nombre d'espaces : non pertinents pour un AAC multi-lieux

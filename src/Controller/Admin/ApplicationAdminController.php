@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Filter\Model\FilterData;
 use App\Entity\Application;
+use App\Entity\ApplicationLocationPreference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -43,20 +44,26 @@ class ApplicationAdminController extends CRUDController
                 throw $this->createAccessDeniedException('Token CSRF invalide.');
             }
 
-            $selectedFields = $request->request->all('fields');
-            
+            $selectedFields = array_values(array_filter(
+                $request->request->all('fields'),
+                static fn (mixed $field): bool => is_string($field) && $field !== ''
+            ));
+
             if (empty($selectedFields)) {
                 $this->addFlash('sonata_flash_error', 'Veuillez sélectionner au moins un champ à exporter.');
                 return $this->renderWithExtraParams('Admin/Application/select_export_fields.html.twig', [
                     'availableFields' => $availableFields,
+                    'presetExportFieldKeys' => $this->getPresetExportFieldKeys(),
                     'action' => 'list',
                     'filterParameters' => $filterParameters,
                 ]);
             }
-            
+
+            $selectedFields = $this->sortSelectedExportFieldKeys($selectedFields);
+
             // Préparer les paramètres pour l'export en conservant les filtres
             $exportParams = array_merge(
-                ['fields' => implode(',', array_filter($selectedFields, 'is_string'))],
+                ['fields' => implode(',', $selectedFields)],
                 $filterParameters
             );
             
@@ -66,6 +73,7 @@ class ApplicationAdminController extends CRUDController
         
         return $this->renderWithExtraParams('Admin/Application/select_export_fields.html.twig', [
             'availableFields' => $availableFields,
+            'presetExportFieldKeys' => $this->getPresetExportFieldKeys(),
             'action' => 'list',
             'filterParameters' => $filterParameters,
         ]);
@@ -77,16 +85,21 @@ class ApplicationAdminController extends CRUDController
     public function customExportAction(Request $request): Response
     {
         $fieldsParam = $request->query->getString('fields');
-        $selectedFieldKeys = array_filter(explode(',', $fieldsParam));
+        $selectedFieldKeys = array_values(array_filter(
+            explode(',', $fieldsParam),
+            static fn (string $key): bool => $key !== ''
+        ));
 
         if (empty($selectedFieldKeys)) {
             $this->addFlash('sonata_flash_error', 'Aucun champ sélectionné pour l\'export.');
             return $this->redirectToList();
         }
-        
+
+        $selectedFieldKeys = $this->sortSelectedExportFieldKeys($selectedFieldKeys);
+
         // Récupérer tous les champs disponibles
         $allFields = $this->getAllAvailableFields();
-        
+
         // Construire le tableau des champs à exporter
         $exportFields = [];
         foreach ($selectedFieldKeys as $key) {
@@ -147,7 +160,11 @@ class ApplicationAdminController extends CRUDController
         };
         
         // Parcourir les filtres et les appliquer au datagrid
-        foreach ($queryParams as $filterName => $filterData) {
+        $filtersToApply = isset($queryParams['filter']) && is_array($queryParams['filter'])
+            ? $queryParams['filter']
+            : $queryParams;
+
+        foreach ($filtersToApply as $filterName => $filterData) {
             // Ignorer les paramètres système et fields
             if (in_array($filterName, ['_page', '_sort_by', '_sort_order', '_per_page', 'fields'])) {
                 continue;
@@ -623,6 +640,116 @@ class ApplicationAdminController extends CRUDController
                 'category' => 'Candidature - Documents déposés'
             ],
         ];
+
+        $maxRank = $this->getMaxLocationPreferenceRank();
+        for ($rank = 1; $rank <= $maxRank; ++$rank) {
+            $fields[sprintf('locationPreference_rank_%d', $rank)] = [
+                'label' => sprintf('[Candidature] Choix %d', $rank),
+                'property' => sprintf('computed.locationPreference.rank.%d', $rank),
+                'category' => 'Candidature - Mon projet',
+            ];
+        }
+
+        return $fields;
+    }
+
+    /** @return string[] */
+    private function getPresetExportFieldKeys(): array
+    {
+        $keys = $this->getExportFieldOrderPreset();
+        $keys = array_values(array_filter($keys, static fn (string $key): bool => $key !== 'localUsageDescription'));
+
+        if ($this->getMaxLocationPreferenceRank() > 0) {
+            $keys = array_values(array_filter($keys, static fn (string $key): bool => $key !== 'locationPreferences'));
+        } else {
+            $keys = array_values(array_filter(
+                $keys,
+                static fn (string $key): bool => !preg_match('/^locationPreference_rank_\d+$/', $key)
+            ));
+        }
+
+        return $keys;
+    }
+
+    /** @return string[] */
+    private function getExportFieldOrderPreset(): array
+    {
+        $orderPreset = [
+            'space',
+            'status',
+            'name',
+            'projectHolder_company',
+            'projectHolder_fullName',
+            'projectHolder_phone',
+            'projectHolder_email',
+            'projectHolder_companyDescription',
+            'projectHolder_useType',
+            'projectHolder_isSubjectToVat',
+            'projectHolder_isPuShareholder',
+            'projectHolder_companySite',
+            'projectHolder_instagramUrl',
+            'projectHolder_linkedinUrl',
+            'description',
+            'created',
+            'wishedSize',
+            'lengthOccupation',
+            'startOccupation',
+            'category',
+            'contribution',
+        ];
+
+        $maxRank = $this->getMaxLocationPreferenceRank();
+        for ($rank = 1; $rank <= $maxRank; ++$rank) {
+            $orderPreset[] = sprintf('locationPreference_rank_%d', $rank);
+        }
+
+        return array_merge($orderPreset, [
+            'localUsageDescription',
+            'locationPreferences',
+        ]);
+    }
+
+    /**
+     * @param string[] $selectedFieldKeys
+     *
+     * @return string[]
+     */
+    private function sortSelectedExportFieldKeys(array $selectedFieldKeys): array
+    {
+        $orderPreset = $this->getExportFieldOrderPreset();
+
+        $resolveExportFieldSortIndex = static function (string $key) use ($orderPreset): int {
+            $index = array_search($key, $orderPreset, true);
+            if ($index !== false) {
+                return (int) $index;
+            }
+            if (preg_match('/^locationPreference_rank_(\d+)$/', $key, $matches)) {
+                return 9000 + (int) $matches[1];
+            }
+
+            return 10000;
+        };
+
+        usort($selectedFieldKeys, static function ($a, $b) use ($resolveExportFieldSortIndex): int {
+            if (!is_string($a) || !is_string($b)) {
+                return 0;
+            }
+
+            return $resolveExportFieldSortIndex($a) <=> $resolveExportFieldSortIndex($b);
+        });
+
+        return $selectedFieldKeys;
+    }
+
+    private function getMaxLocationPreferenceRank(): int
+    {
+        $maxRank = (int) $this->em->createQueryBuilder()
+            ->select('MAX(lp.rank)')
+            ->from(ApplicationLocationPreference::class, 'lp')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return max($maxRank, 0);
     }
 
     /**
@@ -685,6 +812,13 @@ class ApplicationAdminController extends CRUDController
         if ($property === 'computed.applicationDocumentsPaths') {
             $paths = $this->getApplicationDocumentDisplayPaths($application);
             return $paths ? implode('; ', $paths) : '';
+        }
+
+        if (is_object($application)
+            && $application instanceof Application
+            && preg_match('/^computed\.locationPreference\.rank\.(\d+)$/', $property, $matches)
+        ) {
+            return $application->getLocationLabelAtRank((int) $matches[1]);
         }
 
         if (!is_object($application) || !method_exists($application, 'getProjectHolder')) {

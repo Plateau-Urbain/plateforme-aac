@@ -5,8 +5,10 @@ namespace App\Admin;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Form\Type\CollectionType;
 use App\Form\ApplicationFileType;
+use App\Form\Admin\ApplicationLocationPreferenceFilterType;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
+use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\DoctrineORMAdminBundle\Filter\ChoiceFilter;
@@ -15,12 +17,19 @@ use Sonata\DoctrineORMAdminBundle\Filter\DateTimeRangeFilter;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
+use Sonata\DoctrineORMAdminBundle\Filter\CallbackFilter;
+use Sonata\AdminBundle\Filter\Model\FilterData;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Entity\Application;
+use App\Entity\ApplicationLocationPreference;
+use App\Entity\Space;
+use App\Entity\SpaceLocation;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 /** @extends AbstractAdmin<Application> */
 class ApplicationAdmin extends AbstractAdmin
@@ -28,12 +37,20 @@ class ApplicationAdmin extends AbstractAdmin
     protected $baseRouteName = 'candidature';
     protected $baseRoutePattern = 'candidature';
 
-    // setup the default sort column and order
-    /** @var array<string, mixed> */
-    protected array $datagridValues = [
-        '_sort_order' => 'desc',
-        '_sort_by' => 'created',
-    ];
+    public function __construct(
+        private EntityManagerInterface $em,
+        ?string $code = null,
+        ?string $class = null,
+        ?string $baseControllerName = null,
+    ) {
+        parent::__construct($code, $class, $baseControllerName);
+    }
+
+    protected function configureDefaultSortValues(array &$sortValues): void
+    {
+        $sortValues[DatagridInterface::SORT_ORDER] = 'DESC';
+        $sortValues[DatagridInterface::SORT_BY] = 'created';
+    }
 
     /**
      * Configure les routes personnalisées
@@ -151,6 +168,9 @@ class ApplicationAdmin extends AbstractAdmin
     // Fields to be shown on filter forms
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
+        $siteChoices = $this->getMultiLocationSiteFilterChoices();
+        $rankChoices = $this->getLocationPreferenceRankChoices();
+
         $datagridMapper
             ->add('name', null, ['label' => 'Nom du projet'])
             ->add('status', ChoiceFilter::class, [
@@ -171,12 +191,81 @@ class ApplicationAdmin extends AbstractAdmin
                 'admin_code' => 'app.admin.project_holder',
             ])
             ->add('space', null, ['label' => 'Espace'])
+            ->add('locationPreference', CallbackFilter::class, [
+                'label' => 'Choix de site (AAC multi-sites)',
+                'callback' => function (ProxyQueryInterface $query, string $alias, string $field, FilterData $data): bool {
+                    if (!$data->hasValue()) {
+                        return false;
+                    }
+
+                    $value = $data->getValue();
+                    if (!\is_array($value)) {
+                        return false;
+                    }
+
+                    $siteId = $value['site'] ?? null;
+                    if ($siteId === null || $siteId === '') {
+                        return false;
+                    }
+
+                    $dql = sprintf(
+                        'SELECT 1 FROM %s lp_filter WHERE lp_filter.application = %s AND lp_filter.location = :locationPrefSite',
+                        ApplicationLocationPreference::class,
+                        $alias
+                    );
+
+                    $qb = $query->getQueryBuilder();
+                    $qb->setParameter('locationPrefSite', (int) $siteId);
+
+                    $rank = $value['rank'] ?? null;
+                    if ($rank !== null && $rank !== '') {
+                        $dql .= ' AND lp_filter.rank = :locationPrefRank';
+                        $qb->setParameter('locationPrefRank', (int) $rank);
+                    }
+
+                    $qb->andWhere($qb->expr()->exists($dql));
+
+                    return true;
+                },
+                'field_type' => ApplicationLocationPreferenceFilterType::class,
+                'field_options' => [
+                    'site_choices' => $siteChoices,
+                    'rank_choices' => $rankChoices,
+                ],
+            ])
             ->add('created', DateTimeRangeFilter::class, ['label' => 'Date de création'])
             ->add('startOccupation', DateRangeFilter::class, ['label' => 'Date d\'entrée souhaitée'])
-            ->add('projectHolder.companyStatus', null, ['label' => 'Statut juridique (profil)'])
             ->add('companyStatus', null, ['label' => 'Statut juridique (candidature)'])
-            ->add('projectHolder.wishedSize', null, ['label' => 'Surface souhaitée (profil) (m²)'])
-            ->add('wishedSize', null, ['label' => 'Surface souhaitée (candidature) (m²)'])
+            ->add('wishedSizeMin', CallbackFilter::class, [
+                'label' => 'Surface souhaitée min (candidature) (m²)',
+                'callback' => static function (ProxyQueryInterface $query, string $alias, string $field, FilterData $data): bool {
+                    if (!$data->hasValue() || $data->getValue() === null || $data->getValue() === '') {
+                        return false;
+                    }
+
+                    $query->getQueryBuilder()
+                        ->andWhere(sprintf('%s.wishedSize >= :applicationWishedSizeMin', $alias))
+                        ->setParameter('applicationWishedSizeMin', $data->getValue());
+
+                    return true;
+                },
+                'field_type' => NumberType::class,
+            ])
+            ->add('wishedSizeMax', CallbackFilter::class, [
+                'label' => 'Surface souhaitée max (candidature) (m²)',
+                'callback' => static function (ProxyQueryInterface $query, string $alias, string $field, FilterData $data): bool {
+                    if (!$data->hasValue() || $data->getValue() === null || $data->getValue() === '') {
+                        return false;
+                    }
+
+                    $query->getQueryBuilder()
+                        ->andWhere(sprintf('%s.wishedSize <= :applicationWishedSizeMax', $alias))
+                        ->setParameter('applicationWishedSizeMax', $data->getValue());
+
+                    return true;
+                },
+                'field_type' => NumberType::class,
+            ])
             ->add('openToGlobalProject', null, ['label' => 'Ouvert au projet collectif'])
         ;
     }
@@ -233,6 +322,10 @@ class ApplicationAdmin extends AbstractAdmin
                 'route' => ['name' => 'edit'],
             ])
             ->add('space', null, ['label' => 'Espace'])
+            ->add('locationPreferencesLabelsForExport', null, [
+                'label' => 'Choix de sites',
+                'sortable' => false,
+            ])
             ->add('category', null, ['label' => "Type d'usage"])
             ->add('projectHolder', null, [
                 'label' => 'Porteur de projet',
@@ -325,6 +418,69 @@ class ApplicationAdmin extends AbstractAdmin
           'Date d\'entrée souhaitée' => 'startOccupation',
           'Contribution au projet du propriétaire' => 'contribution'
         ];
+    }
+
+    /** @return array<string, string> */
+    private function getMultiLocationSiteFilterChoices(): array
+    {
+        /** @var SpaceLocation[] $locations */
+        $locations = $this->em->createQueryBuilder()
+            ->select('loc', 'space')
+            ->from(SpaceLocation::class, 'loc')
+            ->innerJoin('loc.space', 'space')
+            ->where('space.workflowType = :workflow')
+            ->setParameter('workflow', Space::WORKFLOW_MULTI_LOCATION)
+            ->orderBy('space.name', 'ASC')
+            ->addOrderBy('loc.displayOrder', 'ASC')
+            ->addOrderBy('loc.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $choices = [];
+        foreach ($locations as $location) {
+            $space = $location->getSpace();
+            $label = (string) $location->getName();
+            if ($location->getCity()) {
+                $label .= ' (' . $location->getCity() . ')';
+            }
+            if ($space && $space->getName()) {
+                $label = $space->getName() . ' — ' . $label;
+            }
+
+            $choices[$label] = (string) $location->getId();
+        }
+
+        return $choices;
+    }
+
+    /** @return array<string, string> */
+    private function getLocationPreferenceRankChoices(): array
+    {
+        $maxRank = (int) $this->em->createQueryBuilder()
+            ->select('MAX(lp.rank)')
+            ->from(ApplicationLocationPreference::class, 'lp')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        if ($maxRank < 1) {
+            $maxRank = 10;
+        }
+
+        $choices = [];
+        for ($rank = 1; $rank <= $maxRank; ++$rank) {
+            $choices[$this->formatLocationPreferenceRankLabel($rank)] = (string) $rank;
+        }
+
+        return $choices;
+    }
+
+    private function formatLocationPreferenceRankLabel(int $rank): string
+    {
+        return match ($rank) {
+            1 => '1er choix',
+            2 => '2e choix',
+            default => $rank . 'e choix',
+        };
     }
 
     

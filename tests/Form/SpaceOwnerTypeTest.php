@@ -39,5 +39,7 @@ class SpaceOwnerTypeTest extends AbstractFormTestCase
         $this->assertFalse($companyInfo->has('companyEffective'));
         $this->assertFalse($companyInfo->has('companyStructures'));
         $this->assertFalse($companyInfo->has('companyBlog'));
+        $this->assertFalse($companyInfo->has('isPuShareholder'));
+        $this->assertFalse($companyInfo->has('isSubjectToVat'));
     }
 }

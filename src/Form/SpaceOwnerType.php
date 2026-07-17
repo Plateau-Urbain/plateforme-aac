@@ -32,7 +32,9 @@ class SpaceOwnerType extends AbstractType
         $companyForm->remove('companyDescription')
                     ->remove('companyEffective')
                     ->remove('companyStructures')
-                    ->remove('companyBlog');
+                    ->remove('companyBlog')
+                    ->remove('isPuShareholder')
+                    ->remove('isSubjectToVat');
     }
 
     /**

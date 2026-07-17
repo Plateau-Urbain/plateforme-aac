@@ -22,7 +22,6 @@
 {% import _self as helper %}
 <div class="row">
     <div class="col-md-12">
-        {# Afficher les filtres appliqués - Version robuste #}
         {% set activeFilters = [] %}
         {% set filterValues = (filterParameters.filter is defined ? filterParameters.filter : filterParameters)|default({}) %}
 
@@ -31,7 +30,7 @@
                 {% if value is iterable and value.value is defined %}
                     {% set filterValue = value.value %}
                     {% if filterValue is not null and filterValue != '' %}
-                        {% if key in ['usageDate', 'createdAt', 'startOccupation', 'created'] %}
+                        {% if key in ['limitAvailability', 'created', 'updated', 'submittedAt'] %}
                             {% if filterValue is iterable %}
                                 {% set parts = [] %}
                                 {% if filterValue.start is defined and filterValue.start is not empty %}
@@ -64,7 +63,7 @@
                         {% endif %}
                     {% endif %}
                 {% elseif value is not null and value != '' and value is not iterable %}
-                    {% if key in ['usageDate', 'createdAt', 'startOccupation', 'created'] %}
+                    {% if key in ['limitAvailability', 'created', 'updated', 'submittedAt'] %}
                         {% set dateStr = helper.format_sonata_date(value) %}
                         {% if dateStr is not empty %}
                             {% set activeFilters = activeFilters|merge([{'name': key, 'value': dateStr}]) %}
@@ -75,7 +74,7 @@
                 {% endif %}
             {% endif %}
         {% endfor %}
-        
+
         {% if activeFilters|length > 0 %}
         <div class="box box-info">
             <div class="box-header with-border">
@@ -118,7 +117,7 @@
                 </div>
             </div>
             <div class="box-body">
-                <p>Vous êtes sur le point d'exporter <strong>TOUS les porteurs de projet</strong>.</p>
+                <p>Vous êtes sur le point d'exporter <strong>TOUS les espaces</strong>.</p>
             </div>
         </div>
         {% endif %}
@@ -130,11 +129,6 @@
         <h3 class="box-title">
             <i class="fa fa-download"></i> Sélectionner les champs à exporter
         </h3>
-        <div class="box-tools pull-right">
-            <a href="{{ admin.generateUrl('help_filters') }}" class="btn btn-box-tool" title="Aide">
-                <i class="fa fa-question-circle"></i> Aide
-            </a>
-        </div>
     </div>
 
     <form method="POST" action="{{ admin.generateUrl('select_export_fields', filterParameters|default({})) }}" id="export-form">
@@ -193,9 +187,9 @@
                                 <div class="col-md-4 col-sm-6">
                                     <div class="checkbox">
                                         <label>
-                                            <input 
-                                                type="checkbox" 
-                                                name="fields[]" 
+                                            <input
+                                                type="checkbox"
+                                                name="fields[]"
                                                 value="{{ item.key }}"
                                                 class="field-checkbox category-{{ category|replace({' ': '_'}) }}"
                                             />
@@ -214,7 +208,7 @@
 
         <div class="box-footer">
             <button type="submit" class="btn btn-success btn-lg" id="submit-btn">
-                <i class="fa fa-download"></i> Exporter les porteurs de projet
+                <i class="fa fa-download"></i> Exporter les espaces
             </button>
             <a href="{{ admin.generateUrl('list') }}" class="btn btn-default btn-lg">
                 <i class="fa fa-times"></i> Annuler
@@ -229,16 +223,16 @@
         font-size: 16px;
         font-weight: bold;
     }
-    
+
     .checkbox {
         margin-top: 5px;
         margin-bottom: 5px;
     }
-    
+
     .panel-body {
         background-color: #f9f9f9;
     }
-    
+
     #selected-count {
         font-size: 14px;
         padding: 8px 12px;
@@ -246,22 +240,22 @@
         margin-top: 10px;
         display: inline-block;
     }
-    
+
     .box-footer {
         padding: 15px;
     }
-    
+
     .btn-group {
         margin-bottom: 15px;
     }
-    
+
     .checkbox div[class^="icheckbox"],
     .checkbox-inline div[class^="icheckbox"],
     .radio div[class^="iradio"],
     .radio-inline div[class^="iradio"] {
         display: none !important;
     }
-    
+
     .checkbox label.field-selected {
         background-color: #d9edf7;
         padding: 5px 10px;
@@ -270,7 +264,7 @@
         font-weight: bold;
         transition: all 0.2s;
     }
-    
+
     .checkbox label.field-selected:before {
         content: "✓ ";
         color: #3c8dbc;
@@ -287,11 +281,11 @@ $(document).ready(function() {
     const selectedCountLabel = $('#selected-count');
     const selectAllBtn = $('#select-all-btn');
     const deselectAllBtn = $('#deselect-all-btn');
-    
+
     function updateSelectedCount() {
         const count = $('input[name="fields[]"]:checked').length;
         selectedCountLabel.text(count + ' champ' + (count > 1 ? 's' : '') + ' sélectionné' + (count > 1 ? 's' : ''));
-        
+
         if (count === 0) {
             selectedCountLabel.attr('class', 'label label-default');
         } else if (count < 5) {
@@ -300,7 +294,7 @@ $(document).ready(function() {
             selectedCountLabel.attr('class', 'label label-info');
         }
     }
-    
+
     selectAllBtn.on('click', function(e) {
         e.preventDefault();
         $('input[name="fields[]"]').prop('checked', true);
@@ -309,7 +303,7 @@ $(document).ready(function() {
         updateSelectedCount();
         updateVisualIndicators();
     });
-    
+
     deselectAllBtn.on('click', function(e) {
         e.preventDefault();
         $('input[name="fields[]"]').prop('checked', false);
@@ -319,31 +313,7 @@ $(document).ready(function() {
         updateVisualIndicators();
     });
 
-    // Sélection type : champs essentiels du profil porteur
-    var presetFields = [
-        'lastname',
-        'firstname',
-        'email',
-        'phone',
-        'createdAt',
-        'company',
-        'companyDescription',
-        'companyStatus',
-        'useType',
-        'address',
-        'zipcode',
-        'city',
-        'companyPhone',
-        'companyMobile',
-        'company_site',
-        'instagramUrl',
-        'linkedinUrl',
-        'wishedSize',
-        'preferredDepartments',
-        'usageDate',
-        'usageDuration',
-        'projectDescription'
-    ];
+    var presetFields = {{ presetExportFieldKeys|default([])|json_encode|raw }};
 
     function syncCategoryCheckboxes() {
         categoryCheckboxes.each(function() {
@@ -364,19 +334,19 @@ $(document).ready(function() {
         updateSelectedCount();
         updateVisualIndicators();
     });
-    
+
     categoryCheckboxes.on('change', function() {
         const category = $(this).data('category');
         $('.category-' + category).prop('checked', $(this).prop('checked'));
         updateSelectedCount();
         updateVisualIndicators();
     });
-    
+
     function updateVisualIndicators() {
         $('input[name="fields[]"]').each(function() {
             const $checkbox = $(this);
             const $label = $checkbox.closest('label');
-            
+
             if ($checkbox.is(':checked')) {
                 $label.addClass('field-selected');
             } else {
@@ -384,15 +354,15 @@ $(document).ready(function() {
             }
         });
     }
-    
+
     fieldCheckboxes.on('change', function() {
         updateSelectedCount();
         updateVisualIndicators();
     });
-    
+
     updateSelectedCount();
     updateVisualIndicators();
-    
+
     $('#export-form').on('submit', function(e) {
         const checkedCount = $('.field-checkbox:checked').length;
         if (checkedCount === 0) {

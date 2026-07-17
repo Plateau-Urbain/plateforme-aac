@@ -48,7 +48,11 @@ services:
     app.admin.space:
         class: App\Admin\SpaceAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\Space, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Espaces }
+            - { name: sonata.admin, model_class: App\Entity\Space, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Espaces, controller: App\Controller\Admin\SpaceAdminController }
+
+    App\Controller\Admin\SpaceAdminController:
+        public: true
+        tags: ['controller.service_arguments']
 
     app.admin.parcel:
         class: App\Admin\ParcelAdmin
@@ -81,7 +85,11 @@ services:
     app.admin.user:
         class: App\Admin\UserAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\User, manager_type: orm, group: plateau_urbain.admin.group.users, label: Utilisateurs, default: true }
+            - { name: sonata.admin, model_class: App\Entity\User, manager_type: orm, group: plateau_urbain.admin.group.users, label: Utilisateurs, default: true, controller: App\Controller\Admin\UtilisateursAdminController }
+
+    App\Controller\Admin\UtilisateursAdminController:
+        public: true
+        tags: ['controller.service_arguments']
 
     app.admin.user_document:
         class: App\Admin\UserDocumentAdmin

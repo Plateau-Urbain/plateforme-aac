@@ -17,6 +17,7 @@
         "knplabs/knp-paginator-bundle": "^6.10",
         "sonata-project/admin-bundle": "^4.42",
         "sonata-project/doctrine-orm-admin-bundle": "^4.21",
+        "sonata-project/exporter": "^3.4",
         "symfony/brevo-mailer": "6.4.*",
         "symfony/console": "6.4.*",
         "symfony/dotenv": "6.4.*",

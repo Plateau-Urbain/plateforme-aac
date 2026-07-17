@@ -35,6 +35,8 @@ class SpaceAdmin extends AbstractAdmin
     protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         $collection->remove('show');
+        $collection->add('select_export_fields', 'select-export-fields');
+        $collection->add('custom_export', 'custom-export');
     }
 
     protected function configure(): void
@@ -49,6 +51,7 @@ class SpaceAdmin extends AbstractAdmin
         assert($query instanceof ProxyQuery);
         $alias = $query->getRootAliases()[0];
         $query->leftJoin($alias.'.owner', 'space_owner')->addSelect('space_owner');
+        $query->leftJoin($alias.'.type', 'space_type')->addSelect('space_type');
 
         return $query;
     }
@@ -105,6 +108,215 @@ class SpaceAdmin extends AbstractAdmin
     {
         $sortValues[DatagridInterface::SORT_ORDER] = 'DESC';
         $sortValues[DatagridInterface::SORT_BY] = 'created';
+    }
+
+    public function getExportFormats(): array
+    {
+        return ['csv', 'xls'];
+    }
+
+    /** @return array<string, array{label: string, property: string, category: string}> */
+    public static function getExportFieldDefinitions(): array
+    {
+        return [
+            'id' => [
+                'label' => 'Identifiant',
+                'property' => 'id',
+                'category' => 'Informations générales',
+            ],
+            'name' => [
+                'label' => "Nom de l'espace",
+                'property' => 'name',
+                'category' => 'Informations générales',
+            ],
+            'managedByLabel' => [
+                'label' => 'Texte du badge',
+                'property' => 'managedByLabel',
+                'category' => 'Informations générales',
+            ],
+            'workflowType' => [
+                'label' => 'Type de workflow',
+                'property' => 'computed.workflowTypeLabel',
+                'category' => 'Informations générales',
+            ],
+            'created' => [
+                'label' => 'Date de création',
+                'property' => 'created',
+                'category' => 'Informations générales',
+            ],
+            'updated' => [
+                'label' => 'Date de mise à jour',
+                'property' => 'updated',
+                'category' => 'Informations générales',
+            ],
+            'submittedAt' => [
+                'label' => 'Date de soumission',
+                'property' => 'submittedAt',
+                'category' => 'Informations générales',
+            ],
+            'owner' => [
+                'label' => 'Propriétaire',
+                'property' => 'computed.ownerLabel',
+                'category' => 'Propriétaire',
+            ],
+            'owner_company' => [
+                'label' => 'Structure du propriétaire',
+                'property' => 'owner.company',
+                'category' => 'Propriétaire',
+            ],
+            'owner_email' => [
+                'label' => 'Email du propriétaire',
+                'property' => 'owner.email',
+                'category' => 'Propriétaire',
+            ],
+            'owner_phone' => [
+                'label' => 'Téléphone du propriétaire',
+                'property' => 'owner.phone',
+                'category' => 'Propriétaire',
+            ],
+            'address' => [
+                'label' => 'Adresse',
+                'property' => 'address',
+                'category' => 'Localisation',
+            ],
+            'zipCode' => [
+                'label' => 'Code postal',
+                'property' => 'zipCode',
+                'category' => 'Localisation',
+            ],
+            'city' => [
+                'label' => 'Ville',
+                'property' => 'city',
+                'category' => 'Localisation',
+            ],
+            'type' => [
+                'label' => 'Type de locaux',
+                'property' => 'type',
+                'category' => 'Caractéristiques',
+            ],
+            'isErp' => [
+                'label' => 'ERP (Établissement Recevant du Public)',
+                'property' => 'computed.yesno.isErp',
+                'category' => 'Caractéristiques',
+            ],
+            'description' => [
+                'label' => 'Description',
+                'property' => 'description',
+                'category' => 'Description',
+            ],
+            'activityDescription' => [
+                'label' => 'Activités recherchées',
+                'property' => 'activityDescription',
+                'category' => 'Description',
+            ],
+            'locationDescription' => [
+                'label' => 'Description du lieu',
+                'property' => 'locationDescription',
+                'category' => 'Description',
+            ],
+            'usageRestriction' => [
+                'label' => 'Restrictions d\'usage',
+                'property' => 'usageRestriction',
+                'category' => 'Description',
+            ],
+            'surface' => [
+                'label' => 'Surface totale (m²)',
+                'property' => 'surface',
+                'category' => 'Caractéristiques',
+            ],
+            'nbSpaces' => [
+                'label' => "Nombre d'espaces",
+                'property' => 'nbSpaces',
+                'category' => 'Caractéristiques',
+            ],
+            'minSpace' => [
+                'label' => 'Surface minimale (m²)',
+                'property' => 'minSpace',
+                'category' => 'Caractéristiques',
+            ],
+            'maxSpace' => [
+                'label' => 'Surface maximale (m²)',
+                'property' => 'maxSpace',
+                'category' => 'Caractéristiques',
+            ],
+            'availability' => [
+                'label' => 'Durée du projet',
+                'property' => 'availability',
+                'category' => 'Caractéristiques',
+            ],
+            'limitAvailability' => [
+                'label' => 'Date limite de candidature',
+                'property' => 'limitAvailability',
+                'category' => 'Caractéristiques',
+            ],
+            'price' => [
+                'label' => 'Prix au m² mensuel',
+                'property' => 'price',
+                'category' => 'Caractéristiques',
+            ],
+            'priceText' => [
+                'label' => 'Prix personnalisé (texte libre)',
+                'property' => 'priceText',
+                'category' => 'Caractéristiques',
+            ],
+            'rollingApplications' => [
+                'label' => 'Candidatures au fil de l\'eau',
+                'property' => 'computed.yesno.rollingApplications',
+                'category' => 'Caractéristiques',
+            ],
+            'enabled' => [
+                'label' => 'En ligne',
+                'property' => 'computed.yesno.enabled',
+                'category' => 'Publication',
+            ],
+            'submitted' => [
+                'label' => 'Soumis',
+                'property' => 'computed.yesno.submitted',
+                'category' => 'Publication',
+            ],
+            'closed' => [
+                'label' => 'Clôturé',
+                'property' => 'computed.yesno.closed',
+                'category' => 'Publication',
+            ],
+        ];
+    }
+
+    protected function configureExportFields(): array
+    {
+        $fields = [];
+        foreach (self::getExportFieldDefinitions() as $definition) {
+            $fields[$definition['label']] = self::mapExportPropertyForStandardExport($definition['property']);
+        }
+
+        return $fields;
+    }
+
+    private static function mapExportPropertyForStandardExport(string $property): string
+    {
+        return match ($property) {
+            'computed.workflowTypeLabel' => 'workflowType',
+            'computed.ownerLabel' => 'owner.company',
+            'computed.yesno.isErp' => 'isErp',
+            'computed.yesno.rollingApplications' => 'rollingApplications',
+            'computed.yesno.enabled' => 'enabled',
+            'computed.yesno.submitted' => 'submitted',
+            'computed.yesno.closed' => 'closed',
+            default => $property,
+        };
+    }
+
+    protected function configureActionButtons(array $buttonList, string $action, ?object $object = null): array
+    {
+        $buttonList = parent::configureActionButtons($buttonList, $action, $object);
+
+        if ($action === 'list') {
+            $buttonList['export_custom'] = [
+                'template' => 'Admin/button_export_custom.html.twig',
+            ];
+        }
+
+        return $buttonList;
     }
 
     protected function configureFormOptions(array &$formOptions): void

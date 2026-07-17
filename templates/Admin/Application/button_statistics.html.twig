@@ -1,5 +1,8 @@
-{% if is_granted('LIST', admin.class) or is_granted('ROLE_ADMIN') %}
-    <a class="btn btn-info" href="{{ admin.generateUrl('statistics') }}" title="Statistiques globales des candidatures">
-        <i class="fa fa-bar-chart"></i> Statistiques
-    </a>
+{% if admin.hasRoute('statistics') and admin.hasAccess('list') %}
+    <li>
+        <a class="sonata-action-element" href="{{ admin.generateUrl('statistics') }}" title="Statistiques globales des candidatures">
+            <i class="fa fa-bar-chart" aria-hidden="true"></i>
+            Statistiques
+        </a>
+    </li>
 {% endif %}

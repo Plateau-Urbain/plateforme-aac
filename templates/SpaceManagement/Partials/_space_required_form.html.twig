@@ -30,8 +30,25 @@
     Formats acceptés : <strong>PDF, DOC, DOCX</strong>. Taille maximale : <strong>10 Mo</strong> par document.
 </p>
 
-<div class="row">
-  <div class="col-sm-4">
+<style>
+    #js-form-space .space-required-docs-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    #js-form-space .space-required-docs-row__item {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+    @media (min-width: 992px) {
+        #js-form-space .space-required-docs-row__item {
+            flex: 1 1 0;
+        }
+    }
+</style>
+
+<div class="space-required-docs-row">
+  <div class="space-required-docs-row__item">
     <h5>Appel à candidature</h5>
     {% if space.getDocs('document_aac') | length %}
         {% set fileaac =  space.getDocs('document_aac')[0] %}
@@ -48,7 +65,7 @@
     {% endif %}
   </div>
 
-  <div class="col-sm-4">
+  <div class="space-required-docs-row__item">
     <h5>Répartition des espaces</h5>
     {% if space.getDocs('document_plan') | length %}
         {% set fileplan =  space.getDocs('document_plan')[0] %}
@@ -65,7 +82,7 @@
     {% endif %}
   </div>
 
-  <div class="col-sm-4">
+  <div class="space-required-docs-row__item">
     <h5>F.A.Q</h5>
     {% if space.getDocs('document_faq') | length %}
         {% set filefaq =  space.getDocs('document_faq')[0] %}

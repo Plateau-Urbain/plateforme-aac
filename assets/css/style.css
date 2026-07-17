@@ -5943,7 +5943,9 @@ a.tp-caption.btn-lg {
   margin-left: 0;
   float: left;
 }
-
+.results-numbers {
+  padding: 20px 30px;
+}
 .view-mode,
 .sort {
   float: left !important;
@@ -11015,6 +11017,7 @@ div.dark_square #pp_full_res .pp_inline {
   margin-left: auto;
   white-space: nowrap;
   text-align: right;
+  font-size:19px;
 }
 
 #property-listing.management-list .application-space .space-card-side-link--inline {
@@ -11848,13 +11851,13 @@ form .main .section-title {
 /* Badge "Géré par Plateau Urbain" affiché en absolu sur les cartes admin */
 .pu-managed-badge {
   position: absolute;
-  top: 6px;
-  right: 10px;
+  top: 0;
+  right: 0;
   z-index: 2;
   background: rgba(45, 116, 186, 0.95);
   color: #fff;
-  padding: 4px 9px;
-  border-radius: 3px;
+  padding: 9px 9px;
+  border-bottom-left-radius: 3px;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -14556,13 +14559,13 @@ form .main .section-title.form-sixth:after {
 /* Badge "Géré par [structure]" pour les cartes proprio */
 .pu-owner-badge {
   position: absolute;
-  top: 6px;
-  right: 10px;
+  top: 0px;
+  right: 0px;
   z-index: 2;
   background: #e7b15a;
   color: #fff;
-  padding: 4px 9px;
-  border-radius: 3px;
+  padding: 9px 9px;
+  border-bottom-left-radius: 3px;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -14572,7 +14575,7 @@ form .main .section-title.form-sixth:after {
   max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  
 }
 
 .pu-owner-badge .fa {

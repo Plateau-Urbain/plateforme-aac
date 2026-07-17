@@ -2,111 +2,26 @@
 
 namespace App\Controller\Admin;
 
-use App\Admin\SpaceAdmin;
-use App\Entity\Space;
+use App\Admin\UserAdmin;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Controller\CRUDController;
-use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Filter\Model\FilterData;
 use Sonata\Exporter\Writer\CsvWriter;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-/** @extends CRUDController<Space> */
-class SpaceAdminController extends CRUDController
+/** @extends CRUDController<User> */
+class UtilisateursAdminController extends CRUDController
 {
     private readonly PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(private EntityManagerInterface $em)
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-    }
-
-    /**
-     * Action de suppression en lot personnalisée pour gérer les applications associées
-     */
-    public function batchActionDelete(ProxyQueryInterface $query): Response
-    {
-        $this->admin->checkAccess('batchDelete');
-
-        $em = $this->em;
-
-        $spaces = $query->execute();
-        $spaceIds = [];
-
-        foreach ($spaces as $space) {
-            $spaceIds[] = $space->getId();
-        }
-
-        if (empty($spaceIds)) {
-            $this->addFlash('sonata_flash_info', 'Aucun espace sélectionné.');
-            return new RedirectResponse($this->admin->generateUrl('list'));
-        }
-
-        $applications = $em->getRepository(\App\Entity\Application::class)->createQueryBuilder('a')
-            ->where('a.space IN (:spaceIds)')
-            ->setParameter('spaceIds', $spaceIds)
-            ->getQuery()
-            ->getResult();
-
-        $applicationIds = [];
-        foreach ($applications as $application) {
-            $applicationIds[] = $application->getId();
-        }
-
-        $nbApplications = count($applicationIds);
-        $conn = $em->getConnection();
-
-        $conn->beginTransaction();
-        try {
-            if (!empty($applicationIds)) {
-                $em->createQueryBuilder()
-                   ->delete(\App\Entity\ApplicationFile::class, 'af')
-                   ->where('af.application IN (:applicationIds)')
-                   ->setParameter('applicationIds', $applicationIds)
-                   ->getQuery()
-                   ->execute();
-
-                $em->createQueryBuilder()
-                   ->delete(\App\Entity\Application::class, 'a')
-                   ->where('a.id IN (:applicationIds)')
-                   ->setParameter('applicationIds', $applicationIds)
-                   ->getQuery()
-                   ->execute();
-            }
-
-            $nbDeleted = 0;
-            foreach ($spaces as $space) {
-                $em->remove($space);
-                $nbDeleted++;
-            }
-
-            $em->flush();
-            $conn->commit();
-        } catch (\Exception $e) {
-            $conn->rollBack();
-            $em->clear();
-            $this->addFlash('sonata_flash_error', 'Erreur lors de la suppression en lot : ' . $e->getMessage());
-            return new RedirectResponse($this->admin->generateUrl('list'));
-        }
-
-        if ($nbApplications > 0) {
-            $this->addFlash(
-                'sonata_flash_success',
-                sprintf('%d espace(s) supprimé(s) avec %d candidature(s) associée(s).', $nbDeleted, $nbApplications)
-            );
-        } else {
-            $this->addFlash(
-                'sonata_flash_success',
-                sprintf('%d espace(s) supprimé(s).', $nbDeleted)
-            );
-        }
-
-        return new RedirectResponse($this->admin->generateUrl('list'));
     }
 
     public function selectExportFieldsAction(Request $request): Response
@@ -126,7 +41,7 @@ class SpaceAdminController extends CRUDController
 
             if (empty($selectedFields)) {
                 $this->addFlash('sonata_flash_error', 'Veuillez sélectionner au moins un champ à exporter.');
-                return $this->renderWithExtraParams('Admin/Space/select_export_fields.html.twig', [
+                return $this->renderWithExtraParams('Admin/Utilisateurs/select_export_fields.html.twig', [
                     'availableFields' => $availableFields,
                     'presetExportFieldKeys' => $this->getPresetExportFieldKeys(),
                     'action' => 'list',
@@ -144,7 +59,7 @@ class SpaceAdminController extends CRUDController
             return $this->redirect($this->admin->generateUrl('custom_export', $exportParams));
         }
 
-        return $this->renderWithExtraParams('Admin/Space/select_export_fields.html.twig', [
+        return $this->renderWithExtraParams('Admin/Utilisateurs/select_export_fields.html.twig', [
             'availableFields' => $availableFields,
             'presetExportFieldKeys' => $this->getPresetExportFieldKeys(),
             'action' => 'list',
@@ -190,21 +105,21 @@ class SpaceAdminController extends CRUDController
         $datagrid->buildPager();
 
         if ($hasComputedFields) {
-            $spaces = $datagrid->getResults();
+            $users = $datagrid->getResults();
             $headers = array_keys($exportFields);
 
-            $callback = function () use ($spaces, $exportFields, $headers) {
+            $callback = function () use ($users, $exportFields, $headers) {
                 echo "\xEF\xBB\xBF";
                 $rows = [];
                 $rows[] = $headers;
 
-                foreach ($spaces as $space) {
-                    if (!$space instanceof Space) {
+                foreach ($users as $user) {
+                    if (!$user instanceof User) {
                         continue;
                     }
                     $row = [];
                     foreach ($exportFields as $property) {
-                        $row[] = (string) $this->resolveExportValue($space, $property);
+                        $row[] = (string) $this->resolveExportValue($user, $property);
                     }
                     $rows[] = $row;
                 }
@@ -217,7 +132,7 @@ class SpaceAdminController extends CRUDController
                 }
             };
 
-            $filename = 'export_espaces_' . date('Y-m-d_H-i-s') . '.csv';
+            $filename = 'export_utilisateurs_' . date('Y-m-d_H-i-s') . '.csv';
 
             return new StreamedResponse($callback, 200, [
                 'Content-Type' => 'text/csv; charset=utf-8',
@@ -237,7 +152,7 @@ class SpaceAdminController extends CRUDController
         );
 
         $writer = new CsvWriter('php://output');
-        $filename = 'export_espaces_' . date('Y-m-d_H-i-s') . '.csv';
+        $filename = 'export_utilisateurs_' . date('Y-m-d_H-i-s') . '.csv';
 
         $callback = function () use ($sourceIterator, $writer) {
             $handler = \Sonata\Exporter\Handler::create($sourceIterator, $writer);
@@ -253,7 +168,7 @@ class SpaceAdminController extends CRUDController
     /** @return array<string, array{label: string, property: string, category: string}> */
     private function getAllAvailableFields(): array
     {
-        return SpaceAdmin::getExportFieldDefinitions();
+        return UserAdmin::getExportFieldDefinitions();
     }
 
     /** @return list<string> */
@@ -261,26 +176,19 @@ class SpaceAdminController extends CRUDController
     {
         return [
             'id',
-            'name',
-            'owner',
-            'owner_company',
-            'owner_email',
-            'city',
-            'zipCode',
-            'type',
-            'workflowType',
-            'isErp',
-            'description',
-            'activityDescription',
-            'limitAvailability',
-            'availability',
-            'minSpace',
-            'maxSpace',
-            'price',
+            'email',
+            'civility',
+            'firstname',
+            'lastname',
+            'typeUser',
             'enabled',
-            'submitted',
-            'closed',
-            'created',
+            'locked',
+            'createdAt',
+            'newsletter',
+            'preferredDepartments',
+            'company',
+            'city',
+            'zipcode',
         ];
     }
 
@@ -440,38 +348,35 @@ class SpaceAdminController extends CRUDController
         }
     }
 
-    private function resolveExportValue(Space $space, string $property): string
+    private function resolveExportValue(User $user, string $property): string
     {
-        if ($property === 'computed.workflowTypeLabel') {
-            return match ($space->getWorkflowType()) {
-                Space::WORKFLOW_MULTI_LOCATION => 'Multi-sites',
-                default => 'Standard',
+        if ($property === 'computed.typeUserLabel') {
+            return match ($user->getTypeUser()) {
+                User::PORTEUR => 'Porteur de projet',
+                User::PROPRIO => 'Propriétaire',
+                User::ADMIN => 'Administrateur',
+                default => '',
             };
         }
 
-        if ($property === 'computed.ownerLabel') {
-            $owner = $space->getOwner();
-            if ($owner === null) {
-                return '';
-            }
+        if ($property === 'computed.rolesLabel') {
+            $roles = array_values(array_filter(
+                $user->getRoles(),
+                static fn (string $role): bool => $role !== 'ROLE_USER'
+            ));
 
-            $company = trim((string) $owner->getCompany());
-            if ($company !== '') {
-                return $company;
-            }
-
-            return trim((string) $owner);
+            return implode(', ', $roles);
         }
 
         if (str_starts_with($property, 'computed.yesno.')) {
             $field = substr($property, strlen('computed.yesno.'));
-            $value = $this->readBooleanFieldValue($space, $field);
+            $value = $this->readBooleanFieldValue($user, $field);
 
             return $value ? 'Oui' : 'Non';
         }
 
         try {
-            $value = $this->propertyAccessor->getValue($space, $property);
+            $value = $this->propertyAccessor->getValue($user, $property);
         } catch (\Exception $e) {
             return '';
         }
@@ -482,6 +387,10 @@ class SpaceAdminController extends CRUDController
 
         if (is_bool($value)) {
             return $value ? 'Oui' : 'Non';
+        }
+
+        if (is_array($value)) {
+            return implode(', ', array_map('strval', $value));
         }
 
         if (is_object($value) && method_exists($value, '__toString')) {
@@ -495,7 +404,7 @@ class SpaceAdminController extends CRUDController
         return (string) $value;
     }
 
-    private function readBooleanFieldValue(Space $space, string $field): bool
+    private function readBooleanFieldValue(User $user, string $field): bool
     {
         $getterCandidates = [
             'is' . ucfirst($field),
@@ -503,8 +412,8 @@ class SpaceAdminController extends CRUDController
         ];
 
         foreach ($getterCandidates as $getter) {
-            if (method_exists($space, $getter)) {
-                return (bool) $space->$getter();
+            if (method_exists($user, $getter)) {
+                return (bool) $user->$getter();
             }
         }
 

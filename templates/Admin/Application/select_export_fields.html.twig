@@ -149,6 +149,9 @@
                         <button type="button" class="btn btn-default" id="deselect-all-btn">
                             <i class="fa fa-square-o"></i> Tout désélectionner
                         </button>
+                        <button type="button" class="btn btn-primary" id="preset-btn" title="Pré-sélectionne les champs essentiels pour un premier export rapide">
+                            <i class="fa fa-star"></i> Sélection type
+                        </button>
                     </div>
                     <div class="pull-right">
                         <span class="label label-default" id="selected-count" style="font-size: 14px; padding: 8px 12px;">
@@ -330,6 +333,29 @@ $(document).ready(function() {
         $('.select-category').prop('checked', false);
         
         // Mettre à jour le compteur ET les indicateurs visuels
+        updateSelectedCount();
+        updateVisualIndicators();
+    });
+
+    // Sélection type : champs essentiels (aligné sur l'export front candidats)
+    var presetFields = {{ presetExportFieldKeys|default([])|json_encode|raw }};
+
+    function syncCategoryCheckboxes() {
+        categoryCheckboxes.each(function() {
+            const category = $(this).data('category');
+            const categoryFields = $('.category-' + category);
+            const allChecked = categoryFields.length > 0 && categoryFields.filter(':checked').length === categoryFields.length;
+            $(this).prop('checked', allChecked);
+        });
+    }
+
+    $('#preset-btn').on('click', function(e) {
+        e.preventDefault();
+        $('.field-checkbox').prop('checked', false);
+        presetFields.forEach(function(key) {
+            $('input.field-checkbox[value="' + key + '"]').prop('checked', true);
+        });
+        syncCategoryCheckboxes();
         updateSelectedCount();
         updateVisualIndicators();
     });

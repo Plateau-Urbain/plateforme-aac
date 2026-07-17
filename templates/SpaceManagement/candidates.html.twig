@@ -803,7 +803,7 @@
       <div class="toolbar-grid__actions">
         <div class="ctrl-panel panel-actions">
           <h5><i class="fa fa-cogs"></i> Actions groupées</h5>
-          <div style="display: flex; gap: 8px; align-items: flex-start;">
+          <div >
             <div class="form-control-large" style="margin: 0; flex: 1;">
               <select id="groupActionSelect" data-placeholder="Choisir une action...">
                 <option value=""> </option>
@@ -856,7 +856,7 @@
             <h5 class="toolbar-export-zone__subtitle"><i class="fa fa-star"></i> Export personnalisé</h5>
             <div class="export-compact">
               <p class="export-compact__text">Colonnes au choix, selon les filtres (CSV ou ZIP).</p>
-              <a href="{{ path('space_manager_select_export_fields', { 'id': space.id }) }}" class="btn btn-success btn-line-16 btn-sm" style="background-color: #4CAF50; border-color: #4CAF50; color: white !important; white-space: nowrap;">
+              <a href="{{ path('space_manager_select_export_fields', { 'id': space.id }) }}" class="btn btn-success btn-line-16 btn-sm" style="background-color: #4CAF50; border-color: #4CAF50; color: white !important; white-space: nowrap;font-size:19px;">
                 Configurer et exporter
               </a>
             </div>
