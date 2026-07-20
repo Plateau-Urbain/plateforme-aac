@@ -1,7 +1,9 @@
-<div class="row-flex">
-<div class="connexion-page  col-xs-12 col-md-6">
-<div class="colorBox-content registration">
-  <img class="icon" src="{{ asset('/bundles/app/images/lock_icon.png') }}" />
+{% embed 'Partials/_auth_split_layout.html.twig' %}
+{% block auth_body %}
+<div class="connexion-page">
+    <div class="colorBox-content registration" style="background: rgba(255, 255, 255, 0.9); padding: 30px; border-radius: 8px;">
+        <img class="icon" src="{{ asset('/bundles/app/images/lock_icon.png') }}" style="width: 48px; margin-bottom: 20px;" />
+        <h4 style="font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #333;">Mot de passe oublié</h4>
         <div class="alert alert-info" role="alert">
             <p>Veuillez saisir votre adresse email afin de réinitialiser votre mot de passe.</p>
             <p>Un email vous sera envoyé. Regardez dans le dossier de spam si vous ne recevez rien.</p>
@@ -16,18 +18,7 @@
                 <input type="submit" class="btn btn-line-login" value="Envoyer le lien de réinitialisation" />
             </div>
         </form>
-      </div>
-    </div>
-    <div class="col-xs-12 col-md-6 sans-marge">
-       <img src="" id="image" alt="" />
     </div>
 </div>
-<script type="text/javascript">
-    (function randomImg(){
-        var tabImg = ["village-reille.jpg", "asnieres.jpg", "opale.jpg", "opale-1.jpg"];
-        var imgEl = document.getElementById('image');
-        if (imgEl) {
-            imgEl.src = '/bundles/app/images/' + tabImg[Math.floor(Math.random() * tabImg.length)];
-        }
-    })();
-</script>
+{% endblock %}
+{% endembed %}

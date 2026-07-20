@@ -75,7 +75,12 @@ class OwnerAdmin extends AbstractAdmin
                 'required' => $this->getSubject()->getId() === null,
                 'label'     => 'Mot de passe',
             ])
-            ->add('enabled', ChoiceType::class, ['label' => 'Activé', 'required' => false, 'choices' => ['Oui' => true, 'Non' => false]])
+            ->add('enabled', ChoiceType::class, [
+                'label' => 'Activé',
+                'required' => false,
+                'choices' => ['Oui' => true, 'Non' => false],
+                'help' => 'Mettre « Oui » pour activer manuellement un compte en attente de confirmation e-mail.',
+            ])
 
             ->end()
             ->with('Profile')
@@ -120,7 +125,10 @@ class OwnerAdmin extends AbstractAdmin
             ])
             ->add('firstname', null, ['label' => 'Prénom'])
             ->add('lastName', null, ['label' => 'Nom'])
-            ->add('enabled', null, ['label' => 'Activé'])
+            ->add('enabled', null, [
+                'label' => 'Activé',
+                'editable' => true,
+            ])
             ->add('locked', null, ['label' => 'Verouillé'])
         ;
     }
@@ -138,6 +146,9 @@ class OwnerAdmin extends AbstractAdmin
         if ($object->getPlainPassword()) {
             $object->setPassword($this->passwordHasher->hashPassword($object, $object->getPlainPassword()));
             $object->setPlainPassword(null);
+        }
+        if ($object->isEnabled()) {
+            $object->setConfirmationToken(null);
         }
     }
 
@@ -165,6 +176,9 @@ class OwnerAdmin extends AbstractAdmin
         } elseif (!$object->getPassword()) {
             // Sécurité : mot de passe vide → chaîne impossible à utiliser
             $object->setPassword('!');
+        }
+        if ($object->isEnabled()) {
+            $object->setConfirmationToken(null);
         }
     }
 

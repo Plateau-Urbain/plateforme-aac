@@ -110,7 +110,11 @@ class ProjectHolderAdmin extends AbstractAdmin
                 'required' => $this->getSubject()->getId() === null,
                 'label'     => 'Mot de passe',
             ])
-            ->add('enabled', ChoiceType::class, ['label' => 'Activé', 'choices' => ['Oui' => true, 'Non' => false]])
+            ->add('enabled', ChoiceType::class, [
+                'label' => 'Activé',
+                'choices' => ['Oui' => true, 'Non' => false],
+                'help' => 'Mettre « Oui » pour activer manuellement un compte en attente de confirmation e-mail.',
+            ])
             ->end()
             ->with('Profile')
             ->add('civility', ChoiceType::class, ['choices' => User::getAllCivilities(), 'required' => false, 'label' => 'Civilité'])
@@ -261,7 +265,10 @@ class ProjectHolderAdmin extends AbstractAdmin
             ->add('newsletter', null, ['label' => 'Newsletter'])
             ->add('usageDate', 'date', ['label' => 'Disponibilité', 'format' => 'd/m/Y'])
             ->add('createdAt', 'datetime', ['label' => 'Date d\'inscription', 'format' => 'd/m/Y H:i'])
-            ->add('enabled', null, ['label' => 'Activé'])
+            ->add('enabled', null, [
+                'label' => 'Activé',
+                'editable' => true,
+            ])
             ->add('locked', null, ['label' => 'Verrouillé'])
         ;
     }
@@ -292,6 +299,10 @@ class ProjectHolderAdmin extends AbstractAdmin
         if ($object->getPlainPassword()) {
             $object->setPassword($this->passwordHasher->hashPassword($object, $object->getPlainPassword()));
             $object->setPlainPassword(null);
+        }
+
+        if ($object->isEnabled()) {
+            $object->setConfirmationToken(null);
         }
 
         $this->syncDocs($object, $object->getDocuments());

@@ -1,0 +1,30 @@
+{% block captcha_widget %}
+{% if is_human %}
+-
+{% else %}
+    <div class="captcha-row">
+        <div class="captcha-row__image">
+            <img class="captcha_image" id="{{ image_id }}" src="{{ captcha_code }}" alt="" title="captcha" width="{{ captcha_width|default(200) }}" height="{{ captcha_height|default(60) }}" />
+            {% if reload %}
+            <a class="captcha_reload" href="javascript:reload_{{ image_id }}();">{{ 'Renew'|trans({}, 'gregwar_captcha') }}</a>
+            {% endif %}
+        </div>
+        <div class="captcha-row__field form-group{{ errors|default([])|length ? ' has-error' : '' }}">
+            <label class="captcha-row__label" for="{{ id }}">Je ne suis pas un robot :</label>
+            <div class="input-group">
+                <span class="input-group-addon"><img src="{{ asset('/bundles/app/images/lock_login.png') }}" alt="" class="closed" /></span>
+                {{- block('form_widget_simple') -}}
+            </div>
+            {{- form_errors(form) -}}
+        </div>
+    </div>
+    {% if reload %}
+    <script type="text/javascript">
+        function reload_{{ image_id }}() {
+            var img = document.getElementById('{{ image_id }}');
+            img.src = '{{ captcha_code }}?n=' + (new Date()).getTime();
+        }
+    </script>
+    {% endif %}
+{% endif %}
+{% endblock %}

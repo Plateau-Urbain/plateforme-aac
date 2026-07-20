@@ -1,19 +1,17 @@
 {% extends "bundles/FOSUserBundle/views/layout.html.twig" %}
 
 {% block fos_user_content %}
-  <div class="row-flex">
-<div class="login-page col-xs-12 col-md-6">
-<div id="cboxContent" style="background: transparent;">
-<div  class="colorBox-content registration">
+{% embed 'Partials/_auth_split_layout.html.twig' %}
+{% block auth_body %}
+<div class="login-page">
+    <div class="colorBox-content registration" style="background: rgba(255, 255, 255, 0.9); padding: 30px; border-radius: 8px;">
+        <img class="icon" src="{{ asset('/bundles/app/images/user_icon.png') }}" style="width: 48px; margin-bottom: 20px;" />
 
-    <img class="icon" src="{{ asset('/bundles/app/images/user_icon.png') }}" />
-
-    <h4>Inscription</h4>
+        <h4 style="font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #333;">Inscription</h4>
 
         <div id="cboxContent white">
-
             {{ form_start(form, {'action': path('fos_user_registration_register'), 'attr': {'class':'fos_user_registration_register'}}) }}
-         
+
             <div class="form-group{{ form.email.vars.errors | length ? ' has-error' : '' }}">
                 <div class="input-group">
                     <span class="input-group-addon"><img src="{{ asset('/bundles/app/images/user_login.png') }}" alt="user" class="closed" /></span>
@@ -38,7 +36,6 @@
                 {{ form_errors(form.plainPassword.second) }}
             </div>
 
-            <small class="text-left">Je ne suis pas un robot :</small>
             {{ form_widget(form.captcha) }}
 
             <p class="forgotten">
@@ -47,38 +44,20 @@
             </p>
 
             {{ form_rest(form) }}
-           <!-- <div class="alert alert-danger alert-error">
-            {% for msg in app.session.flashbag.get('error_sign')  %}
-                <p>{{ msg }}</p>
-            {% endfor %}
-        </div>-->
 
-
-
-            <input type="submit" id="_submit" value="Je m'inscris" class='btn btn-line-login'/>
-<div class="text-left">
-<hr class="black">
+            <input type="submit" id="_submit" value="Je m'inscris" class="btn btn-line-login"/>
+            <div class="text-left">
+                <hr class="black" style="border-top: 1px solid #eee; margin: 20px 0;">
                 <p>
-                   <span> Vous avez déjà un compte Plateau Urbain ?</span>
+                    <span>Vous avez déjà un compte Plateau Urbain ?</span>
                     <br />
                     <i class="fa-solid fa-arrow-right connex"></i> <a class="connex" href="{{ path('app_login') }}">Connexion</a>
                 </p>
             </div>
             {{ form_end(form) }}
-         </div>
-  </div>
+        </div>
+    </div>
 </div>
-</div>
-<div class="col-xs-12 col-md-6 sans-marge">
-     <img src="" id="image" />
-</div>
-</div>
-</div>
-
-<script type="text/javascript">
-    (function randomImg(){
-        var tabImg = ["village-reille.jpg", "asnieres.jpg", "opale.jpg", "opale-1.jpg"];
-        document.getElementById('image').src = '/bundles/app/images/' + tabImg[Math.floor(Math.random() * tabImg.length)];
-    })();
-</script>
+{% endblock %}
+{% endembed %}
 {% endblock fos_user_content %}

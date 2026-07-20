@@ -1,24 +1,23 @@
 {% extends "bundles/FOSUserBundle/views/layout.html.twig" %}
 
-{% trans_default_domain 'FOSUserBundle' %}
-
 {% block fos_user_content %}
-<div class="row-flex">
-        <div class="login-page  col-xs-12 col-md-6"> 
-           <div class="colorBox-content registration">
-             <img class="icon" src="{{ asset('/bundles/app/images/lock_icon.png') }}" />
-<h4>Activation de compte</h4>
-    <p>{{ 'registration.check_email'|trans({'%email%': user.email}) }}</p>
-</div>
+{% embed 'Partials/_auth_split_layout.html.twig' %}
+{% block auth_body %}
+<div class="login-page">
+    <div class="colorBox-content registration" style="background: rgba(255, 255, 255, 0.9); padding: 30px; border-radius: 8px;">
+        <img class="icon" src="{{ asset('/bundles/app/images/lock_icon.png') }}" style="width: 48px; margin-bottom: 20px;" />
+        <h4 style="font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #333;">Activation de compte</h4>
+        {% if email %}
+            <p>Un e-mail d’activation vient d’être envoyé à <strong>{{ email }}</strong>.</p>
+        {% else %}
+            <p>Un e-mail d’activation vient d’être envoyé à votre adresse.</p>
+        {% endif %}
+        <p>Ouvrez le lien reçu pour activer votre compte, puis connectez-vous. Pensez à vérifier vos spams.</p>
+        <p style="margin-top: 20px;">
+            <a class="btn btn-line-login" href="{{ path('app_login') }}">Retour à la connexion</a>
+        </p>
     </div>
-    <div class="col-xs-12 col-md-6 sans-marge">
-        <img src="" id="image" />
-    </div>
 </div>
-<script type="text/javascript">
-    (function randomImg(){
-        var tabImg = ["village-reille.jpg", "asnieres.jpg", "opale.jpg", "opale-1.jpg"];
-        document.getElementById('image').src = '/bundles/app/images/' + tabImg[Math.floor(Math.random() * tabImg.length)];
-    })();
-</script>
+{% endblock %}
+{% endembed %}
 {% endblock fos_user_content %}

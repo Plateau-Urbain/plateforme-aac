@@ -36,7 +36,7 @@ class RegistrationController extends AbstractController
     {
         $user = new User();
         $user->setTypeUser(User::PORTEUR);
-        $user->setEnabled(true);
+        $user->setEnabled(false);
 
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -65,12 +65,17 @@ class RegistrationController extends AbstractController
                 $user->setCreatedAt(new \DateTime());
             }
 
+            $user->setEnabled(false);
+            $user->setConfirmationToken(bin2hex(random_bytes(32)));
+
             $this->em->persist($user);
             $this->em->flush();
 
             $this->sendConfirmationEmail($user);
 
-            return $this->redirectToRoute('homepage', ['confirm_inscription' => 1]);
+            return $this->redirectToRoute('fos_user_registration_check_email', [
+                'email' => $user->getEmail(),
+            ]);
         }
 
         if ($form->isSubmitted() && !$form->isValid()) {
@@ -87,6 +92,35 @@ class RegistrationController extends AbstractController
         ]);
     }
 
+    #[Route(path: '/register/check-email', name: 'fos_user_registration_check_email', methods: ['GET'])]
+    public function checkEmail(Request $request): Response
+    {
+        $email = (string) $request->query->get('email', '');
+
+        return $this->render('bundles/FOSUserBundle/views/Registration/check_email.html.twig', [
+            'email' => $email,
+        ]);
+    }
+
+    #[Route(path: '/register/confirm/{token}', name: 'fos_user_registration_confirm', methods: ['GET'])]
+    public function confirm(string $token): Response
+    {
+        $user = $this->userRepository->findOneBy(['confirmationToken' => $token]);
+        if (!$user instanceof User) {
+            $this->addFlash('error_sign', 'Ce lien d\'activation est invalide ou a déjà été utilisé.');
+
+            return $this->redirectToRoute('app_login');
+        }
+
+        $user->setEnabled(true);
+        $user->setConfirmationToken(null);
+        $this->em->flush();
+
+        $this->addFlash('success_msg', 'Votre compte est activé. Vous pouvez vous connecter.');
+
+        return $this->redirectToRoute('app_login');
+    }
+
     private function sendConfirmationEmail(User $user): void
     {
         try {
@@ -95,7 +129,11 @@ class RegistrationController extends AbstractController
             $context->setHost($this->baseUrl);
             $context->setScheme($scheme);
 
-            $loginUrl = $this->generateUrl('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
+            $confirmUrl = $this->generateUrl(
+                'fos_user_registration_confirm',
+                ['token' => (string) $user->getConfirmationToken()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
             $homeUrl = $this->generateUrl('homepage', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
             $email = (new Email())
@@ -103,14 +141,16 @@ class RegistrationController extends AbstractController
                 ->from($this->mailConfirmationFrom)
                 ->to((string) $user->getEmail())
                 ->html($this->renderView('Email/confirm.html.twig', [
-                    'url' => $loginUrl,
+                    'url' => $confirmUrl,
                     'email' => $user->getEmail(),
                     'homeurl' => $homeUrl,
+                    'rooturl' => $homeUrl,
                 ]))
                 ->text($this->renderView('Email/confirm.txt.twig', [
-                    'url' => $loginUrl,
+                    'url' => $confirmUrl,
                     'email' => $user->getEmail(),
                     'homeurl' => $homeUrl,
+                    'rooturl' => $homeUrl,
                 ]));
 
             $this->mailer->send($email);

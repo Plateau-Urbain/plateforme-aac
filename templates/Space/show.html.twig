@@ -280,60 +280,54 @@
     </div>
     {% endif %}
  
+  {% set fileAac = space.getDocs('document_aac') %}
+  {% set filePlan = space.getDocs('document_plan') %}
+  {% set fileFaq = space.getDocs('document_faq') %}
+  {% set hasRessources = (fileAac|length > 0) or (filePlan|length > 0) or (fileFaq|length > 0) %}
+
+  {% if hasRessources %}
   <h4>
       {{ 'Documents ressources' }}
     </h4>
     <div class="pu-col-container content-block ressources">
-     
-     
-          <div class="col-xs-12 col-md-4 grey">
+          {% if fileAac|length %}
+          <div class="ressources-item grey">
             <div class="fd ressources-fd"><div class="pdf-appel"></div></div>
             <div class="lien-pdf red">
                 <p>
-                    {% set file = space.getDocs('document_aac') %}
-                    {% if file | length %}
-                        <a class="red" href="{{ asset(vich_uploader_asset(file[0], 'file')) }}" target="_blank">
-                    {% else %}
-                        <a class="red" href="#">
-                    {% endif %}
+                    <a class="red" href="{{ asset(vich_uploader_asset(fileAac[0], 'file')) }}" target="_blank">
                         Télécharger l'appel à candidatures
                     </a>
                 </p>
             </div>
           </div>
-          {% set filePlan = space.getDocs('document_plan') %}
-          <div class="col-xs-12 col-md-4 grey">
+          {% endif %}
+          {% if filePlan|length %}
+          <div class="ressources-item grey">
            <div class="fd ressources-fd"><img src="{{ asset('bundles/app/images/groupe-repartion-espace.png') }}" alt="Répartition des espaces" /></div>
            <div class="lien-pdf red">
                <p>
-                   {% if filePlan | length %}
                    <a class="red" href="{{ asset(vich_uploader_asset(filePlan[0], 'file')) }}" target="_blank">
                        Répartition des espaces
                    </a>
-                   {% else %}
-                   <span class="text-muted">Répartition des espaces non disponible</span>
-                   {% endif %}
                </p>
            </div>
         </div>
-          {% set fileFaq = space.getDocs('document_faq') %}
-          <div class="col-xs-12 col-md-4 grey">
+          {% endif %}
+          {% if fileFaq|length %}
+          <div class="ressources-item grey">
            <div class="fd ressources-fd"><img src="{{ asset('bundles/app/images/groupe-faq.png') }}" alt="F.A.Q" /></div>
            <div class="lien-pdf red">
                <p>
-                   {% if fileFaq | length %}
                    <a class="red" href="{{ asset(vich_uploader_asset(fileFaq[0], 'file')) }}" target="_blank">
                        F.A.Q
                    </a>
-                   {% else %}
-                   <span class="text-muted">F.A.Q non disponible</span>
-                   {% endif %}
                </p>
            </div>
         </div>
-    
+          {% endif %}
      </div>
-    </div>
+  {% endif %}
 
 
     {% if space.hasTagType(constant('App\\Entity\\SpaceAttribute::STATUS_INCLUDED')) %}

@@ -1,10 +1,9 @@
 <p>Bonjour,</p>
-<p>suite à votre pré-inscription en ligne, votre compte a été créé sur la plateforme Plateau Urbain.
-Pour le valider, veuillez ouvrir le lien
-<a href="{{ url }}">{{ url }}</a>
-dans votre navigateur et choisir un mot de passe.</p>
-<p>Vous pourrez utiliser ensuite votre adresse {{ email }}
-et ce mot de passe pour vous identifier sur la
-<a href="{{ rooturl }}">plateforme Plateau Urbain</a>.
+<p>Suite à votre inscription en ligne, votre compte a été créé sur la plateforme Plateau Urbain.</p>
+<p>Pour l’activer, veuillez ouvrir le lien suivant dans votre navigateur&nbsp;:<br>
+<a href="{{ url }}">{{ url }}</a></p>
+<p>Vous pourrez ensuite vous connecter avec votre adresse {{ email }}
+et le mot de passe choisi lors de l’inscription sur la
+<a href="{{ rooturl|default(homeurl) }}">plateforme Plateau Urbain</a>.</p>
 <p>Bien cordialement,</p>
-<p>l'équipe de Plateau Urbain<p>
+<p>L’équipe de Plateau Urbain</p>

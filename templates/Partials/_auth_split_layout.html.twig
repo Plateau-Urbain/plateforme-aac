@@ -1,0 +1,19 @@
+<div class="login-layout">
+    <div class="login-layout__form">
+        <div class="container">
+            {% block auth_body %}{% endblock %}
+        </div>
+    </div>
+    <div class="login-image-container sans-marge">
+        <img src="" class="login-image auth-random-image" alt="" />
+    </div>
+</div>
+<script type="text/javascript">
+    (function randomAuthImg(){
+        var tabImg = ["village-reille.jpg", "asnieres.jpg", "opale.jpg", "opale-1.jpg"];
+        var imgEl = document.querySelector('.auth-random-image');
+        if (imgEl) {
+            imgEl.src = '/bundles/app/images/' + tabImg[Math.floor(Math.random() * tabImg.length)];
+        }
+    })();
+</script>

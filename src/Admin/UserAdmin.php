@@ -241,7 +241,11 @@ class UserAdmin extends AbstractAdmin
                         'multiple' => true,
                         'required' => false,
                     ])
-                    ->add('enabled', null, ['label' => 'Activé', 'required' => false])
+                    ->add('enabled', null, [
+                        'label' => 'Activé',
+                        'required' => false,
+                        'help' => 'Décochez pour bloquer la connexion. Cochez pour activer manuellement un compte en attente d’e-mail de confirmation.',
+                    ])
                 ->end()
             ->end()
         ;
@@ -261,7 +265,10 @@ class UserAdmin extends AbstractAdmin
                     User::ADMIN   => 'Administrateur',
                 ],
             ])
-            ->add('enabled', null, ['label' => 'Actif'])
+            ->add('enabled', null, [
+                'label' => 'Actif',
+                'editable' => true,
+            ])
             ->add('createdAt', 'datetime', ['label' => 'Créé le', 'format' => 'd/m/Y H:i'])
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
@@ -309,6 +316,7 @@ class UserAdmin extends AbstractAdmin
                 $object->setCreatedAt(new \DateTime());
             }
             $this->hashPassword($object);
+            $this->syncActivationState($object);
         }
     }
 
@@ -316,6 +324,14 @@ class UserAdmin extends AbstractAdmin
     {
         if ($object instanceof User) {
             $this->hashPassword($object);
+            $this->syncActivationState($object);
+        }
+    }
+
+    private function syncActivationState(User $user): void
+    {
+        if ($user->isEnabled()) {
+            $user->setConfirmationToken(null);
         }
     }
 
