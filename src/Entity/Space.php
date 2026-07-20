@@ -123,7 +123,6 @@ class Space implements \Stringable
      * @var string
      */
     #[ORM\Column(name: 'availability', type: 'string', length: 255, nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
     private $availability;
 
     /**
@@ -1553,6 +1552,20 @@ class Space implements \Stringable
         if ($activeLocations < 1) {
             $context->buildViolation('Au moins un site complet (nom, ville, code postal) est requis pour publier.')
                 ->atPath('locations')
+                ->addViolation();
+        }
+    }
+
+    #[Assert\Callback(groups: ['save'])]
+    public function validateAvailability(ExecutionContextInterface $context): void
+    {
+        if ($this->isMultiLocation()) {
+            return;
+        }
+
+        if (trim((string) $this->getAvailability()) === '') {
+            $context->buildViolation('Cette valeur ne doit pas être vide.')
+                ->atPath('availability')
                 ->addViolation();
         }
     }

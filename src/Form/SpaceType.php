@@ -176,7 +176,7 @@ class SpaceType extends AbstractType
             $form = $event->getForm();
 
             if ($data instanceof Space && $data->isMultiLocation()) {
-                foreach (['limitAvailability', 'zipCode', 'nbSpaces', 'minSpace', 'maxSpace', 'isErp'] as $field) {
+                foreach (['availability', 'limitAvailability', 'zipCode', 'nbSpaces', 'minSpace', 'maxSpace', 'isErp'] as $field) {
                     if ($form->has($field)) {
                         $form->remove($field);
                     }

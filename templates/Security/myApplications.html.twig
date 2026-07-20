@@ -177,9 +177,11 @@
                   <a href="{{ path('space_show', {'id': space.id}) }}">
                     <div class="image">
                       <img src="{% if space.pics.0 is not null %}{{ vich_uploader_asset(space.pics.0, 'file') }}{% endif %}" alt="" />
+                      {% if not space.isMultiLocation %}
                       <div class="availability-overlay">
                         <span class="availability-text">Durée du projet : {{ space.availability }}</span>
                       </div>
+                      {% endif %}
                     </div>
                   </a>
               

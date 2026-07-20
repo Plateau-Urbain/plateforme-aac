@@ -63,6 +63,11 @@ class SpaceLocation
     #[ORM\Column(name: 'suspended_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $suspendedAt = null;
 
+    #[ORM\Column(name: 'availability', type: 'string', length: 255, nullable: true)]
+    #[Assert\NotBlank(groups: ['save'])]
+    #[Assert\Length(max: 255, groups: ['save', 'draft'])]
+    private ?string $availability = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -254,6 +259,18 @@ class SpaceLocation
                 ->atPath('suspensionMessage')
                 ->addViolation();
         }
+    }
+
+    public function getAvailability(): ?string
+    {
+        return $this->availability;
+    }
+
+    public function setAvailability(?string $availability): self
+    {
+        $this->availability = $availability;
+
+        return $this;
     }
 
     public function __toString(): string

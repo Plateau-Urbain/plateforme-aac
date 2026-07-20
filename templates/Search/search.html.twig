@@ -77,6 +77,25 @@
                                         <small>{{ space.city }} ({{ space.zipCode|slice(0,2)}})</small>
                                         {{ space.name }} {% if space.size is not empty %}à partir de {{ space.size }}m<sup>2</sup>{% endif %}<br/>
                                     </h3>
+                                    {% if space.isMultiLocation %}
+                                        <div class="location-chips" style="margin-bottom: 12px;">
+                                            {% for loc in space.orderedActiveLocations %}
+                                                {% set chipLabel = loc.city %}
+                                                {% if loc.zipCode and loc.city|lower == 'paris' %}
+                                                    {% set arr = (loc.zipCode|slice(3, 2)) + 0 %}
+                                                    {% if arr == 1 %}
+                                                        {% set chipLabel = 'Paris 1er' %}
+                                                    {% else %}
+                                                        {% set chipLabel = 'Paris ' ~ arr ~ 'e' %}
+                                                    {% endif %}
+                                                {% elseif loc.zipCode %}
+                                                    {% set dep = loc.zipCode|slice(0, 2) %}
+                                                    {% set chipLabel = loc.city ~ ' (' ~ dep ~ ')' %}
+                                                {% endif %}
+                                                <span class="chip-location">{{ chipLabel }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-sm-5">
                                     <h3 class="price">
@@ -87,7 +106,7 @@
                             </div>
 
                             <div class="row margin-15">
-                                <div class="col-sm-3 item-desc border-box">
+                                <div class="{% if space.isMultiLocation %}col-sm-6{% else %}col-sm-3{% endif %} item-desc border-box">
                                     <dl class="dl-horizontal dl-with-icon">
                                         <dt><i class="icon small square-brown"></i></dt>
                                         <dd>
@@ -96,6 +115,7 @@
                                         </dd>
                                     </dl>
                                 </div>
+                                {% if not space.isMultiLocation %}
                                 <div class="col-sm-4 item-desc border-box">
                                     <dl class="dl-horizontal dl-with-icon">
                                         <dt><i class="icon small cal-brown"></i></dt>
@@ -105,7 +125,8 @@
                                         </dd>
                                     </dl>
                                 </div>
-                                <div class="col-sm-5 item-desc">
+                                {% endif %}
+                                <div class="{% if space.isMultiLocation %}col-sm-6{% else %}col-sm-5{% endif %} item-desc">
                                     <dl class="dl-horizontal dl-with-icon">
                                         <dt><i class="icon small time-brown"></i></dt>
                                         <dd>

@@ -62,7 +62,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row row-show-layout">
   
     <div class="sidebar col-xs-12 col-md-4 sticky">
        <h6><a href="{{ path('search_index') }}" class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Tous les appels à candidatures</a></h6>
@@ -99,7 +99,9 @@
             <a href="#parcels">Voir la répartition des espaces</a>
           </dd>
         </dl> #} 
+            {% if not space.isMultiLocation %}
             <p class="pu-label">Durée du projet&nbsp;: {{ space.availability }}</p>
+            {% endif %}
             {% if space.nbSpaces or space.minSpace or space.maxSpace %}
             <p class="pu-label">
               Surfaces&nbsp;:
@@ -116,7 +118,10 @@
 
     <div class="pu-apply-zone">
       {% if space.isMultiLocation %}
-      <p class="center">Candidatures ouvertes</p>
+      <p class="center" style="font-weight: bold; margin-bottom: 5px;">Candidatures ouvertes</p>
+      <p style="font-size: 13px; line-height: 1.45; color: #4b5563; text-align: center; margin-bottom: 15px; padding: 0 10px;">
+        Cet appel regroupe plusieurs locaux. Vous pourrez sélectionner le ou les sites qui vous intéressent et définir vos priorités lors du remplissage de votre dossier de candidature.
+      </p>
       {% else %}
       <p class="center">Date limite de candidature</p>
       <h5 class="center apply-date-show">
@@ -625,6 +630,7 @@
                     city: {{ location.city|default('')|json_encode|raw }},
                     fullAddress: {{ location.fullAddress|json_encode|raw }},
                     description: {{ location.description|default('')|json_encode|raw }},
+                    availability: {{ location.availability|default('')|json_encode|raw }},
                     isErp: {{ location.isErp ? 'true' : 'false' }},
                     suspended: {{ location.suspended ? 'true' : 'false' }},
                     suspensionMessage: {{ location.suspensionMessage|default('')|json_encode|raw }}
@@ -660,6 +666,10 @@
 
                 if (loc.description) {
                     html += '<div class="aac-map-popup-description">' + formatMultiline(loc.description) + '</div>';
+                }
+
+                if (loc.availability) {
+                    html += '<div style="margin-top: 5px; font-size: 12px; color: #5a3808; font-weight: bold;"><i class="fa fa-clock-o"></i> Durée du projet : ' + escapeHtml(loc.availability) + '</div>';
                 }
 
                 if (loc.isErp) {

@@ -10,67 +10,6 @@
   {{ parent() }}
 
   <link rel="stylesheet" href="{{ asset('bundles/app/css/print.css') }}" type="text/css" media="print" />
-
-  <style>
-    @media print {
-      /* Récap candidat (print uniquement) : version resserrée + charte, compatible PDF */
-      :root{
-        --brand-primary:#2D74BA;
-        --brand-accent:#F2BE6A;
-        --text:#1f2937;
-        --muted:#6b7280;
-        --line:#e5e7eb;
-        --card:#f8fafc;
-      }
-
-      /* Ne pas imprimer l'enrobage site / actions */
-      #header, .navbar, nav, header { display: none !important; }
-      .no-print { display: none !important; }
-      .application_buttons, .pagination-wrapper { display: none !important; }
-
-      /* Mise en page print compacte */
-      body { color: var(--text) !important; }
-      .white, .container { width: 100% !important; margin: 0 !important; padding: 0 !important; }
-      .application-header { margin: 0 0 10px 0; padding: 10px 12px; border: 1px solid var(--line); border-left: 4px solid var(--brand-primary); background: var(--card); }
-      .application-space .image { display: none !important; } /* image inutile en PDF */
-
-      /* Impression en rangée (1 colonne), blocs empilés */
-      .row.print-grid { display: block !important; }
-      .print-span-2, .print-col-1, .print-col-2 { grid-column: auto; }
-
-      .box-information { break-inside: avoid; page-break-inside: avoid; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-      .box-information.allow-break { break-inside: auto !important; page-break-inside: auto !important; }
-      .box-information .box-content { padding: 10px 10px; }
-      .box-information { margin-bottom: 10px; }
-      .box-information .box-title {
-        margin: 0 0 8px 0;
-        padding-bottom: 6px;
-        border-bottom: 2px solid var(--brand-primary);
-        color: #0f3f6b;
-        letter-spacing: .3px;
-        text-transform: uppercase;
-        font-size: 11px;
-        font-weight: 700;
-      }
-      .box-information table { width: 100%; border-collapse: collapse; }
-      .box-information table tbody tr { border-bottom: 1px solid var(--line); }
-      .box-information table tbody tr:last-child { border-bottom: 0; }
-      .box-information table th,
-      .box-information table td { font-size: 11px; padding: 5px 7px; }
-      .box-information table th { width: 34%; background: #fbfdff; font-weight: 700; color: #0b2239; }
-
-      a[href]:after { content: ""; } /* évite d'ajouter les URLs partout */
-
-      /* Remonter la section "Projet" en haut pour être sur la 1ère page */
-      .print-flow { display: flex !important; flex-direction: column; }
-      .print-flow .row { display: contents !important; } /* neutralise Bootstrap rows en print */
-      .print-order-project { order: 1; }
-      .print-order-contact { order: 2; }
-      .print-order-structure { order: 3; }
-      .print-order-social { order: 4; }
-      .print-order-docs { order: 5; }
-    }
-  </style>
 {% endblock %}
 
 {% block body %}
@@ -213,6 +152,12 @@
             {% if application.projectHolder.companyStatus %}
               <tr><th>Statut</th><td>{{ application.projectHolder.companyStatus }}</td></tr>
             {% endif %}
+            {% if application.projectHolder.useType %}
+              <tr><th>Secteur d'activité</th><td>{{ application.projectHolder.useType }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.isSubjectToVat is not null %}
+              <tr><th>Assujetti à la TVA</th><td>{{ application.projectHolder.isSubjectToVat ? 'Oui' : 'Non' }}</td></tr>
+            {% endif %}
             <tr>
               <th>Date de création</th>
               <td>
@@ -236,9 +181,6 @@
             {% if application.projectHolder.address %}
               <tr><th>Adresse</th><td>{{ application.projectHolder.address }}</td></tr>
             {% endif %}
-            {% if application.projectHolder.addressSuite %}
-              <tr><th>Adresse (suite)</th><td>{{ application.projectHolder.addressSuite }}</td></tr>
-            {% endif %}
             {% if application.projectHolder.companyPhone %}
               <tr><th>Téléphone fixe</th><td>{{ application.projectHolder.companyPhone }}</td></tr>
             {% endif %}
@@ -254,14 +196,95 @@
             {% if application.projectHolder.companyStructures %}
               <tr><th>Structure(s) d'accompagnement</th><td>{{ application.projectHolder.companyStructures|nl2br }}</td></tr>
             {% endif %}
-            {% if application.projectHolder.companySite %}
-              <tr><th>Site web</th><td>{% set _site = application.projectHolder.companySite|safe_href %}{% if _site %}<a href="{{ _site }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companySite|length > 30 ? application.projectHolder.companySite|slice(0, 30) ~ '...' : application.projectHolder.companySite }}</a>{% else %}{{ application.projectHolder.companySite }}{% endif %}</td></tr>
+            {% if application.projectHolder.isPuShareholder is not null %}
+              <tr><th>Déjà sociétaire Plateau Urbain</th><td>{{ application.projectHolder.isPuShareholder ? 'Oui' : 'Non' }}</td></tr>
             {% endif %}
           </tbody>
         </table>
       </div>
     </div>
   </div>
+
+{% set hasAnySocialOrWeb = application.projectHolder.companySite or application.projectHolder.companyBlog or application.projectHolder.facebookUrl or application.projectHolder.twitterUrl or application.projectHolder.instagramUrl or application.projectHolder.linkedinUrl or application.projectHolder.youtubeUrl or application.projectHolder.tiktokUrl or application.projectHolder.googleUrl or application.projectHolder.otherUrl %}
+{% if hasAnySocialOrWeb %}
+  <div class="col-sm-12 print-order-social">
+    <div class="box-information">     
+      <div class="box-content">
+         <h4 class="box-title">
+        Site internet et réseaux sociaux
+      </h4>
+        <table>
+          <tbody>
+            {% if application.projectHolder.companySite %}
+              <tr>
+                <th><i class="fa fa-globe fa-lg" style="margin-right: 5px;"></i> Site web</th>
+                <td>{% set _site = application.projectHolder.companySite|safe_href %}{% if _site %}<a href="{{ _site }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companySite|length > 30 ? application.projectHolder.companySite|slice(0, 30) ~ '...' : application.projectHolder.companySite }}</a>{% else %}{{ application.projectHolder.companySite }}{% endif %}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.companyBlog %}
+              <tr>
+                <th><i class="fa fa-rss fa-lg" style="margin-right: 5px;"></i> Blog</th>
+                <td>{% set _blog = application.projectHolder.companyBlog|safe_href %}{% if _blog %}<a href="{{ _blog }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companyBlog|length > 30 ? application.projectHolder.companyBlog|slice(0, 30) ~ '...' : application.projectHolder.companyBlog }}</a>{% else %}{{ application.projectHolder.companyBlog }}{% endif %}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.facebookUrl %}
+              <tr>
+                <th><i class="fa-brands fa-facebook fa-lg" style="margin-right: 5px;"></i> Facebook</th>
+                <td>{{ application.projectHolder.facebookUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.twitterUrl %}
+              <tr>
+                <th>
+                  <span aria-label="X (anciennement Twitter)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1.33em" height="1.33em" fill="currentColor" aria-hidden="true" focusable="false" role="img" style="vertical-align: middle; margin-right: 4px;"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg></span> Twitter
+                </th>
+                <td>{{ application.projectHolder.twitterUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.instagramUrl %}
+              <tr>
+                <th><i class="fa-brands fa-instagram fa-lg" style="margin-right: 5px;"></i> Instagram</th>
+                <td>{{ application.projectHolder.instagramUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.linkedinUrl %}
+              <tr>
+                <th><i class="fa-brands fa-linkedin fa-lg" style="margin-right: 5px;"></i> LinkedIn</th>
+                <td>{{ application.projectHolder.linkedinUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.youtubeUrl %}
+              <tr>
+                <th><i class="fa-brands fa-youtube fa-lg" style="margin-right: 5px;"></i> YouTube</th>
+                <td>{{ application.projectHolder.youtubeUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.tiktokUrl %}
+              <tr>
+                <th><i class="fa-brands fa-tiktok fa-lg" style="margin-right: 5px;"></i> TikTok</th>
+                <td>{{ application.projectHolder.tiktokUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.googleUrl %}
+              <tr>
+                <th>
+                  <span aria-label="Bluesky"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" width="1.33em" height="1.33em" fill="currentColor" aria-hidden="true" focusable="false" role="img" style="vertical-align: middle; margin-right: 4px;"><path d="m135.72 44.03c66.5 49.92 138.02 151.14 164.28 205.46 26.26-54.32 97.78-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/></svg></span> Bluesky
+                </th>
+                <td>{{ application.projectHolder.googleUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.otherUrl %}
+              <tr>
+                <th><i class="fa fa-link fa-lg" style="margin-right: 5px;"></i> Autre URL</th>
+                <td>{{ application.projectHolder.otherUrl }}</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endif %}
 </div>
 
 <div class="row print-sections">
@@ -274,26 +297,17 @@
         <table>
           <tbody>
             <tr><th>Nom du projet</th><td>{{ application.name }}</td></tr>
-            {% if application.projectHolder.useType %}
-              <tr><th>Type d'usage</th><td>{{ application.projectHolder.useType }}</td></tr>
-            {% endif %}
             {% if application.category %}
-              <tr><th>Type de projet</th><td>{{ application.category }}</td></tr>
+              <tr><th>Type d'usage</th><td>{{ application.category }}</td></tr>
             {% endif %}
             {% if application.projectHolder.preferredDepartmentsLabels|length %}
               <tr><th>Départements souhaités</th><td>{{ application.projectHolder.preferredDepartmentsLabels|join(', ') }}</td></tr>
             {% endif %}
-            {% if application.projectHolder.companyStatus %}
-              <tr><th>Statut juridique (profil)</th><td>{{ application.projectHolder.companyStatus }}</td></tr>
-            {% endif %}
             {% if application.companyStatus %}
-              <tr><th>Statut juridique (candidature)</th><td>{{ application.companyStatus }}</td></tr>
-            {% endif %}
-            {% if application.projectHolder.wishedSize %}
-              <tr><th>Surface souhaitée (profil)</th><td>{{ application.projectHolder.wishedSize }} m<sup>2</sup></td></tr>
+              <tr><th>Statut juridique</th><td>{{ application.companyStatus }}</td></tr>
             {% endif %}
             {% if application.wishedSize %}
-              <tr><th>Surface souhaitée (candidature)</th><td>{{ application.wishedSize }} m<sup>2</sup></td></tr>
+              <tr><th>Surface souhaitée</th><td>{{ application.wishedSize }} m<sup>2</sup></td></tr>
             {% endif %}
             {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
             {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
@@ -329,35 +343,6 @@
       </div>
     </div>
   </div>
-
-{% set hasAnySocial = application.projectHolder.facebookUrl or application.projectHolder.twitterUrl or application.projectHolder.instagramUrl or application.projectHolder.linkedinUrl or application.projectHolder.youtubeUrl or application.projectHolder.tiktokUrl or application.projectHolder.googleUrl or application.projectHolder.otherUrl %}
-{% if hasAnySocial %}
-<div class="col-sm-6 print-order-social">
-    <div class="box-information">     
-      <div class="box-content">
-         <h4 class="box-title">
-        Réseaux sociaux
-      </h4>
-        <table>
-          <tbody>
-            {% if application.projectHolder.facebookUrl %}<tr><th><i class="fa-brands fa-facebook fa-lg"></i></th><td>{{ application.projectHolder.facebookUrl }}</td></tr>{% endif %}
-            {% if application.projectHolder.twitterUrl %}<tr><th>
-                <span aria-label="X (anciennement Twitter)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1.33em" height="1.33em" fill="currentColor" aria-hidden="true" focusable="false" role="img"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg></span>
-            </th><td>{{ application.projectHolder.twitterUrl }}</td></tr>{% endif %}
-            {% if application.projectHolder.instagramUrl %}<tr><th><i class="fa-brands fa-instagram fa-lg"></i></th><td>{{ application.projectHolder.instagramUrl }}</td></tr>{% endif %}
-            {% if application.projectHolder.linkedinUrl %}<tr><th><i class="fa-brands fa-linkedin fa-lg"></i></th><td>{{ application.projectHolder.linkedinUrl }}</td></tr>{% endif %}
-            {% if application.projectHolder.youtubeUrl %}<tr><th><i class="fa-brands fa-youtube fa-lg"></i></th><td>{{ application.projectHolder.youtubeUrl }}</td></tr>{% endif %}
-            {% if application.projectHolder.tiktokUrl %}<tr><th><i class="fa-brands fa-tiktok fa-lg"></i></th><td>{{ application.projectHolder.tiktokUrl }}</td></tr>{% endif %}
-            {% if application.projectHolder.googleUrl %}<tr><th>
-                <span aria-label="Bluesky"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" width="1.33em" height="1.33em" fill="currentColor" aria-hidden="true" focusable="false" role="img"><path d="m135.72 44.03c66.5 49.92 138.02 151.14 164.28 205.46 26.26-54.32 97.78-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/></svg></span>
-            </th><td>{{ application.projectHolder.googleUrl }}</td></tr>{% endif %}
-            {% if application.projectHolder.otherUrl %}<tr><th><i class="fa fa-link fa-lg" title="Autre URL"></i></th><td>{{ application.projectHolder.otherUrl }}</td></tr>{% endif %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-{% endif %}
   
 
   <div class="col-sm-12 print-order-docs">

@@ -715,10 +715,10 @@
   </div>
 
   <div class="row">
-    {# === Graphique 3 : Par type de projet === #}
+    {# === Graphique 3 : Par Secteurs d'activité === #}
     <div class="col-sm-6">
       <div class="chart-section">
-        <h4><i class="fa fa-users"></i> Candidatures par type de projet</h4>
+        <h4><i class="fa fa-users"></i> Candidatures par Secteurs d'activité</h4>
         <div id="usageChart"></div>
       </div>
     </div>
@@ -853,7 +853,7 @@
           </div>
 
           <div class="toolbar-export-zone__block">
-            <h5 class="toolbar-export-zone__subtitle"><i class="fa fa-star"></i> Export personnalisé</h5>
+            <h5 class="toolbar-export-zone__title"><i class="fa fa-star"></i> Export personnalisé</h5>
             <div class="export-compact">
               <p class="export-compact__text">Colonnes au choix, selon les filtres (CSV ou ZIP).</p>
               <a href="{{ path('space_manager_select_export_fields', { 'id': space.id }) }}" class="btn btn-success btn-line-16 btn-sm" style="background-color: #4CAF50; border-color: #4CAF50; color: white !important; white-space: nowrap;font-size:19px;">
@@ -1339,7 +1339,7 @@
             });
 
             // ======================================================
-            // GRAPHIQUE 3 : Par type de projet (barres horizontales)
+            // GRAPHIQUE 3 : Par Secteurs d'activité (barres horizontales)
             // ======================================================
             var usageColors = ['#5B9BD5', '#ED7D31', '#A5A5A5', '#FFC000', '#4472C4', '#70AD47', '#264478', '#9B59B6'];
             var usageData = [

@@ -56,6 +56,14 @@
     </div>
 
     <div class="row">
+        <div class="col-sm-12 form-group{% if not locationForm.availability.vars.valid %} has-error{% endif %}">
+            {{ form_label(locationForm.availability) }}
+            {{ form_widget(locationForm.availability) }}
+            {{ form_errors(locationForm.availability) }}
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-sm-12 form-group">
             <div class="alert alert-info" role="alert" style="margin-top: 0; margin-bottom: 8px; padding: 8px 12px; font-size: 13px;">
                 <strong>ERP :</strong> cochez si ce site est un Établissement Recevant du Public.

@@ -135,8 +135,9 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-sm-12">
+<div class="print-flow">
+<div class="row print-sections">
+  <div class="col-sm-12 print-order-contact">
     <div class="box-information">    
       <div class="box-content">
          <h3 class="box-title ">
@@ -148,14 +149,13 @@
             <tr><th>Date de naissance</th><td>{{ application.projectHolder.birthday|date('d/m/Y') }}</td></tr>
             <tr><th>Téléphone</th><td>{{ application.projectHolder.phone }}</td></tr>
             <tr><th>Email</th><td>{{ application.projectHolder.email }}</td></tr>
-            <tr><th>À propos</th><td>{{ application.projectHolder.description|nl2br }}</td></tr>
            </tbody>
         </table>
       </div>
     </div>
   </div>
 
- <div class="col-sm-12">
+  <div class="col-sm-12 print-order-structure">
     <div class="box-information">    
       <div class="box-content">
           <h3 class="box-title">
@@ -165,6 +165,12 @@
           <tbody>
             <tr><th>Nom de la structure</th><td>{{ application.projectHolder.company }}</td></tr>
             <tr><th>Statut</th><td>{{ application.projectHolder.companyStatus }}</td></tr>
+            {% if application.projectHolder.useType %}
+              <tr><th>Secteur d'activité</th><td>{{ application.projectHolder.useType }}</td></tr>
+            {% endif %}
+            {% if application.projectHolder.isSubjectToVat is not null %}
+              <tr><th>Assujetti à la TVA</th><td>{{ application.projectHolder.isSubjectToVat ? 'Oui' : 'Non' }}</td></tr>
+            {% endif %}
             <tr>
               <th>Date de création</th>
               <td>
@@ -177,22 +183,101 @@
             <tr><th>Ville</th><td>{{ application.projectHolder.city }}</td></tr>
             <tr><th>Code postal</th><td>{{ application.projectHolder.zipcode }}</td></tr>
             <tr><th>Adresse</th><td>{{ application.projectHolder.address }}</td></tr>
-            <tr><th>Adresse (suite)</th><td>{{ application.projectHolder.addressSuite }}</td></tr>
             <tr><th>Téléphone fixe</th><td>{{ application.projectHolder.companyPhone }}</td></tr>
             <tr><th>Téléphone mobile</th><td>{{ application.projectHolder.companyMobile }}</td></tr>
             <tr><th>Présentation</th><td>{{ application.projectHolder.companyDescription|nl2br }}</td></tr>
             <tr><th>Nombre de personnes dans la structure</th><td>{{ application.projectHolder.companyEffective }}</td></tr>
             <tr><th>Structure(s) d'accompagnement</th><td>{{ application.projectHolder.companyStructures|nl2br }}</td></tr>
-            <tr><th>Site web</th><td>{% set _site = application.projectHolder.companySite|safe_href %}{% if _site %}<a href="{{ _site }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companySite|length > 30 ? application.projectHolder.companySite|slice(0, 30) ~ '...' : application.projectHolder.companySite }}</a>{% else %}{{ application.projectHolder.companySite }}{% endif %}</td></tr>
-            <tr><th>Blog</th><td>{% set _blog = application.projectHolder.companyBlog|safe_href %}{% if _blog %}<a href="{{ _blog }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companyBlog|length > 30 ? application.projectHolder.companyBlog|slice(0, 30) ~ '...' : application.projectHolder.companyBlog }}</a>{% else %}{{ application.projectHolder.companyBlog }}{% endif %}</td></tr>
+            {% if application.projectHolder.isPuShareholder is not null %}
+              <tr><th>Déjà sociétaire Plateau Urbain</th><td>{{ application.projectHolder.isPuShareholder ? 'Oui' : 'Non' }}</td></tr>
+            {% endif %}
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-
-<div class="col-sm-12">
+{% set hasAnySocialOrWeb = application.projectHolder.companySite or application.projectHolder.companyBlog or application.projectHolder.facebookUrl or application.projectHolder.twitterUrl or application.projectHolder.instagramUrl or application.projectHolder.linkedinUrl or application.projectHolder.youtubeUrl or application.projectHolder.tiktokUrl or application.projectHolder.googleUrl or application.projectHolder.otherUrl %}
+{% if hasAnySocialOrWeb %}
+ <div class="col-sm-12 print-order-social">
+    <div class="box-information">     
+      <div class="box-content">
+         <h3 class="box-title">
+        Site internet et réseaux sociaux
+      </h3>
+        <table>
+          <tbody>
+            {% if application.projectHolder.companySite %}
+              <tr>
+                <th><i class="fa fa-globe fa-lg" style="margin-right: 5px;"></i> Site web</th>
+                <td>{% set _site = application.projectHolder.companySite|safe_href %}{% if _site %}<a href="{{ _site }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companySite|length > 30 ? application.projectHolder.companySite|slice(0, 30) ~ '...' : application.projectHolder.companySite }}</a>{% else %}{{ application.projectHolder.companySite }}{% endif %}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.companyBlog %}
+              <tr>
+                <th><i class="fa fa-rss fa-lg" style="margin-right: 5px;"></i> Blog</th>
+                <td>{% set _blog = application.projectHolder.companyBlog|safe_href %}{% if _blog %}<a href="{{ _blog }}" target="_blank" rel="noopener noreferrer">{{ application.projectHolder.companyBlog|length > 30 ? application.projectHolder.companyBlog|slice(0, 30) ~ '...' : application.projectHolder.companyBlog }}</a>{% else %}{{ application.projectHolder.companyBlog }}{% endif %}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.facebookUrl %}
+              <tr>
+                <th><i class="fa-brands fa-facebook fa-lg" style="margin-right: 5px;"></i> Facebook</th>
+                <td>{{ application.projectHolder.facebookUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.twitterUrl %}
+              <tr>
+                <th>
+                  <span aria-label="X (anciennement Twitter)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1.33em" height="1.33em" fill="currentColor" aria-hidden="true" focusable="false" role="img" style="vertical-align: middle; margin-right: 4px;"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg></span> Twitter
+                </th>
+                <td>{{ application.projectHolder.twitterUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.instagramUrl %}
+              <tr>
+                <th><i class="fa-brands fa-instagram fa-lg" style="margin-right: 5px;"></i> Instagram</th>
+                <td>{{ application.projectHolder.instagramUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.linkedinUrl %}
+              <tr>
+                <th><i class="fa-brands fa-linkedin fa-lg" style="margin-right: 5px;"></i> LinkedIn</th>
+                <td>{{ application.projectHolder.linkedinUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.youtubeUrl %}
+              <tr>
+                <th><i class="fa-brands fa-youtube fa-lg" style="margin-right: 5px;"></i> YouTube</th>
+                <td>{{ application.projectHolder.youtubeUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.tiktokUrl %}
+              <tr>
+                <th><i class="fa-brands fa-tiktok fa-lg" style="margin-right: 5px;"></i> TikTok</th>
+                <td>{{ application.projectHolder.tiktokUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.googleUrl %}
+              <tr>
+                <th>
+                  <span aria-label="Bluesky"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" width="1.33em" height="1.33em" fill="currentColor" aria-hidden="true" focusable="false" role="img" style="vertical-align: middle; margin-right: 4px;"><path d="m135.72 44.03c66.5 49.92 138.02 151.14 164.28 205.46 26.26-54.32 97.78-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/></svg></span> Bluesky
+                </th>
+                <td>{{ application.projectHolder.googleUrl }}</td>
+              </tr>
+            {% endif %}
+            {% if application.projectHolder.otherUrl %}
+              <tr>
+                <th><i class="fa fa-link fa-lg" style="margin-right: 5px;"></i> Autre URL</th>
+                <td>{{ application.projectHolder.otherUrl }}</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+</div>
+{% endif %}
+  <div class="col-sm-12 print-order-project">
     <div class="box-information">
       <div class="box-content">
       <h3 class="box-title">
@@ -201,13 +286,10 @@
         <table>
           <tbody>
             <tr><th>Nom du projet</th><td>{{ application.name }}</td></tr>
-            <tr><th>Type d'usage</th><td>{{ application.projectHolder.useType }}</td></tr>
-            <tr><th>Type de projet</th><td>{{ application.category }}</td></tr>
+            <tr><th>Type d'usage</th><td>{{ application.category }}</td></tr>
             <tr><th>Départements souhaités</th><td>{% if application.projectHolder.preferredDepartmentsLabels|length %}{{ application.projectHolder.preferredDepartmentsLabels|join(', ') }}{% else %}—{% endif %}</td></tr>
-            <tr><th>Statut juridique (profil)</th><td>{% if application.projectHolder.companyStatus %}{{ application.projectHolder.companyStatus }}{% else %}—{% endif %}</td></tr>
-            <tr><th>Statut juridique (candidature)</th><td>{% if application.companyStatus %}{{ application.companyStatus }}{% else %}—{% endif %}</td></tr>
-            <tr><th>Surface souhaitée (profil)</th><td>{% if application.projectHolder.wishedSize %}{{ application.projectHolder.wishedSize }}{% else %}—{% endif %} m<sup>2</sup></td></tr>
-            <tr><th>Surface souhaitée (candidature)</th><td>{% if application.wishedSize %}{{ application.wishedSize }}{% else %}—{% endif %} m<sup>2</sup></td></tr>
+            <tr><th>Statut juridique</th><td>{% if application.companyStatus %}{{ application.companyStatus }}{% else %}—{% endif %}</td></tr>
+            <tr><th>Surface souhaitée</th><td>{% if application.wishedSize %}{{ application.wishedSize }}{% else %}—{% endif %} m<sup>2</sup></td></tr>
             {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
             {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
             <tr>
@@ -233,42 +315,10 @@
     </div>
   </div>
 
-<div class="col-sm-6">
- <div class="box-information">     
-      <div class="box-content">
-         <h3 class="box-title">
-        Réseaux sociaux
-      </h3>
-        <table>
-          <tbody>
-            <tr><th><i class="fa-brands fa-facebook fa-lg"></i></th><td>{{ application.projectHolder.facebookUrl }}</td></tr>
-            <tr><th>
-                <span aria-label="X (anciennement Twitter)">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1.33em" height="1.33em" fill="currentColor" aria-hidden="true" focusable="false" role="img">
-                        <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/>
-                    </svg>
-                </span>
-            </th><td>{{ application.projectHolder.twitterUrl }}</td></tr>
-            <tr><th><i class="fa-brands fa-instagram fa-lg"></i></th><td>{{ application.projectHolder.instagramUrl }}</td></tr>
-            <tr><th><i class="fa-brands fa-linkedin fa-lg"></i></th><td>{{ application.projectHolder.linkedinUrl }}</td></tr>
-            <tr><th><i class="fa-brands fa-youtube fa-lg"></i></th><td>{{ application.projectHolder.youtubeUrl }}</td></tr>
-            <tr><th><i class="fa-brands fa-tiktok fa-lg"></i></th><td>{{ application.projectHolder.tiktokUrl }}</td></tr>
-            <tr><th>
-                <span aria-label="Bluesky">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 530" width="1.33em" height="1.33em" fill="currentColor" aria-hidden="true" focusable="false" role="img">
-                        <path d="m135.72 44.03c66.5 49.92 138.02 151.14 164.28 205.46 26.26-54.32 97.78-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z"/>
-                    </svg>
-                </span>
-            </th><td>{{ application.projectHolder.googleUrl }}</td></tr>
-            <tr><th><i class="fa fa-link fa-lg" title="Autre URL"></i></th><td>{{ application.projectHolder.otherUrl }}</td></tr>
 
-          </tbody>
-        </table>
-      </div>
-    </div>
-</div>
 
-  <div class="col-sm-6">
+
+  <div class="col-sm-12 print-order-docs">
     <div class="box-information">
       <div class="box-content">
       <h3 class="box-title">
@@ -319,6 +369,8 @@
       </div>
     </div>
   </div>
+</div>
+</div>
 </div>
 
 

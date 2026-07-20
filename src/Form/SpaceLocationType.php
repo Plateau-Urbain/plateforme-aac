@@ -51,6 +51,12 @@ class SpaceLocationType extends AbstractType
                 'required' => false,
                 'error_bubbling' => false,
             ])
+            ->add('availability', null, [
+                'label' => 'Durée du projet',
+                'attr' => ['class' => 'form-control', 'placeholder' => '1 an, 6 mois…'],
+                'required' => true,
+                'error_bubbling' => false,
+            ])
             ->add('isErp', CheckboxType::class, [
                 'label' => 'Le site est un ERP (Établissement Recevant du Public)',
                 'required' => false,

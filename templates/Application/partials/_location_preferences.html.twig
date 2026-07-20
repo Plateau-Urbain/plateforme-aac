@@ -9,6 +9,12 @@
                     {% if preference.location.city %}
                         — {{ preference.location.city }}
                     {% endif %}
+                    {% if preference.location.availability %}
+                        ({{ preference.location.availability }})
+                    {% endif %}
+                    {% if preference.location.isErp %}
+                        <span class="label label-info" style="font-size: 10px; margin-left: 5px;">ERP</span>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ol>

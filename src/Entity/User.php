@@ -108,13 +108,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
      * @var bool|null
      */
     #[ORM\Column(name: 'is_pu_shareholder', type: 'boolean', nullable: true, options: ['default' => false])]
-    protected $isPuShareholder = false;
+    protected $isPuShareholder = null;
 
     /**
      * @var bool|null
      */
     #[ORM\Column(name: 'is_subject_to_vat', type: 'boolean', nullable: true, options: ['default' => false])]
-    protected $isSubjectToVat = false;
+    protected $isSubjectToVat = null;
 
     /**
      * @var
@@ -864,8 +864,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
         $this->typeUser = self::PORTEUR;
         $this->preferredDepartments = [];
         $this->lengthTypeOccupation = 'mois';
-        $this->isPuShareholder = false;
-        $this->isSubjectToVat = false;
+        $this->isPuShareholder = null;
+        $this->isSubjectToVat = null;
     }
 
     /**

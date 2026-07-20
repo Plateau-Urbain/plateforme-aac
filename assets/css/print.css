@@ -1,286 +1,260 @@
-/* =============================================
-   PRINT STYLESHEET - Liste des candidats
-   ============================================= */
+/* ==========================================================================
+   PREMIUM PRINT STYLESHEET - Plateforme AAC
+   ========================================================================== */
 
 * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    box-sizing: border-box !important;
 }
 
-/* --- Éléments à masquer à l'impression --- */
+/* --- Elements to Hide --- */
 #header,
 #footer,
-.breadcrumb-header,
-.breadcrumb,
-.navigation,
-.pagination,
-.pagination-container,
+.navbar,
+nav,
+header,
+footer,
+.no-print,
+.application_buttons,
 .pagination-wrapper,
-#space-card,
-#space-stats,
-#listing-header,
-#management-toolbar,
-.page-header,
-.top-candidats,
-.space-stats,
-.chart-section,
-.chart-legend,
-.ctrl-panel,
-.panel-export,
-.panel-actions,
-.panel-filters,
-.row-flex-panels,
-.col-panel,
-.btn,
-.btn-toolbar,
+.pagination,
+.breadcrumb,
+.breadcrumb-header,
+.white > .container > .application-space .image,
 .toggle-star,
-.toggle-stats,
+.btn,
+.hint,
+.availability-overlay,
 .sub-arrow,
-.image-wrapper,
-.application-space,
-.form-control-small,
-.btn-appli,
-#filter_status_filter_chzn,
-#filter_sort_field_chzn,
-.icon,
-hr,
-canvas {
+a.red,
+input[type="submit"],
+button,
+.calendar,
+.info-candidature .right {
     display: none !important;
 }
 
+/* --- Page & Layout Setup --- */
+@page {
+    size: A4;
+    margin: 15mm;
+}
 
-
-/* --- Layout général --- */
-body,
-.white,
-.container,
-#property-listing,
-.application-list {
-    width: 100% !important;
+body {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
     margin: 0 !important;
     padding: 0 !important;
-    background: #fff !important;
+}
+
+.white,
+.container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
     box-shadow: none !important;
     border: none !important;
 }
 
-.white {
-    padding-top: 0 !important;
+/* --- Print Grid & Layout Flow --- */
+.print-flow {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
 }
 
-#management-toolbar {
-    display: none !important;
-}
-
-.top-candidats {
+/* Flatten Bootstrap rows for printing */
+.row, .row-flex {
     margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* --- Grille Bootstrap pour impression --- */
-.col-sm-1,
-.col-sm-2,
-.col-sm-3,
-.col-sm-4,
-.col-sm-5,
-.col-sm-6,
-.col-sm-7,
-.col-sm-8,
-.col-sm-9,
-.col-sm-10,
-.col-sm-11,
-.col-sm-12,
-.col-panel {
-    float: left !important;
-    position: relative !important;
-    min-height: 1px !important;
-    padding-left: 15px !important;
-    padding-right: 15px !important;
+    display: block !important;
     width: 100% !important;
 }
 
-.col-sm-6 {
-    width: 50% !important;
-}
-
-.col-sm-4 {
-    width: 41.66666667% !important;
-}
-
-.col-sm-8 {
-    width: 58.33333333% !important;
-}
-
-.row {
-    margin-left: -15px !important;
-    margin-right: -15px !important;
-    page-break-after: avoid;
-}
-
-.clearfix::after {
-    content: "";
-    clear: both;
-    display: table;
-}
-
-/* --- Typographie --- */
-h2 {
-    font-size: 20pt !important;
-    margin-bottom: 5px !important;
-}
-
-h3 {
-    font-size: 14pt !important;
-    margin-top: 5px !important;
-}
-
-h4 {
-    font-size: 12pt !important;
-}
-
-p,
-li,
-dt,
-dd,
-td,
-th {
-    font-size: 10pt !important;
-    line-height: 1.3 !important;
-}
-
-/* --- Éléments de candidature --- */
-.item.candidate-item,
-.candidate-item {
-    page-break-before: auto !important;
-    page-break-inside: avoid !important;
-    border: 1px solid #ddd !important;
-    margin-bottom: 5px !important;
-    padding: 10px 15px !important;
-    background-color: #fff !important;
-    color: #000 !important;
-}
-
-.border-box {
-    border: none !important;
+.col-sm-12,
+.col-sm-6,
+.col-xs-12,
+.col-md-12,
+.col-md-8,
+.col-md-4 {
+    width: 100% !important;
     padding: 0 !important;
+    float: none !important;
+    margin-bottom: 0 !important;
 }
 
-.border-candidat {
-    padding-left: 15px !important;
-}
-
-/* --- Statuts --- */
-.application-list .application-status {
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    font-size: 9pt !important;
-}
-
-.label-status {
-    border: 1px solid #ccc !important;
-    padding: 2px 6px !important;
-    color: #000 !important;
-    display: inline-block !important;
-    font-size: 9pt !important;
-}
-
-.awaiting {
-    background-color: #fcf8e3 !important;
-    color: #8a6d3b !important;
-}
-
-.accepted {
-    background-color: #dff0d8 !important;
-    color: #2d6a2d !important;
-}
-
-.rejected {
-    background-color: #f2dede !important;
-    color: #a94442 !important;
-}
-
-/* --- Titres des candidatures --- */
-.application-list .application-title {
-    text-transform: uppercase !important;
-    margin-top: 5px !important;
-    margin-bottom: 10px !important;
-    letter-spacing: 1px !important;
-}
-
-.application-list .application-title h3,
-.application-list .application-title h4 {
-    color: #000 !important;
-    font-weight: bold !important;
-    font-size: 13pt !important;
-}
-
-.application-list .application-title strong {
-    color: #000 !important;
-    font-size: 11pt !important;
-}
-
-/* --- Listes des infos candidature --- */
-.application-list .item ul,
-.application-desc {
-    list-style: none !important;
-    margin-bottom: 5px !important;
-    padding-left: 0 !important;
-}
-
-.application-list .item ul li,
-.application-desc li {
-    color: #000 !important;
-    font-weight: normal !important;
-    margin-bottom: 5px !important;
-    font-size: 10pt !important;
-}
-
-.application-list .item ul strong,
-.application-desc li strong {
-    color: #000 !important;
-}
-
-.application-list .item p,
-.application-list .item span {
-    color: #000 !important;
-    font-size: 10pt !important;
-    line-height: 1.3 !important;
-}
-
-/* --- Descriptions tronquées --- */
-.application-list .cell-content p {
-    font-size: 9pt !important;
-    color: #333 !important;
-    max-height: none !important;
-    overflow: visible !important;
-}
-
-/* --- En-tête du document (stats) --- */
-.stats-summary {
-    font-size: 11pt !important;
-    margin-bottom: 8px !important;
-}
-
-/* --- Application header --- */
+/* --- Header Section --- */
 .application-header {
-    margin-bottom: 0;
-    margin-top: 0;
+    margin: 0 0 20px 0 !important;
+    padding: 15px 20px !important;
+    border: 1px solid #e5e7eb !important;
+    border-left: 5px solid #2d74ba !important;
+    border-radius: 6px !important;
+    background-color: #f8fafc !important;
+    page-break-after: avoid;
+    break-inside: avoid;
 }
 
-.application-header h3,
-.application-header h6,
+.application-header h3 {
+    margin: 0 0 5px 0 !important;
+    font-size: 16pt !important;
+    font-weight: 700 !important;
+    color: #0f3f6b !important;
+}
+
+.application-header h6 {
+    margin: 0 0 5px 0 !important;
+    font-size: 11pt !important;
+    font-weight: 600 !important;
+    color: #4b5563 !important;
+}
+
 .application-header p {
-    text-align: left;
+    margin: 0 !important;
+    font-size: 9pt !important;
+    color: #6b7280 !important;
 }
 
-/* --- Divers --- */
-.box-information .box-title {
-    margin-top: 0;
-    margin-bottom: 0;
-    font-size: 16pt;
-    text-transform: uppercase;
+/* --- Space Card in Print --- */
+.application-space {
+    margin-bottom: 20px !important;
+    padding: 15px 20px !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    background-color: #f9fafb !important;
+    break-inside: avoid;
 }
 
+.application-space h5 {
+    margin: 0 0 10px 0 !important;
+    font-size: 12pt !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+}
+
+.application-space ul {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 15px !important;
+}
+
+.application-space ul li {
+    font-size: 9pt !important;
+    color: #4b5563 !important;
+}
+
+/* --- Information Box Card --- */
 .box-information {
-    margin-bottom: 0;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    background-color: #ffffff !important;
+    margin-bottom: 20px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    overflow: hidden !important;
 }
+
+.box-information .box-content {
+    padding: 15px 20px !important;
+    background-color: #ffffff !important;
+}
+
+.box-information .box-title {
+    margin: 0 0 12px 0 !important;
+    padding-bottom: 8px !important;
+    border-bottom: 2px solid #2d74ba !important;
+    color: #0f3f6b !important;
+    font-size: 11pt !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* --- Data Table --- */
+.box-information table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
+}
+
+.box-information table tbody tr {
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.box-information table tbody tr:last-child {
+    border-bottom: none !important;
+}
+
+.box-information table th,
+.box-information table td {
+    padding: 8px 10px !important;
+    font-size: 9.5pt !important;
+    vertical-align: top !important;
+}
+
+.box-information table th {
+    width: 30% !important;
+    font-weight: 700 !important;
+    color: #374151 !important;
+    text-align: left !important;
+    background-color: #f9fafb !important;
+}
+
+.box-information table td {
+    color: #1f2937 !important;
+}
+
+/* --- Files list --- */
+.files {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.file-infos {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    background: #f3f4f6 !important;
+    border-radius: 4px !important;
+    border: 1px solid #e5e7eb !important;
+    font-size: 9pt !important;
+}
+
+.file-infos span,
+.file-infos div {
+    font-weight: 600 !important;
+    color: #374151 !important;
+}
+
+.file-infos a {
+    color: #2d74ba !important;
+    text-decoration: none !important;
+}
+
+/* --- Social Icons replacement in print (use text labels) --- */
+.box-information table svg {
+    display: none !important; /* Hide SVGs in print */
+}
+
+/* Ensure clean page breaks */
+h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+/* Print flow ordering */
+.print-order-project { order: 1; }
+.print-order-contact { order: 2; }
+.print-order-structure { order: 3; }
+.print-order-social { order: 4; }
+.print-order-docs { order: 5; }
