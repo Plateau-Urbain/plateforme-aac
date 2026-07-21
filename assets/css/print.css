@@ -90,10 +90,10 @@ body {
 
 /* --- Header Section --- */
 .application-header {
-    margin: 0 0 20px 0 !important;
-    padding: 15px 20px !important;
+    margin: 0 0 15px 0 !important;
+    padding: 12px 18px !important;
     border: 1px solid #e5e7eb !important;
-    border-left: 5px solid #2d74ba !important;
+    border-left: none !important;
     border-radius: 6px !important;
     background-color: #f8fafc !important;
     page-break-after: avoid;
@@ -122,17 +122,25 @@ body {
 
 /* --- Space Card in Print --- */
 .application-space {
-    margin-bottom: 20px !important;
-    padding: 15px 20px !important;
+    margin-bottom: 15px !important;
+    padding: 10px 15px !important;
     border: 1px solid #e5e7eb !important;
     border-radius: 6px !important;
     background-color: #f9fafb !important;
     break-inside: avoid;
 }
 
+.application-space .ville {
+    margin: 0 0 2px 0 !important;
+    font-size: 8pt !important;
+    text-transform: uppercase !important;
+    color: #6b7280 !important;
+    font-weight: 600 !important;
+}
+
 .application-space h5 {
-    margin: 0 0 10px 0 !important;
-    font-size: 12pt !important;
+    margin: 0 0 6px 0 !important;
+    font-size: 11pt !important;
     font-weight: 700 !important;
     color: #1f2937 !important;
 }
@@ -143,12 +151,22 @@ body {
     list-style: none !important;
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 15px !important;
+    gap: 12px !important;
 }
 
 .application-space ul li {
-    font-size: 9pt !important;
+    font-size: 8.5pt !important;
     color: #4b5563 !important;
+}
+
+.application-space ul li:not(:last-child)::after {
+    content: " •" !important;
+    margin-left: 12px !important;
+    color: #9ca3af !important;
+}
+
+.application-space .info-candidature {
+    display: none !important;
 }
 
 /* --- Information Box Card --- */
