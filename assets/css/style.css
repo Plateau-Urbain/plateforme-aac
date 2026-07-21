@@ -11776,9 +11776,11 @@ form .main .section-title.form-sixth:after {
 
 .form-contener.bleu .help-block,
 .form-contener.bleu small.help-block,
-.form-contener.bleu p.help-block {
-  color: rgba(255, 255, 255, 0.85) !important;
-  font-size: 13px;
+.form-contener.bleu p.help-block,
+.form-contener.bleu .text-muted,
+.form-contener.bleu .form-text {
+  color: rgba(0, 0, 0, 0.85) !important;
+  font-size: 13px !important;
 }
 
 .required-files ul {
@@ -12226,7 +12228,6 @@ form .main .section-title.form-sixth:after {
   line-height: 1.2;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   pointer-events: none;
-  max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
 

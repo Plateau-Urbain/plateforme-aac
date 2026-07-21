@@ -24,7 +24,7 @@
 {% set allFlashes = app.flashes %}
 
 {% if allFlashes|length %}
-<div class="container" style="margin-top: 25px; margin-bottom: 25px;">
+<div class="container" style="margin-top: 25px; margin-bottom: 25px; position: relative; z-index: 10;">
     {% for label, messages in allFlashes %}
         {% if label != 'photo_upload' %}
         {% for message in messages %}
@@ -227,7 +227,7 @@
                     {{ form_label(form.managedByLabel) }}
                     {{ form_widget(form.managedByLabel) }}
                     {{ form_errors(form.managedByLabel) }}
-                    <p class="help-block" style="font-size: 13px; margin-top: 5px;">{{ form_help(form.managedByLabel) }}</p>
+                    {{ form_help(form.managedByLabel) }}
                 </div>
             </div>
 

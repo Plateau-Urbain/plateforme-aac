@@ -23,7 +23,7 @@
         {% set allFlashes = app.flashes %}
 
         {% if allFlashes|length %}
-        <div class="container" style="margin-top: 25px; margin-bottom: 25px;">
+        <div class="container" style="margin-top: 25px; margin-bottom: 25px; position: relative; z-index: 10;">
             {% for label, messages in allFlashes %}
                 {% if label != 'photo_upload' %}
                 {% for message in messages %}
@@ -151,8 +151,8 @@
             .publish-errors-summary ul { max-height: 280px; overflow-y: auto; }
             #js-form-space .form-contener.bleu .text-muted,
             #js-form-space .form-contener.bleu p.help-block {
-                color: rgba(0, 0, 0, 0.70);
-                font-size:16px;
+                color: rgba(0, 0, 0, 0.85) !important;
+                font-size: 13px !important;
             }
             #js-form-space .form-contener.bleu .alert-info,
             #js-form-space .form-contener.bleu .alert-success {
@@ -202,7 +202,7 @@
                                 {{ form_label(form.managedByLabel) }}
                                 {{ form_widget(form.managedByLabel) }}
                                 {{ form_errors(form.managedByLabel) }}
-                                <p class="help-block" style="font-size: 13px; margin-top: 5px;">{{ form_help(form.managedByLabel) }}</p>
+                                {{ form_help(form.managedByLabel) }}
                             </div>
                         </div>
 
