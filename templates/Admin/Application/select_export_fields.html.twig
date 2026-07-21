@@ -293,6 +293,14 @@ $(document).ready(function() {
     const selectAllBtn = $('#select-all-btn');
     const deselectAllBtn = $('#deselect-all-btn');
     
+    // Helper pour changer l'état d'une checkbox et synchroniser iCheck
+    function setCheckboxState($el, checked) {
+        $el.prop('checked', checked);
+        if ($.isFunction($.fn.iCheck)) {
+            $el.iCheck('update');
+        }
+    }
+
     // Fonction pour mettre à jour le compteur
     function updateSelectedCount() {
         // Forcer jQuery à recalculer les cases cochées
@@ -312,13 +320,9 @@ $(document).ready(function() {
     // Bouton tout sélectionner
     selectAllBtn.on('click', function(e) {
         e.preventDefault();
-        
-        // Sélectionner toutes les checkboxes
-        $('input[name="fields[]"]').prop('checked', true);
-        $('.field-checkbox').prop('checked', true);
-        $('.select-category').prop('checked', true);
-        
-        // Mettre à jour le compteur ET les indicateurs visuels
+        setCheckboxState($('input[name="fields[]"]'), true);
+        setCheckboxState($('.field-checkbox'), true);
+        setCheckboxState($('.select-category'), true);
         updateSelectedCount();
         updateVisualIndicators();
     });
@@ -326,13 +330,9 @@ $(document).ready(function() {
     // Bouton tout désélectionner
     deselectAllBtn.on('click', function(e) {
         e.preventDefault();
-        
-        // Désélectionner toutes les checkboxes
-        $('input[name="fields[]"]').prop('checked', false);
-        $('.field-checkbox').prop('checked', false);
-        $('.select-category').prop('checked', false);
-        
-        // Mettre à jour le compteur ET les indicateurs visuels
+        setCheckboxState($('input[name="fields[]"]'), false);
+        setCheckboxState($('.field-checkbox'), false);
+        setCheckboxState($('.select-category'), false);
         updateSelectedCount();
         updateVisualIndicators();
     });
@@ -345,15 +345,15 @@ $(document).ready(function() {
             const category = $(this).data('category');
             const categoryFields = $('.category-' + category);
             const allChecked = categoryFields.length > 0 && categoryFields.filter(':checked').length === categoryFields.length;
-            $(this).prop('checked', allChecked);
+            setCheckboxState($(this), allChecked);
         });
     }
 
     $('#preset-btn').on('click', function(e) {
         e.preventDefault();
-        $('.field-checkbox').prop('checked', false);
+        setCheckboxState($('.field-checkbox'), false);
         presetFields.forEach(function(key) {
-            $('input.field-checkbox[value="' + key + '"]').prop('checked', true);
+            setCheckboxState($('input.field-checkbox[value="' + key + '"]'), true);
         });
         syncCategoryCheckboxes();
         updateSelectedCount();
@@ -361,9 +361,9 @@ $(document).ready(function() {
     });
     
     // Sélectionner/désélectionner par catégorie
-    categoryCheckboxes.on('change', function() {
+    categoryCheckboxes.on('change ifChanged', function() {
         const category = $(this).data('category');
-        $('.category-' + category).prop('checked', $(this).prop('checked'));
+        setCheckboxState($('.category-' + category), $(this).prop('checked'));
         updateSelectedCount();
         updateVisualIndicators();
     });
@@ -383,7 +383,7 @@ $(document).ready(function() {
     }
     
     // Mettre à jour le compteur ET les indicateurs visuels quand on coche un champ
-    fieldCheckboxes.on('change', function() {
+    fieldCheckboxes.on('change ifChanged', function() {
         updateSelectedCount();
         updateVisualIndicators();
     });
