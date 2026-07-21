@@ -44,9 +44,13 @@ class RegistrationController extends AbstractController
         if ($form->isSubmitted()) {
             $email = strtolower(trim((string) $user->getEmail()));
             if ($email !== '' && $this->userRepository->findOneBy(['email' => $email]) instanceof User) {
-                $this->addFlash('error_sign', 'Cette adresse email est déjà utilisée.');
+                $resetUrl = $this->generateUrl('fos_user_resetting_request');
+                $this->addFlash(
+                    'error_sign',
+                    'Cette adresse e-mail est déjà utilisée. Veuillez vous connecter ou <a href="' . $resetUrl . '" style="text-decoration: underline; font-weight: bold; color: inherit;">réinitialiser votre mot de passe</a> si vous l\'avez oublié.'
+                );
 
-                return $this->redirectToRoute('homepage');
+                return $this->redirectToRoute('app_login');
             }
         }
 
@@ -79,12 +83,22 @@ class RegistrationController extends AbstractController
         }
 
         if ($form->isSubmitted() && !$form->isValid()) {
-            $this->addFlash(
-                'error_sign',
-                'Erreur lors de l\'inscription, veuillez vérifier votre e-mail et votre mot de passe.'
-            );
+            $captchaErrors = $form->get('captcha')->getErrors();
+            if (count($captchaErrors) > 0) {
+                $this->addFlash(
+                    'error_sign',
+                    'Le code de sécurité (captcha) est incorrect. Veuillez réessayer.'
+                );
 
-            return $this->redirectToRoute('homepage');
+                return $this->redirectToRoute('fos_user_registration_register');
+            } else {
+                $this->addFlash(
+                    'error_sign',
+                    'Erreur lors de l\'inscription, veuillez vérifier votre e-mail et votre mot de passe.'
+                );
+
+                return $this->redirectToRoute('homepage');
+            }
         }
 
         return $this->render('bundles/FOSUserBundle/views/Registration/register.html.twig', [

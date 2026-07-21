@@ -1736,9 +1736,9 @@ class Space implements \Stringable
     /**
      * @return string
      */
-    public function getManagedByLabel()
+    public function getManagedByLabel(): ?string
     {
-        return $this->managedByLabel ?: 'Géré';
+        return $this->managedByLabel ?: null;
     }
 
     /**

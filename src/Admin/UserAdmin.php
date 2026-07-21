@@ -248,6 +248,32 @@ class UserAdmin extends AbstractAdmin
                     ])
                 ->end()
             ->end()
+            ->tab('Structure')
+                ->with('Informations sur la structure', ['class' => 'col-md-6'])
+                    ->add('company', TextType::class, ['label' => 'Nom de la structure', 'required' => false])
+                    ->add('companyStatus', ChoiceType::class, [
+                        'label' => 'Statut juridique',
+                        'choices' => User::getAllProCompanyStatut(),
+                        'required' => false,
+                        'placeholder' => '-- Choisir --',
+                    ])
+                    ->add('companyCreationDate', DateType::class, [
+                        'label' => 'Date de création',
+                        'widget' => 'single_text',
+                        'required' => false,
+                    ])
+                    ->add('siret', TextType::class, ['label' => 'SIRET', 'required' => false])
+                    ->add('address', TextType::class, ['label' => 'Adresse', 'required' => false])
+                    ->add('zipcode', TextType::class, ['label' => 'Code postal', 'required' => false])
+                    ->add('city', TextType::class, ['label' => 'Ville', 'required' => false])
+                ->end()
+                ->with('Contact structure', ['class' => 'col-md-6'])
+                    ->add('companySite', TextType::class, ['label' => 'Site web', 'required' => false])
+                    ->add('companyPhone', TextType::class, ['label' => 'Téléphone fixe', 'required' => false])
+                    ->add('companyMobile', TextType::class, ['label' => 'Téléphone mobile', 'required' => false])
+                    ->add('companyFunction', TextType::class, ['label' => 'Fonction', 'required' => false])
+                ->end()
+            ->end()
         ;
     }
 
@@ -295,16 +321,33 @@ class UserAdmin extends AbstractAdmin
     protected function configureShowFields(ShowMapper $show): void
     {
         $show
-            ->with('Identité')
-                ->add('civility', null, ['label' => 'Civilité'])
-                ->add('firstname', null, ['label' => 'Prénom'])
-                ->add('lastname', null, ['label' => 'Nom'])
-                ->add('email', null, ['label' => 'Email'])
-                ->add('birthday', null, ['label' => 'Date de naissance'])
-                ->add('typeUser', null, ['label' => 'Type d\'utilisateur'])
-                ->add('preferredDepartmentsLabelsForExport', null, ['label' => 'Départements souhaités'])
-                ->add('enabled', null, ['label' => 'Actif'])
-                ->add('createdAt', null, ['label' => 'Créé le'])
+            ->tab('Identité')
+                ->with('Identité')
+                    ->add('civility', null, ['label' => 'Civilité'])
+                    ->add('firstname', null, ['label' => 'Prénom'])
+                    ->add('lastname', null, ['label' => 'Nom'])
+                    ->add('email', null, ['label' => 'Email'])
+                    ->add('birthday', null, ['label' => 'Date de naissance'])
+                    ->add('typeUser', null, ['label' => 'Type d\'utilisateur'])
+                    ->add('preferredDepartmentsLabelsForExport', null, ['label' => 'Départements souhaités'])
+                    ->add('enabled', null, ['label' => 'Actif'])
+                    ->add('createdAt', null, ['label' => 'Créé le'])
+                ->end()
+            ->end()
+            ->tab('Structure')
+                ->with('Structure')
+                    ->add('company', null, ['label' => 'Nom de la structure'])
+                    ->add('companyStatus', null, ['label' => 'Statut juridique'])
+                    ->add('companyCreationDate', null, ['label' => 'Date de création'])
+                    ->add('siret', null, ['label' => 'SIRET'])
+                    ->add('address', null, ['label' => 'Adresse'])
+                    ->add('zipcode', null, ['label' => 'Code postal'])
+                    ->add('city', null, ['label' => 'Ville'])
+                    ->add('companySite', null, ['label' => 'Site web'])
+                    ->add('companyPhone', null, ['label' => 'Téléphone fixe'])
+                    ->add('companyMobile', null, ['label' => 'Téléphone mobile'])
+                    ->add('companyFunction', null, ['label' => 'Fonction'])
+                ->end()
             ->end()
         ;
     }

@@ -120,7 +120,7 @@
       {% if space.isMultiLocation %}
       <p class="center" style="font-weight: bold; margin-bottom: 5px;">Candidatures ouvertes</p>
       <p style="font-size: 13px; line-height: 1.45; color: #4b5563; text-align: center; margin-bottom: 15px; padding: 0 10px;">
-        Cet appel regroupe plusieurs locaux. Vous pourrez sélectionner le ou les sites qui vous intéressent et définir vos priorités lors du remplissage de votre dossier de candidature.
+        Cet appel à candidatures regroupe plusieurs sites. Vous pourrez sélectionner le ou les sites qui vous intéressent et définir vos priorités lors du remplissage de votre dossier de candidature.
       </p>
       {% else %}
       <p class="center">Date limite de candidature</p>
@@ -152,7 +152,7 @@
           {% else %}
             {% if not app.user.isProfileComplete() %}
               <a href="{{ path('security_profil', {'next': path('space_apply', {'space': space.id})}) }}" class="btn btn-line-19">
-                <span>Veuillez compléter votre profil</span>
+                <span>{% if app.user.firstname is empty %}Veuillez compléter votre profil{% else %}Veuillez finaliser votre profil{% endif %}</span>
               </a>
               <p class="center" style="margin-top:8px">Votre profil doit être complet pour candidater.</p>
             {% else %}
@@ -665,7 +665,7 @@
                 }
 
                 if (loc.description) {
-                    html += '<div class="aac-map-popup-description">' + formatMultiline(loc.description) + '</div>';
+                    html += '<div class="aac-map-popup-description">' + loc.description + '</div>';
                 }
 
                 if (loc.availability) {
@@ -683,7 +683,21 @@
                 return html;
             }
 
+            var coordinatesUsed = {};
+
             function addMarker(loc, lat, lng) {
+                var key = lat.toFixed(6) + ',' + lng.toFixed(6);
+                if (coordinatesUsed[key]) {
+                    var count = coordinatesUsed[key];
+                    var angle = (count * 2 * Math.PI) / 8;
+                    var radius = 0.00015 * Math.sqrt(count);
+                    lat += Math.sin(angle) * radius;
+                    lng += Math.cos(angle) * radius;
+                    coordinatesUsed[key]++;
+                } else {
+                    coordinatesUsed[key] = 1;
+                }
+
                 var marker = L.marker([lat, lng], {
                     opacity: loc.suspended ? 0.5 : 1
                 }).addTo(map);

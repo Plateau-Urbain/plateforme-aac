@@ -1,5 +1,7 @@
 {% extends "bundles/FOSUserBundle/views/layout.html.twig" %}
 
+{% block prebody %}{% endblock %}
+
 {% block fos_user_content %}
 {% embed 'Partials/_auth_split_layout.html.twig' %}
 {% block auth_body %}
@@ -10,6 +12,13 @@
         <h4 style="font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #333;">Inscription</h4>
 
         <div id="cboxContent white">
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type == 'error_sign' or type == 'error' or type == 'danger' or type == 'error_msg' ? 'danger' : (type == 'success_msg' or type == 'success' ? 'success' : 'info') }} alert-error" style="margin-top: 10px; margin-bottom: 15px; padding: 10px; border-radius: 4px;">
+                        {{ message|raw }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
             {{ form_start(form, {'action': path('fos_user_registration_register'), 'attr': {'class':'fos_user_registration_register'}}) }}
 
             <div class="form-group{{ form.email.vars.errors | length ? ' has-error' : '' }}">

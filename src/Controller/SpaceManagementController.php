@@ -2837,6 +2837,11 @@ class SpaceManagementController extends AbstractController
     {
         $items = $this->collectFormErrors($form);
 
+        foreach ($items as &$item) {
+            $item = str_replace(['2 MiB', '2 Mo', '2MB', '2 MB'], '10 Mo', $item);
+        }
+        unset($item);
+
         if ($items === []) {
             return 'Le formulaire n\'a pas pu être publié. Vérifiez les champs signalés en rouge sur la page.';
         }

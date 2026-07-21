@@ -1,5 +1,7 @@
 {% extends "base.html.twig" %}
 
+{% block prebody %}{% endblock %}
+
 {% block body %}
 <div class="white"> 
         <div class="container"> 
@@ -15,12 +17,27 @@
            <h6> <a href="{{ path('search_index') }}" class="red"><span class="sub-arrow"><i class="fa fa-square"></i></span>Tous les appels à candidatures</a></h6>
             {# <p>Voir les <a href="{{ path('cgu') }}">Conditions générales d'utilisation</a></p> #}
             
-            {% if next is defined and next %}
-                <div class="alert alert-info" role="alert">
-                    <i class="fa fa-info-circle"></i>
-                    <strong>Information :</strong> Mettez à jour votre profil. Une fois vos modifications enregistrées, vous serez automatiquement redirigé vers votre candidature.
-                </div>
-            {% endif %}
+            <div class="alert alert-info" role="alert">
+                {% if not app.user.isProfileComplete() %}
+                    {% if app.user.firstname is empty %}
+                        <i class="fa fa-info-circle"></i>
+                        <strong>Votre profil doit être complété pour pouvoir candidater</strong>
+                        <p style="margin:8px 0 0 0;">Bienvenue sur la plateforme ! Certains champs de votre profil sont manquants. Merci de remplir et compléter l'ensemble des sections de votre profil (coordonnées, présentation, projet, réseaux sociaux…) avant de déposer une candidature.{% if next is defined and next %} Une fois vos modifications enregistrées, vous y serez redirigé automatiquement.{% endif %}</p>
+                    {% else %}
+                        <i class="fa fa-info-circle"></i>
+                        <strong>Votre profil doit être complété pour pouvoir candidater</strong>
+                        <p style="margin:8px 0 0 0;">Des champs de votre profil sont manquants ou ont été mis à jour depuis votre dernière connexion. Merci de relire et compléter l'ensemble des sections de votre profil (coordonnées, présentation, projet, réseaux sociaux…) avant de déposer une candidature.{% if next is defined and next %} Une fois vos modifications enregistrées, vous serez automatiquement redirigé vers votre candidature.{% endif %}</p>
+                    {% endif %}
+                {% else %}
+                    {% if app.user.firstname is empty %}
+                        <i class="fa fa-info-circle"></i>
+                        <strong>Bienvenue sur la plateforme !</strong> Veuillez compléter vos informations de profil candidat afin de pouvoir postuler aux espaces proposés.
+                    {% else %}
+                        <i class="fa fa-info-circle"></i>
+                        <strong>Mon Profil :</strong> Vous pouvez ici vérifier, modifier et mettre à jour vos informations de profil candidat.
+                    {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
 
@@ -964,9 +981,7 @@
                 if ($banner.find('li').length === 0) $banner.hide().empty();
             }
 
-            if (isExistingUser || !$('#project_owner_useType').val()) {
-                buildBanner(getMissingIds());
-            }
+            // Disabled red banner as requested
 
             // Clic sur un lien du bandeau → scroll vers la section puis vers le champ
             $(document).on('click', '.js-banner-scroll-link', function(e) {

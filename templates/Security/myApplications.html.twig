@@ -105,6 +105,8 @@
   <li><span>Mes candidatures</span></li>
 {% endblock %} #}
 
+{% block prebody %}{% endblock %}
+
 {% block body %}
 <div class="white"> 
         <div class="container"> 
@@ -144,7 +146,9 @@
         {{ form_end(filterForm) }}
       </div>
     </div>
-  </div> 
+  </div>
+
+  {% include 'Partials/flash_messages.html.twig' %}
 
   {% if applications | length == 0 %}
     <div class="no-results">
@@ -169,11 +173,11 @@
                   {% else %}
                            <div class="space_item {{ space.listingCardClass }}">
                   {% endif %}
-                    {% if space.isProposedByAdmin %}
-                      <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel }} par Plateau Urbain</span>
-                    {% elseif space.owner and space.owner.company %}
-                      <span class="pu-owner-badge"><i class="fa fa-building"></i> {{ space.managedByLabel }} par {{ space.owner.company }}</span>
-                    {% endif %}
+                     {% if space.isProposedByAdmin %}
+                       <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel ?: 'Géré par Plateau Urbain' }}</span>
+                     {% elseif space.owner and space.owner.company %}
+                       <span class="pu-owner-badge"><i class="fa fa-building"></i> {{ space.managedByLabel ?: ('Géré par ' ~ space.owner.company) }}</span>
+                     {% endif %}
                   <a href="{{ path('space_show', {'id': space.id}) }}">
                     <div class="image">
                       <img src="{% if space.pics.0 is not null %}{{ vich_uploader_asset(space.pics.0, 'file') }}{% endif %}" alt="" />

@@ -30,7 +30,7 @@
                             {% endif %}
                         </div>
                         {% if location.description %}
-                            <p style="margin: 8px 0 0 0; font-size: 13px; color: #475569; line-height: 1.4;">{{ location.description }}</p>
+                            <div style="margin: 8px 0 0 0; font-size: 13px; color: #475569; line-height: 1.4;">{{ location.description|raw }}</div>
                         {% endif %}
                     </div>
                     <div class="location-preference-actions" style="display: flex; flex-direction: column; gap: 5px; flex-shrink: 0;">

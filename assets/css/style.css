@@ -11774,6 +11774,13 @@ form .main .section-title.form-sixth:after {
   height: 39px;
 }
 
+.form-contener.bleu .help-block,
+.form-contener.bleu small.help-block,
+.form-contener.bleu p.help-block {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 13px;
+}
+
 .required-files ul {
   padding: 0 !important;
 }
@@ -12262,6 +12269,24 @@ form .main .section-title.form-sixth:after {
   background-color: #e5e7eb;
   color: #1f2937;
   transform: translateY(-1px);
+}
+
+/* Chips de lieux pour les cartes de la page d'accueil */
+.chip-location-home {
+  display: inline-block;
+  background-color: #1f2937;
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.chip-location-home:hover {
+  background-color: #374151;
 }
 
 /* Badge de localisations en haut à gauche des cartes index */

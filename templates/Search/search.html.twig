@@ -80,17 +80,21 @@
                                     {% if space.isMultiLocation %}
                                         <div class="location-chips" style="margin-bottom: 12px;">
                                             {% for loc in space.orderedActiveLocations %}
-                                                {% set chipLabel = loc.city %}
-                                                {% if loc.zipCode and loc.city|lower == 'paris' %}
-                                                    {% set arr = (loc.zipCode|slice(3, 2)) + 0 %}
-                                                    {% if arr == 1 %}
-                                                        {% set chipLabel = 'Paris 1er' %}
-                                                    {% else %}
-                                                        {% set chipLabel = 'Paris ' ~ arr ~ 'e' %}
+                                                {% if loc.name %}
+                                                    {% set chipLabel = loc.name %}
+                                                {% else %}
+                                                    {% set chipLabel = loc.city %}
+                                                    {% if loc.zipCode and loc.city|lower == 'paris' %}
+                                                        {% set arr = (loc.zipCode|slice(3, 2)) + 0 %}
+                                                        {% if arr == 1 %}
+                                                            {% set chipLabel = 'Paris 1er' %}
+                                                        {% else %}
+                                                            {% set chipLabel = 'Paris ' ~ arr ~ 'e' %}
+                                                        {% endif %}
+                                                    {% elseif loc.zipCode %}
+                                                        {% set dep = loc.zipCode|slice(0, 2) %}
+                                                        {% set chipLabel = loc.city ~ ' (' ~ dep ~ ')' %}
                                                     {% endif %}
-                                                {% elseif loc.zipCode %}
-                                                    {% set dep = loc.zipCode|slice(0, 2) %}
-                                                    {% set chipLabel = loc.city ~ ' (' ~ dep ~ ')' %}
                                                 {% endif %}
                                                 <span class="chip-location">{{ chipLabel }}</span>
                                             {% endfor %}

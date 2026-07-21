@@ -85,13 +85,25 @@ class SpaceController extends AbstractController
 
             if (!$user->isProfileComplete()) {
                 $missing = $user->getMissingProfileFields();
+                $isNewUser = empty($user->getFirstname());
                 if (!empty($missing)) {
-                    $this->addFlash('warning', sprintf(
-                        'Veuillez compléter votre profil avant de pouvoir candidater. Champs manquants : %s.',
-                        implode(', ', $missing)
-                    ));
+                    if ($isNewUser) {
+                        $this->addFlash('warning', sprintf(
+                            'Bienvenue ! Veuillez compléter votre profil avant de pouvoir candidater. Champs manquants : %s.',
+                            implode(', ', $missing)
+                        ));
+                    } else {
+                        $this->addFlash('warning', sprintf(
+                            'Veuillez mettre à jour votre profil avant de pouvoir candidater. Champs manquants : %s.',
+                            implode(', ', $missing)
+                        ));
+                    }
                 } else {
-                    $this->addFlash('warning', 'Veuillez compléter votre profil avant de pouvoir candidater.');
+                    if ($isNewUser) {
+                        $this->addFlash('warning', 'Bienvenue ! Veuillez compléter votre profil avant de pouvoir candidater.');
+                    } else {
+                        $this->addFlash('warning', 'Veuillez mettre à jour votre profil avant de pouvoir candidater.');
+                    }
                 }
 
                 $next      = $this->generateUrl('space_apply', ['space' => $space->getId()]);

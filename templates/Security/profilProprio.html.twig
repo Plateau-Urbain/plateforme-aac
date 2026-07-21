@@ -1,5 +1,7 @@
 {% extends "base.html.twig" %}
 
+{% block prebody %}{% endblock %}
+
 {% block breadcrumb_items %}
 <li><span>Mon profil</span></li>
 {% endblock %}
@@ -29,6 +31,30 @@
         </div>
 
         <div id="js-form-space">
+
+            {% for message in  app.flashes('error_msg') %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in  app.flashes('success_msg') %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('warning') %}
+                <div class="alert alert-warning" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
 
             {{ form_start(form, {'attr': {'class': 'has-crosses', 'id': 'form-profil', 'novalidate': 'novalidate'}}) }}
             <div class="row">
@@ -133,11 +159,7 @@
                         <div class="form-contener">
                             <h3>Modifier mon mot de passe</h3>
 
-                            {% for message in  app.flashes('error_msg') %}
-                            <div class="alert alert-danger" role="alert">
-                                {{ message }}
-                            </div>
-                            {% endfor %}
+
 
                             <div class="row" >
                                 <div class="col-sm-6 form-group">
@@ -204,7 +226,13 @@
 
 
 
-{{ form_end(form, {'render_rest': false}) }}
+    {# Rendre uniquement les champs cachés restants (ex: _token), pas les champs visibles oubliés #}
+    {% for child in form %}
+        {% if not child.rendered and child.vars.name starts with('_') %}
+            {{ form_row(child) }}
+        {% endif %}
+    {% endfor %}
+    {{ form_end(form, {'render_rest': false}) }}
 
 {% endblock %}
 
@@ -214,7 +242,7 @@
         $('button[type="submit"]').click(function() {
             var button = $(this)
             var form = document.getElementById(button.attr('form'))
-            var action = form.attributes.action;
+            var action = $(form).attr('action') || '';
             var formData = new FormData(form);
 
             if (form.checkValidity() === false) {

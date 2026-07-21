@@ -124,3 +124,68 @@ $(function(){
     $(this).parents('.form-group.has-error').removeClass('has-error').find('.help-block').detach();
   });
 });
+
+$(function() {
+    function addPasswordToggle(input) {
+        var $passwordInput = $(input);
+        if ($passwordInput.data('password-toggle-added')) {
+            return;
+        }
+        $passwordInput.data('password-toggle-added', true);
+        
+        var $parent = $passwordInput.parent();
+        if ($parent.length) {
+            if ($parent.css('position') === 'static') {
+                $parent.css('position', 'relative');
+            }
+            
+            // Adjust padding-right to prevent text overlap with the eye icon
+            $passwordInput.css('padding-right', '35px');
+            
+            // Calculate right offset based on parent padding-right (e.g. if parent is a Bootstrap column)
+            var paddingRight = parseFloat($parent.css('padding-right')) || 0;
+            var rightOffset = 12 + paddingRight;
+            
+            var $toggleBtn = $('<span class="password-toggle" style="position: absolute; right: ' + rightOffset + 'px; top: 50%; transform: translateY(-50%); cursor: pointer; z-index: 10; color: #777;"><i class="fa-solid fa-eye"></i></span>');
+            $parent.append($toggleBtn);
+            
+            $toggleBtn.on('click', function(e) {
+                e.preventDefault();
+                var $icon = $toggleBtn.find('i');
+                if ($passwordInput.attr('type') === 'password') {
+                    $passwordInput.attr('type', 'text');
+                    $icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    $passwordInput.attr('type', 'password');
+                    $icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+        }
+    }
+
+    // Initialize on existing password fields
+    $('input[type="password"]').each(function() {
+        addPasswordToggle(this);
+    });
+
+    // Observe body for dynamically added inputs (e.g. Colorbox modal/Ajax templates)
+    if (window.MutationObserver) {
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1) { // Element node
+                        if ($(node).is('input[type="password"]')) {
+                            addPasswordToggle(node);
+                        } else {
+                            $(node).find('input[type="password"]').each(function() {
+                                addPasswordToggle(this);
+                            });
+                        }
+                    }
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+});
+

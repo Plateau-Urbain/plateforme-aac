@@ -1,0 +1,15 @@
+{% if app.request.hasPreviousSession %}
+    {% set flashes = app.session.flashbag.all() %}
+    {% if flashes|length %}
+        <div class="flash-messages-container" style="margin-top: 25px; margin-bottom: 25px;">
+            {% for type, messages in flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type == 'error_sign' or type == 'error' or type == 'danger' or type == 'error_msg' ? 'danger' : (type == 'success_msg' or type == 'success' ? 'success' : 'info') }} alert-dismissible" role="alert" style="margin-bottom: 15px;">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        {{ message|raw }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endif %}

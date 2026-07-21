@@ -7,6 +7,8 @@
     </li>
 {% endblock %} #}
 
+{% block prebody %}{% endblock %}
+
 {% block body %}
 <div class="white"> 
         <div class="container"> 
@@ -54,6 +56,8 @@
     </div>
   </div>
 </div>
+
+{% include 'Partials/flash_messages.html.twig' %}
 
 {% if pagination | length == 0 %}
 
