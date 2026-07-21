@@ -270,7 +270,13 @@
       Dates et horaires des visites prévues
     </h4>
     <div class="pu-col-container content-block">
-      <p>À la clôture de l’AAC vous recevrez un mail pour vous inscrire à l’une de nos visites (la visite du site est obligatoire).</p>
+      <p>
+        {%- if space.isMultiLocation -%}
+          À la clôture de l’AAC, si votre candidature est sélectionnée, vous recevrez un mail pour vous inscrire à l’une de nos visites (la visite du site est obligatoire).
+        {%- else -%}
+          À la clôture de l’AAC vous recevrez un mail pour vous inscrire à l’une de nos visites (la visite du site est obligatoire).
+        {%- endif -%}
+      </p>
       <ul class="property-amenities-list">
         {% for v in space.visits %}
           <li>
