@@ -131,8 +131,19 @@ body {
     text-align: left !important;
 }
 
+.application-space .row,
+.application-space .row-flex,
+.application-space [class*="col-"] {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    float: none !important;
+}
+
 .application-space .ville {
     margin: 0 0 2px 0 !important;
+    padding: 0 !important;
     font-size: 8pt !important;
     text-transform: uppercase !important;
     color: #6b7280 !important;
@@ -142,6 +153,7 @@ body {
 
 .application-space h5 {
     margin: 0 0 6px 0 !important;
+    padding: 0 !important;
     font-size: 11pt !important;
     font-weight: 700 !important;
     color: #1f2937 !important;
@@ -163,6 +175,7 @@ body {
     font-size: 8.5pt !important;
     color: #4b5563 !important;
     text-align: left !important;
+    padding: 0 !important;
 }
 
 .application-space ul li:not(:last-child)::after {
