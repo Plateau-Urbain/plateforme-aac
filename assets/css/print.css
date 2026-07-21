@@ -128,6 +128,7 @@ body {
     border-radius: 6px !important;
     background-color: #f9fafb !important;
     break-inside: avoid;
+    text-align: left !important;
 }
 
 .application-space .ville {
@@ -136,6 +137,7 @@ body {
     text-transform: uppercase !important;
     color: #6b7280 !important;
     font-weight: 600 !important;
+    text-align: left !important;
 }
 
 .application-space h5 {
@@ -143,6 +145,7 @@ body {
     font-size: 11pt !important;
     font-weight: 700 !important;
     color: #1f2937 !important;
+    text-align: left !important;
 }
 
 .application-space ul {
@@ -152,11 +155,14 @@ body {
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 12px !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
 }
 
 .application-space ul li {
     font-size: 8.5pt !important;
     color: #4b5563 !important;
+    text-align: left !important;
 }
 
 .application-space ul li:not(:last-child)::after {
