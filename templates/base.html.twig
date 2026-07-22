@@ -54,6 +54,15 @@
     <link rel="stylesheet" href="{{ asset('bundles/app/css/main.css') }}" media="all" />
     <link rel="stylesheet" href="{{ asset('bundles/app/css/trumbowyg.min.css') }}" media="all" />
 
+    {% set active_theme = app.request.query.get('theme', app.session and app.session.has('theme') ? app.session.get('theme') : 'v1') %}
+    {% if app.request.query.has('theme') and app.session %}
+        {% do app.session.set('theme', app.request.query.get('theme')) %}
+    {% endif %}
+
+    {% if active_theme == 'v2' %}
+        <link rel="stylesheet" href="{{ asset('bundles/app/css/theme-v2.css') }}" media="all" />
+    {% endif %}
+
     {% block stylesheets %}{% endblock %}
 
     <!-- Cookie-Consent -->
@@ -84,7 +93,7 @@
     <script type="text/javascript" src="{{ asset('bundles/app/js/modernizr-2.8.1.min.js') }}"></script>
 
 </head>
-<body onload="if(typeof randomImg === 'function') randomImg()">
+<body onload="if(typeof randomImg === 'function') randomImg()" class="{% if active_theme == 'v2' %}theme-v2{% endif %}">
     <!-- BEGIN WRAPPER -->
     <div id="wrapper">
 
@@ -159,6 +168,8 @@
 
     {% block javascript %}
     {% endblock %}
+
+    {% include 'Partials/_theme_switcher.html.twig' %}
 
 </body>
 </html>

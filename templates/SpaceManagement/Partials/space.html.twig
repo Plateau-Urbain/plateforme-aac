@@ -5,10 +5,12 @@
     <div class="row row-flex">
       <div class="col-xs-12 col-md-4">
         <div class="image">
-          {% if space.isProposedByAdmin %}
+          {% if space.isMultiLocation %}
+            <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> Multi-sites déjà ouvert</span>
+          {% elseif space.isProposedByAdmin %}
             <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel ?: 'Géré par Plateau Urbain' }}</span>
           {% elseif space.owner and space.owner.company %}
-            <span class="pu-owner-badge"><i class="fa fa-building"></i> {{ space.managedByLabel ?: ('Géré par ' ~ space.owner.company) }}</span>
+            <span class="pu-owner-badge"><i class="fa fa-building"></i> Proposé par {{ space.owner.company }}</span>
           {% endif %}
           <div class="overlay">
             {% if space.isClosed %}
@@ -38,7 +40,7 @@
             <div class="space-card-location-row">
               {% if space.isMultiLocation %}
                 {% if space.displayCity|default(space.city) %}
-                  <span class="ville">{{ space.displayCity|default(space.city) }}</span>
+                  <span class="ville">{{ space.displayCity|default(space.city) }} — {{ space.managedByLabel ?: 'géré par Plateau Urbain' }}</span>
                 {% endif %}
               {% else %}
                 <span class="ville">{{ space.displayCity|default(space.city) }}{% if space.displayZipCode|default(space.zipCode) %} ({{ (space.displayZipCode|default(space.zipCode))|slice(0,2) }}){% endif %}</span>

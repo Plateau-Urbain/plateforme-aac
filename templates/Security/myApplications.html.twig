@@ -173,10 +173,12 @@
                   {% else %}
                            <div class="space_item {{ space.listingCardClass }}">
                   {% endif %}
-                     {% if space.isProposedByAdmin %}
+                     {% if space.isMultiLocation %}
+                       <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> Multi-sites déjà ouvert</span>
+                     {% elseif space.isProposedByAdmin %}
                        <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel ?: 'Géré par Plateau Urbain' }}</span>
                      {% elseif space.owner and space.owner.company %}
-                       <span class="pu-owner-badge"><i class="fa fa-building"></i> {{ space.managedByLabel ?: ('Géré par ' ~ space.owner.company) }}</span>
+                       <span class="pu-owner-badge"><i class="fa fa-building"></i> Proposé par {{ space.owner.company }}</span>
                      {% endif %}
                   <a href="{{ path('space_show', {'id': space.id}) }}">
                     <div class="image">
@@ -195,8 +197,7 @@
                             <div class="foot-suspended">
                   {% else %}
                            <div class="foot">
-                  {% endif %}              
-                          <p class="ville">{{ space.displayCity|default(space.city) }}{% if not space.isMultiLocation and space.depCode %} ({{ space.depCode }}){% endif %}</p>
+                  {% endif %}                                        <p class="ville">{{ space.displayCity|default(space.city) }}{% if not space.isMultiLocation and space.depCode %} ({{ space.depCode }}){% endif %}{% if space.isMultiLocation %} — {{ space.managedByLabel ?: 'géré par Plateau Urbain' }}{% endif %}</p>
                           <div class="statut-aac">
                         {% if space.isClosed %}
                           <div class="clos"><span><i class="fa fa-times fa-lg"></i>Cloturé</span></div>

@@ -97,10 +97,12 @@
             {% for space in latest %}
                 <div class="item col-xs-12 col-md-6 col-lg-4">
                      <div class="space_item {{ space.listingCardClass }}">
-                    {% if space.isProposedByAdmin %}
+                    {% if space.isMultiLocation %}
+                      <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> Multi-sites déjà ouvert</span>
+                    {% elseif space.isProposedByAdmin %}
                       <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel ?: 'Géré par Plateau Urbain' }}</span>
                     {% elseif space.owner and space.owner.company %}
-                      <span class="pu-owner-badge"><i class="fa fa-building"></i> {{ space.managedByLabel ?: ('Géré par ' ~ space.owner.company) }}</span>
+                      <span class="pu-owner-badge"><i class="fa fa-building"></i> Proposé par {{ space.owner.company }}</span>
                     {% endif %}
                     <!-- Set width to 4 columns for grid view mode only -->
                     <a href="{{ path('space_show', {'id' : space.id}) }}" >
@@ -128,7 +130,7 @@
                             <span class="price">{{ space.price }}€</span><span> /M<sup>2</sup>/MOIS</span>
                         </div>#}
                         <div class="foot">
-                            <p class="ville">{{ space.displayCity|default(space.city) }}{% if not space.isMultiLocation and space.depCode %} ({{ space.depCode }}){% endif %}</p>
+                            <p class="ville">{{ space.displayCity|default(space.city) }}{% if not space.isMultiLocation and space.depCode %} ({{ space.depCode }}){% endif %}{% if space.isMultiLocation %} — {{ space.managedByLabel ?: 'géré par Plateau Urbain' }}{% endif %}</p>
                             <h3 class="h3-21">{{ space.name }}</h3>
                             <ul>
                             <li>
@@ -198,10 +200,12 @@
         {% for space in unavailableSpaces %}
             <div class="item col-xs-12 col-md-6 col-lg-4">
                 <div class="space_item_unavailable {{ space.listingCardClass }}">
-                {% if space.isProposedByAdmin %}
+                {% if space.isMultiLocation %}
+                  <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> Multi-sites déjà ouvert</span>
+                {% elseif space.isProposedByAdmin %}
                   <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel ?: 'Géré par Plateau Urbain' }}</span>
                 {% elseif space.owner and space.owner.company %}
-                  <span class="pu-owner-badge"><i class="fa fa-building"></i> {{ space.managedByLabel ?: ('Géré par ' ~ space.owner.company) }}</span>
+                  <span class="pu-owner-badge"><i class="fa fa-building"></i> Proposé par {{ space.owner.company }}</span>
                 {% endif %}
                 <div class="image">
                     <img src="{% if space.pics.0 is defined %}{{ vich_uploader_asset(space.pics.0, 'file') }}{% endif %}" alt="" />
@@ -227,7 +231,7 @@
                     <span class="price">{{ space.price }}€</span><span> /M<sup>2</sup>/MOIS</span>
                 </div> #}
                 <div class="foot-unavailable">
-                    <p class="ville">{{ space.displayCity|default(space.city) }}{% if not space.isMultiLocation and space.depCode %} ({{ space.depCode }}){% endif %}</p>
+                    <p class="ville">{{ space.displayCity|default(space.city) }}{% if not space.isMultiLocation and space.depCode %} ({{ space.depCode }}){% endif %}{% if space.isMultiLocation %} — {{ space.managedByLabel ?: 'géré par Plateau Urbain' }}{% endif %}</p>
                     <h3 class="h3-21">{{ space.name }}</h3>
                     <ul>
                     <li>

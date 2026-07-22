@@ -1,5 +1,19 @@
 {% extends "@!SonataAdmin/standard_layout.html.twig" %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/trumbowyg.min.css') }}" media="all" />
+
+    {% set active_theme = app.request.query.get('theme', app.session and app.session.has('theme') ? app.session.get('theme') : 'v1') %}
+    {% if app.request.query.has('theme') and app.session %}
+        {% do app.session.set('theme', app.request.query.get('theme')) %}
+    {% endif %}
+
+    {% if active_theme == 'v2' %}
+        <link rel="stylesheet" href="{{ asset('bundles/app/css/theme-v2.css') }}" media="all" />
+    {% endif %}
+{% endblock %}
+
 {% block notice %}
     {% for type, messages in app.flashes %}
         {% for message in messages %}
@@ -11,13 +25,12 @@
     {% endfor %}
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('bundles/app/css/trumbowyg.min.css') }}" media="all" />
+{% block body_attributes %}
+    {% set active_theme = app.request.query.get('theme', app.session and app.session.has('theme') ? app.session.get('theme') : 'v1') %}
+    {% if active_theme == 'v2' %}class="theme-v2"{% endif %}
 {% endblock %}
 
 {% block javascripts %}
-
     {{ parent () }}
     <script type="text/javascript" src="{{ asset('bundles/app/js/trumbowyg.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('bundles/app/langs/fr.min.js') }}"></script>
@@ -33,4 +46,5 @@
         })
     </script>
 
+    {% include 'Partials/_theme_switcher.html.twig' %}
 {% endblock %}

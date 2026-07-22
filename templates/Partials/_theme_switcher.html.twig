@@ -1,0 +1,25 @@
+{% set active_theme = app.request.query.get('theme', app.session and app.session.has('theme') ? app.session.get('theme') : 'v1') %}
+{% if app.request.query.has('theme') and app.session %}
+    {% do app.session.set('theme', app.request.query.get('theme')) %}
+{% endif %}
+
+<div id="theme-switcher-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 999999; background: #0f172a; color: #ffffff; padding: 10px 16px; border-radius: 30px; font-size: 13px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4); font-family: 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+    <span style="display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 16px;">🎨</span> Design : <strong style="color: {{ active_theme == 'v2' ? '#38bdf8' : '#cbd5e1' }};">{{ active_theme == 'v2' ? 'V2 (Nouveau)' : 'V1 (Actuel)' }}</strong>
+    </span>
+
+    {% set current_route = app.request.attributes.get('_route') %}
+    {% set current_params = app.request.attributes.get('_route_params', {})|merge(app.request.query.all) %}
+
+    {% if active_theme == 'v2' %}
+        {% set v1_params = current_params|merge({'theme': 'v1'}) %}
+        <a href="{{ current_route ? path(current_route, v1_params) : '?theme=v1' }}" style="background: rgba(255,255,255,0.15); color: #ffffff; padding: 4px 10px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 12px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+            ↩ Revenir à V1
+        </a>
+    {% else %}
+        {% set v2_params = current_params|merge({'theme': 'v2'}) %}
+        <a href="{{ current_route ? path(current_route, v2_params) : '?theme=v2' }}" style="background: #2563eb; color: #ffffff; padding: 4px 12px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 12px; transition: background 0.2s;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+            ✨ Activer V2
+        </a>
+    {% endif %}
+</div>
