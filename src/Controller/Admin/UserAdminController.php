@@ -490,9 +490,9 @@ class UserAdminController extends CRUDController
                 'category' => 'Projet et souhaits'
             ],
             'useType' => [
-                'label' => 'Type de projet',
+                'label' => 'Secteur d\'activité',
                 'property' => 'useType',
-                'category' => 'Projet et souhaits'
+                'category' => 'Structure du porteur'
             ],
             'usageDate' => [
                 'label' => 'Date de disponibilité',

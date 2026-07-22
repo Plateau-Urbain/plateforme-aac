@@ -265,10 +265,6 @@
     
     /* Indicateur visuel pour les champs sélectionnés */
     .checkbox label.field-selected {
-        background-color: #d9edf7;
-        padding: 5px 10px;
-        border-radius: 3px;
-        border-left: 3px solid #3c8dbc;
         font-weight: bold;
         transition: all 0.2s;
     }
@@ -295,9 +291,10 @@ $(document).ready(function() {
     
     // Helper pour changer l'état d'une checkbox et synchroniser iCheck
     function setCheckboxState($el, checked) {
-        $el.prop('checked', checked);
         if ($.isFunction($.fn.iCheck)) {
-            $el.iCheck('update');
+            $el.iCheck(checked ? 'check' : 'uncheck');
+        } else {
+            $el.prop('checked', checked).trigger('change');
         }
     }
 

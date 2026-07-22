@@ -353,7 +353,7 @@ class ApplicationAdminController extends CRUDController
     private function getAllAvailableFields(): array
     {
         // Aligné sur `SpaceManagementController::getAllAvailableFieldsForExport()`
-        return [
+        $fields = [
             // Informations générales
             'space' => [
                 'label' => '[Candidature] Espace',
