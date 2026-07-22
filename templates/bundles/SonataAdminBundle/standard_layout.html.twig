@@ -3,15 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('bundles/app/css/trumbowyg.min.css') }}" media="all" />
-
-    {% set active_theme = app.request.query.get('theme', app.session and app.session.has('theme') ? app.session.get('theme') : 'v1') %}
-    {% if app.request.query.has('theme') and app.session %}
-        {% do app.session.set('theme', app.request.query.get('theme')) %}
-    {% endif %}
-
-    {% if active_theme == 'v2' %}
-        <link rel="stylesheet" href="{{ asset('bundles/app/css/theme-v2.css') }}" media="all" />
-    {% endif %}
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/theme-v2.css') }}" media="all" />
 {% endblock %}
 
 {% block notice %}
@@ -26,8 +18,7 @@
 {% endblock %}
 
 {% block body_attributes %}
-    {% set active_theme = app.request.query.get('theme', app.session and app.session.has('theme') ? app.session.get('theme') : 'v1') %}
-    {% if active_theme == 'v2' %}class="theme-v2"{% endif %}
+    class="theme-v2"
 {% endblock %}
 
 {% block javascripts %}
@@ -45,6 +36,4 @@
             })
         })
     </script>
-
-    {% include 'Partials/_theme_switcher.html.twig' %}
 {% endblock %}
