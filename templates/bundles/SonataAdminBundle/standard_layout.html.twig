@@ -1,11 +1,5 @@
 {% extends "@!SonataAdmin/standard_layout.html.twig" %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('bundles/app/css/trumbowyg.min.css') }}" media="all" />
-    <link rel="stylesheet" href="{{ asset('bundles/app/css/theme-v2.css') }}" media="all" />
-{% endblock %}
-
 {% block notice %}
     {% for type, messages in app.flashes %}
         {% for message in messages %}
@@ -17,8 +11,9 @@
     {% endfor %}
 {% endblock %}
 
-{% block body_attributes %}
-    class="theme-v2"
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/app/css/trumbowyg.min.css') }}" media="all" />
 {% endblock %}
 
 {% block javascripts %}
