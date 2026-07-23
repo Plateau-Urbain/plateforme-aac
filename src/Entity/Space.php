@@ -1316,9 +1316,13 @@ class Space implements \Stringable
         return $this->isRollingAAC();
     }
 
+    /**
+     * Date d'entrée souhaitée : affichée et requise pour les AAC mono-site (standard)
+     * et les AAC au fil de l'eau (pas spécifiquement pour les multi-sites).
+     */
     public function requiresStartOccupation(): bool
     {
-        return $this->isMultiLocation() || $this->isRollingAAC();
+        return !$this->isMultiLocation() || $this->isRollingAAC();
     }
 
     public function isStartOccupationRequired(): bool

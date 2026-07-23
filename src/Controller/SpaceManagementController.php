@@ -683,9 +683,9 @@ class SpaceManagementController extends AbstractController
                 'Bluesky' => 'projectHolder.googleUrl',
                 'Autre' => 'projectHolder.otherUrl',
                 'Présentation du projet' => 'description',
-                'Quel sera l\'usage du local ?' => 'localUsageDescription',
                 'Date de dépôt de la candidature' => 'created',
                 'Type d\'usage' => 'category',
+                'Quel sera l\'usage du local ?' => 'localUsageDescription',
                 'Statut juridique (profil)' => 'projectHolder.companyStatus',
                 'Statut juridique (candidature)' => 'companyStatus',
                 'Surface souhaitée (profil)' => 'projectHolder.wishedSize',
@@ -839,6 +839,7 @@ class SpaceManagementController extends AbstractController
             'lengthOccupation',
             'startOccupation',
             'category',
+            'localUsageDescription',
             'contribution',
         ];
 
@@ -850,7 +851,6 @@ class SpaceManagementController extends AbstractController
         }
 
         $orderPreset = array_merge($orderPreset, [
-            'localUsageDescription',
             'locationPreferences',
         ]);
 

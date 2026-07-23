@@ -145,8 +145,8 @@ class Application
     protected $wishedSize;
 
     /**
-     * Validation conditionnelle : la "date d'entrée souhaitée" est requise pour
-     * les AAC au fil de l'eau et les AAC multi-lieux.
+     * Validation : la "date d'entrée souhaitée" est requise à la soumission
+     * pour les AAC mono-site (standard) et les AAC au fil de l'eau.
      */
     #[Assert\Callback(groups: ['submit'])]
     public function validateStartOccupationForIndefiniteAAC(ExecutionContextInterface $context)

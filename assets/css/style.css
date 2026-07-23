@@ -9367,7 +9367,7 @@ form .main .section-title {
   text-transform: uppercase;
   letter-spacing: 0.3px;
   line-height: 1.2;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+
   pointer-events: none;
 }
 
@@ -12329,4 +12329,258 @@ form .main .section-title.form-sixth:after {
   line-height: 1.2;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   pointer-events: none;
+}
+
+/* ==========================================================================
+   Design System V2 - Redesign Expérimental
+   Plateau Urbain / Plateforme AAC
+   ========================================================================== */
+
+:root.theme-v2,
+body.theme-v2 {
+    --v2-bg-main: #f8fafc;
+    --v2-bg-card: #ffffff;
+    --v2-bg-aac-card: #f5f4f2;
+    --v2-primary: #2563eb;
+    --v2-primary-hover: #1d4ed8;
+    --v2-secondary: #0f172a;
+    --v2-accent: #10b981;
+    --v2-text-main: #1e293b;
+    --v2-text-muted: #64748b;
+    --v2-border-color: #e2e8f0;
+    --v2-radius-sm: 6px;
+    --v2-radius-md: 12px;
+    --v2-radius-lg: 20px;
+    --v2-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --v2-shadow-md: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+    --v2-shadow-lg: 0 12px 30px -4px rgba(15, 23, 42, 0.12);
+}
+
+/* Conserver la typographie d'origine */
+body.theme-v2 {
+    background-color: var(--v2-bg-main) !important;
+}
+
+/* Redesign des cartes / conteneurs principaux */
+
+body.theme-v2 .box,
+body.theme-v2 .panel,
+body.theme-v2 .card,
+body.theme-v2 .field-selection,
+body.theme-v2 .export-options-section {
+    border-radius: var(--v2-radius-md) !important;
+    border: 1px solid var(--v2-border-color) !important;
+    box-shadow: var(--v2-shadow-md) !important;
+    transition: all 0.25s ease-in-out;
+}
+
+/* Redesign des boutons */
+body.theme-v2 .btn,
+body.theme-v2 button[type="submit"],
+body.theme-v2 .btn-primary,
+body.theme-v2 .btn-export {
+    font-weight: 600 !important;
+    border-radius: var(--v2-radius-sm) !important;
+    padding: 10px 20px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: var(--v2-shadow-sm) !important;
+}
+
+body.theme-v2 .btn-primary,
+body.theme-v2 .btn-export {
+    background-color: var(--v2-primary) !important;
+    border-color: var(--v2-primary) !important;
+    color: #ffffff !important;
+}
+
+body.theme-v2 .btn-primary:hover,
+body.theme-v2 .btn-export:hover {
+    background-color: var(--v2-primary-hover) !important;
+    border-color: var(--v2-primary-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--v2-shadow-md) !important;
+}
+
+/* Règle UX : Le survol modifie le contenant (bordure, ombre, translation), jamais la surface de lecture */
+body.theme-v2 #js-results .space_item,
+body.theme-v2 #js-results .space_item_unavailable,
+body.theme-v2 #js-results .space_item_suspended,
+body.theme-v2 #property-listing .space_item,
+body.theme-v2 #property-listing .space_item_unavailable,
+body.theme-v2 #property-listing .space_item_suspended,
+body.theme-v2 #property-listing.management-list .space-card,
+body.theme-v2 #property-listing .space-card,
+body.theme-v2 .space-card,
+body.theme-v2 .space_item,
+body.theme-v2 .space_item_unavailable,
+body.theme-v2 .space_item_suspended {
+    color: #1e293b !important;
+    border-radius: var(--v2-radius-md) !important;
+    box-shadow: var(--v2-shadow-sm) !important;
+    transition: all 0.25s ease-in-out !important;
+}
+
+/* 1. État normal : Fond teinte pâle + Bordure fine de catégorie */
+body.theme-v2 #js-results .space_item.space-card--by-admin,
+body.theme-v2 #js-results .space_item_unavailable.space-card--by-admin,
+body.theme-v2 #property-listing.management-list .space-card.space-card--by-admin,
+body.theme-v2 #property-listing .space-card.space-card--by-admin,
+body.theme-v2 #property-listing .space_item.space-card--by-admin,
+body.theme-v2 .space-card.space-card--by-admin,
+body.theme-v2 .space_item.space-card--by-admin,
+body.theme-v2 .space-card--by-admin {
+    background-color: rgba(45, 116, 186, 0.12) !important;
+    border: 1px solid rgba(45, 116, 186, 0.3) !important;
+}
+
+body.theme-v2 #js-results .space_item.space-card--by-proprio,
+body.theme-v2 #js-results .space_item_unavailable.space-card--by-proprio,
+body.theme-v2 #property-listing.management-list .space-card.space-card--by-proprio,
+body.theme-v2 #property-listing .space-card.space-card--by-proprio,
+body.theme-v2 #property-listing .space_item.space-card--by-proprio,
+body.theme-v2 .space-card.space-card--by-proprio,
+body.theme-v2 .space_item.space-card--by-proprio,
+body.theme-v2 .space-card--by-proprio {
+    background-color: rgba(242, 190, 106, 0.18) !important;
+    border: 1px solid rgba(242, 190, 106, 0.4) !important;
+}
+
+body.theme-v2 #js-results .space_item.space-card--multi-location,
+body.theme-v2 #js-results .space_item_unavailable.space-card--multi-location,
+body.theme-v2 #property-listing.management-list .space-card.space-card--multi-location,
+body.theme-v2 #property-listing .space-card.space-card--multi-location,
+body.theme-v2 #property-listing .space_item.space-card--multi-location,
+body.theme-v2 .space-card.space-card--multi-location,
+body.theme-v2 .space_item.space-card--multi-location,
+body.theme-v2 .space-card--multi-location {
+    background-color: rgba(105, 189, 147, 0.15) !important;
+    border: 1px solid rgba(105, 189, 147, 0.35) !important;
+}
+
+/* 2. État au survol (Hover) : La bordure s'épaissit à 2px, ombre portée + micro-translation (le fond reste pâle) */
+body.theme-v2 #js-results .space_item.space-card--by-admin:hover,
+body.theme-v2 #js-results .space_item_unavailable.space-card--by-admin:hover,
+body.theme-v2 #property-listing.management-list .space-card.space-card--by-admin:hover,
+body.theme-v2 #property-listing .space-card.space-card--by-admin:hover,
+body.theme-v2 #property-listing .space_item.space-card--by-admin:hover,
+body.theme-v2 .space-card.space-card--by-admin:hover,
+body.theme-v2 .space_item.space-card--by-admin:hover {
+    background-color: rgba(45, 116, 186, 0.18) !important;
+    border: 2px solid #2d74ba !important;
+    box-shadow: 0 10px 25px rgba(45, 116, 186, 0.2) !important;
+    transform: translateY(-3px) !important;
+}
+
+body.theme-v2 #js-results .space_item.space-card--by-proprio:hover,
+body.theme-v2 #js-results .space_item_unavailable.space-card--by-proprio:hover,
+body.theme-v2 #property-listing.management-list .space-card.space-card--by-proprio:hover,
+body.theme-v2 #property-listing .space-card.space-card--by-proprio:hover,
+body.theme-v2 #property-listing .space_item.space-card--by-proprio:hover,
+body.theme-v2 .space-card.space-card--by-proprio:hover,
+body.theme-v2 .space_item.space-card--by-proprio:hover {
+    background-color: rgba(242, 190, 106, 0.26) !important;
+    border: 2px solid #f2be6a !important;
+    box-shadow: 0 10px 25px rgba(242, 190, 106, 0.25) !important;
+    transform: translateY(-3px) !important;
+}
+
+body.theme-v2 #js-results .space_item.space-card--multi-location:hover,
+body.theme-v2 #js-results .space_item_unavailable.space-card--multi-location:hover,
+body.theme-v2 #property-listing.management-list .space-card.space-card--multi-location:hover,
+body.theme-v2 #property-listing .space-card.space-card--multi-location:hover,
+body.theme-v2 #property-listing .space_item.space-card--multi-location:hover,
+body.theme-v2 .space-card.space-card--multi-location:hover,
+body.theme-v2 .space_item.space-card--multi-location:hover {
+    background-color: rgba(105, 189, 147, 0.22) !important;
+    border: 2px solid #69bd93 !important;
+    box-shadow: 0 10px 25px rgba(105, 189, 147, 0.25) !important;
+    transform: translateY(-3px) !important;
+}
+
+/* Lisibilité de la surface de lecture (Invariante au survol) */
+body.theme-v2 .space_item .foot,
+body.theme-v2 .space_item_unavailable .foot,
+body.theme-v2 .space_item .foot h3,
+body.theme-v2 .space_item_unavailable .foot h3,
+body.theme-v2 .space_item .foot p:not(.apply-date-p):not(.apply-date-b):not(.ville),
+body.theme-v2 .space_item_unavailable .foot p:not(.apply-date-p):not(.apply-date-b):not(.ville),
+body.theme-v2 .space_item .foot ul,
+body.theme-v2 .space_item_unavailable .foot ul,
+body.theme-v2 .space_item .foot li,
+body.theme-v2 .space_item_unavailable .foot li {
+    color: #1e293b !important;
+}
+
+body.theme-v2 .space_item .foot p.ville,
+body.theme-v2 .space_item_unavailable .foot p.ville,
+body.theme-v2 .space_item .foot .ville,
+body.theme-v2 .space_item_unavailable .foot .ville,
+body.theme-v2 .ville {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    padding: 2px 8px !important;
+    border-radius: 4px !important;
+}
+
+/* Overlays sur la miniature de carte */
+body.theme-v2 .space_item .availability-overlay,
+body.theme-v2 .space_item_unavailable .availability-overlay {
+    background-color: rgba(245, 244, 242, 0.92) !important;
+    color: #1e293b !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+body.theme-v2 .space_item .availability-text,
+body.theme-v2 .space_item_unavailable .availability-text {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+}
+
+/* Badge de statut / filtres */
+body.theme-v2 .label {
+    border-radius: 50px !important;
+    padding: 6px 14px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+}
+
+/* Indicateurs et animations */
+body.theme-v2 .field-item label {
+    border-radius: var(--v2-radius-sm) !important;
+    padding: 10px 14px !important;
+    border: 1px solid transparent;
+}
+
+body.theme-v2 .field-item label:hover {
+    background-color: #f1f5f9 !important;
+    border-color: var(--v2-border-color) !important;
+}
+
+body.theme-v2 .checkbox label.field-selected {
+    font-weight: 700 !important;
+    color: var(--v2-primary) !important;
+}
+
+/* Point chaud - Date limite de candidature écrite en Rouge PU (#e9473c) sans fond ni bordure */
+body.theme-v2 .apply-date {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-left: 10px !important;
+}
+
+body.theme-v2 .space_item .foot p.apply-date-p,
+body.theme-v2 .space_item_unavailable .foot p.apply-date-p,
+body.theme-v2 .foot .apply-date-p,
+body.theme-v2 .apply-date-p {
+    color: #e9473c !important;
+
+}
+
+body.theme-v2 .space_item .foot p.apply-date-b,
+body.theme-v2 .space_item_unavailable .foot p.apply-date-b,
+body.theme-v2 .foot .apply-date-b,
+body.theme-v2 .apply-date-b {
+    color: #e9473c !important;
+
 }

@@ -961,6 +961,7 @@
               <li>Candidature déposée le : <strong>{{ application.created | date('d/m/Y') }}</strong></li>
               <li>Secteur d'activité : <strong>{{ application.projectHolder.useType }}</strong></li>
               <li>Type d'usage : <strong>{{ application.category }}</strong></li>
+              <li>Quel sera l'usage du local ? : <strong>{% if application.localUsageDescription %}{{ application.localUsageDescription }}{% else %}—{% endif %}</strong></li>
 
               <li>Statut juridique : <strong>{% if application.companyStatus %}{{ application.companyStatus }}{% else %}—{% endif %}</strong></li>
               <li>Surface souhaitée : <strong>{% if application.wishedSize %}{{ application.wishedSize }}{% else %}—{% endif %} m²</strong></li>

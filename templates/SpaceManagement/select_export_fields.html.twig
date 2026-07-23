@@ -707,6 +707,7 @@ $(document).ready(function() {
         'lengthOccupation',               // Durée d'occupation
         'startOccupation',                // Date d'entrée souhaitée
         'category',                       // Type d'usage
+        'localUsageDescription',          // Quel sera l'usage du local ?
         'contribution'                    // Idées pour le projet collectif
         {% if space.isMultiLocation %},
         {% for rank in 1..space.orderedActiveLocations|length %},

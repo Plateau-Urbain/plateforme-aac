@@ -657,7 +657,6 @@ class ApplicationAdminController extends CRUDController
     private function getPresetExportFieldKeys(): array
     {
         $keys = $this->getExportFieldOrderPreset();
-        $keys = array_values(array_filter($keys, static fn (string $key): bool => $key !== 'localUsageDescription'));
 
         if ($this->getMaxLocationPreferenceRank() > 0) {
             $keys = array_values(array_filter($keys, static fn (string $key): bool => $key !== 'locationPreferences'));
@@ -695,6 +694,7 @@ class ApplicationAdminController extends CRUDController
             'lengthOccupation',
             'startOccupation',
             'category',
+            'localUsageDescription',
             'contribution',
         ];
 
@@ -704,7 +704,6 @@ class ApplicationAdminController extends CRUDController
         }
 
         return array_merge($orderPreset, [
-            'localUsageDescription',
             'locationPreferences',
         ]);
     }
