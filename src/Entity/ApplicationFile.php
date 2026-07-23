@@ -69,11 +69,8 @@ class ApplicationFile
      */
     public function setFile(File $file = null)
     {
-        if ($file === null) {
-            return;
-        }
-
         $this->file = $file;
+
         return $this;
     }
 

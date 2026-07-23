@@ -186,9 +186,9 @@ class SpaceLocation
         return $this->displayOrder;
     }
 
-    public function setDisplayOrder(int $displayOrder): self
+    public function setDisplayOrder(?int $displayOrder): self
     {
-        $this->displayOrder = $displayOrder;
+        $this->displayOrder = $displayOrder ?? 0;
 
         return $this;
     }

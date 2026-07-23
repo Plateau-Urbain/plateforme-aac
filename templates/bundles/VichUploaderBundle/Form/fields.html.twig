@@ -32,12 +32,14 @@
             {%- set attr = attr|merge({class: (attr.class|default('') ~ ' is-invalid')|trim}) -%}
         {%- endif -%}
 
-        {# Message d'info sur les contraintes (même règles que le front edit-space) #}
-        <p class="help-block" style="margin-bottom: 6px; font-size: 0.85em; color: #777;">
-            <i class="fa fa-info-circle"></i>
-            Formats acceptés : JPEG, PNG, WebP — max 600 Ko par photo.
-            Taille recommandée : 765 × 570 px en 72 dpi.
-        </p>
+        {# Info Sonata uniquement — le front a déjà ses propres messages au-dessus/en dessous du champ #}
+        {%- if app.request.attributes.get('_sonata_admin') -%}
+            <p class="help-block" style="margin-bottom: 6px; font-size: 0.85em; color: #777;">
+                <i class="fa fa-info-circle"></i>
+                Formats acceptés : JPEG, PNG, WebP — max 600 Ko par photo.
+                Taille recommandée : 765 × 570 px en 72 dpi.
+            </p>
+        {%- endif -%}
 
         {{- form_widget(form.file, {attr: attr}) -}}
         {%- if form.delete is defined -%}

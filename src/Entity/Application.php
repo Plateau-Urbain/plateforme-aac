@@ -534,7 +534,9 @@ class Application
      */
     public function removeFile(ApplicationFile $file)
     {
-        $this->files->removeElement($file);
+        if ($this->files->removeElement($file) && $file->getApplication() === $this) {
+            $file->setApplication(null);
+        }
     }
 
     /**

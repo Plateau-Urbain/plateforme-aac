@@ -7,7 +7,7 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Form\Type\CollectionType;
+use Sonata\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -17,7 +17,6 @@ use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
 use App\Entity\Space;
 use App\Entity\User;
-use App\Form\UserDocumentType;
 use Sonata\DoctrineORMAdminBundle\Filter\ChoiceFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\DateTimeRangeFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\DateRangeFilter;
@@ -125,7 +124,6 @@ class ProjectHolderAdmin extends AbstractAdmin
             ->add('lastname', null, ['required' => false, 'label' => 'Nom'])
             ->add('birthday', BirthdayType::class, ['required' => false, 'label' => 'Date de naissance'])
             ->add('phone', null, ['required' => false, 'label' => 'Téléphone'])
-            ->add('description', null, ['required' => false, 'label' => 'Description'])
             ->add('newsletter', ChoiceType::class, ['required' => false, 'label' => 'Souhaite recevoir la newsletter', 'choices' => ['Oui' => true, 'Non' => false]])
 
             ->end()
@@ -135,7 +133,6 @@ class ProjectHolderAdmin extends AbstractAdmin
             ->add('companyCreationDate', BirthdayType::class, ['required' => false, 'label' => 'Date de création'])
             ->add('siret', null, ['required' => false, 'label' => 'SIRET'])
             ->add('address', null, ['required' => false, 'label' => 'Adresse Structure'])
-            ->add('addressSuite', null, ['required' => false, 'label' => 'Adresse Structure (suite)'])
             ->add('zipcode', null, ['required' => false, 'label' => 'Code Postal Structure'])
             ->add('city', null, ['required' => false, 'label' => 'Ville Structure'])
             ->add('companyPhone', null, ['required' => false, 'label' => 'Téléphone fixe'])
@@ -143,12 +140,23 @@ class ProjectHolderAdmin extends AbstractAdmin
             ->add('companyDescription', null, ['required' => false, 'label' => 'Description'])
             ->add('companyEffective', null, ['required' => false, 'label' => 'Nombre de personnes dans la structure'])
             ->add('companyStructures', null, ['required' => false, 'label' => 'Structure(s) d\'accompagnement'])
-            ->add('company_site', null, ['required' => false, 'label' => 'Site web'])
-            ->add('company_blog', null, ['required' => false, 'label' => 'Blog'])
+            ->add('isSubjectToVat', ChoiceType::class, [
+                'required' => false,
+                'label' => 'Assujetti à la TVA',
+                'choices' => ['Oui' => true, 'Non' => false],
+                'placeholder' => 'Sélectionner...',
+            ])
+            ->add('isPuShareholder', ChoiceType::class, [
+                'required' => false,
+                'label' => 'Déjà sociétaire Plateau urbain',
+                'choices' => ['Oui' => true, 'Non' => false],
+                'placeholder' => 'Sélectionner...',
+            ])
 
             ->end()
             ->with('Souhaits')
             ->add('wishedSize', null, ['required' => false, 'label' => 'Surface souhaitée (m²)'])
+            ->add('monthlyBudgetMax', null, ['required' => false, 'label' => 'Budget mensuel total maximum (€)'])
             ->add('preferredDepartments', ChoiceType::class, [
                 'label' => 'Départements souhaités',
                 'choices' => User::getAllFrenchDepartments(),
@@ -162,7 +170,8 @@ class ProjectHolderAdmin extends AbstractAdmin
             ->add('projectDescription', null, ['required' => false, 'label' => 'Présentation du projet'])
 
             ->end()
-            ->with('Réseaux sociaux')
+            ->with('Site internet & réseaux sociaux')
+            ->add('company_site', null, ['required' => false, 'label' => 'Site web'])
             ->add('facebookUrl', null, ['required' => false, 'label' => 'Facebook'])
             ->add('twitterUrl', null, ['required' => false, 'label' => 'Twitter / X'])
             ->add('instagramUrl', null, ['required' => false, 'label' => 'Instagram'])
@@ -176,14 +185,13 @@ class ProjectHolderAdmin extends AbstractAdmin
 
             ->with('Documents')
             ->add('documents', CollectionType::class, [
-                'entry_type' => UserDocumentType::class,
                 'by_reference' => false,
-                'allow_delete' => true,
-                'allow_add' => true,
+                'required' => false,
                 'label' => 'Documents',
             ], [
                 'edit' => 'inline',
                 'inline' => 'table',
+                'admin_code' => 'app.admin.user_document',
             ])
             ->end()
 

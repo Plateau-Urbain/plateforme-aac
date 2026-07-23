@@ -41,9 +41,13 @@ class SpaceLocationType extends AbstractType
             ])
             ->add('latitude', HiddenType::class, [
                 'attr' => ['class' => 'js-location-lat'],
+                'required' => false,
+                'empty_data' => null,
             ])
             ->add('longitude', HiddenType::class, [
                 'attr' => ['class' => 'js-location-lng'],
+                'required' => false,
+                'empty_data' => null,
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
@@ -63,6 +67,8 @@ class SpaceLocationType extends AbstractType
             ])
             ->add('displayOrder', HiddenType::class, [
                 'attr' => ['class' => 'js-location-order'],
+                'required' => false,
+                'empty_data' => '0',
             ])
             ->add('suspended', CheckboxType::class, [
                 'label' => 'Suspendre ce site (plus de disponibilité)',

@@ -2,6 +2,7 @@ twig:
     file_name_pattern: '*.twig'
     form_themes:
         - 'Form/bootstrap_3_layout.html.twig'
+        - 'Form/custom_admin_fields.html.twig'
         - '@VichUploader/Form/fields.html.twig'
         - '@GregwarCaptcha/captcha.html.twig'
 

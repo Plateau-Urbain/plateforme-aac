@@ -1529,7 +1529,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
      */
     public function addDocument(\App\Entity\UserDocument $documents)
     {
-        $this->documents[] = $documents;
+        if (!$this->documents->contains($documents)) {
+            $this->documents[] = $documents;
+            $documents->setProjectHolder($this);
+        }
 
         return $this;
     }
@@ -1597,7 +1600,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
      */
     public function removeDocument(\App\Entity\UserDocument $documents)
     {
-        $this->documents->removeElement($documents);
+        if ($this->documents->removeElement($documents) && $documents->getProjectHolder() === $this) {
+            $documents->setProjectHolder(null);
+        }
     }
 
     /**

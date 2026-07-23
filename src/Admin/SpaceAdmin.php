@@ -57,7 +57,7 @@ class SpaceAdmin extends AbstractAdmin
         return $query;
     }
 
-    /** @param iterable<\App\Entity\SpaceImage|\App\Entity\SpaceDocument|\App\Entity\SpaceVisit> $children */
+    /** @param iterable<\App\Entity\SpaceImage|\App\Entity\SpaceDocument|\App\Entity\SpaceVisit|\App\Entity\SpaceLocation> $children */
     public function syncSpace(\App\Entity\Space $space, iterable $children): void
     {
         $pos = 0;
@@ -74,6 +74,9 @@ class SpaceAdmin extends AbstractAdmin
                     $child->setUpdatedAt(new \DateTime());
                 }
             }
+            if ($child instanceof \App\Entity\SpaceLocation) {
+                $child->setDisplayOrder($pos);
+            }
             $pos++;
         }
     }
@@ -83,6 +86,7 @@ class SpaceAdmin extends AbstractAdmin
         $this->syncSpace($object, $object->getDocuments());
         $this->syncSpace($object, $object->getVisits());
         $this->syncSpace($object, $object->getLocations());
+        $this->syncPublicationFlags($object);
     }
 
     /**
@@ -94,6 +98,18 @@ class SpaceAdmin extends AbstractAdmin
         $this->syncSpace($object, $object->getDocuments());
         $this->syncSpace($object, $object->getVisits());
         $this->syncSpace($object, $object->getLocations());
+        $this->syncPublicationFlags($object);
+    }
+
+    /**
+     * Le front n'affiche un AAC que si enabled ET submitted (isPublished).
+     * En Sonata, "En ligne" doit donc aussi marquer l'espace comme soumis.
+     */
+    private function syncPublicationFlags(Space $space): void
+    {
+        if ($space->isEnabled()) {
+            $space->setSubmitted(true);
+        }
     }
 
     /**
@@ -472,8 +488,26 @@ class SpaceAdmin extends AbstractAdmin
             ->end()
 
             ->with('Publication')
-                ->add('enabled', ChoiceType::class, ['label' => 'En ligne', 'required' => false, 'choices' => ['Oui' => true, 'Non' => false], 'placeholder' => false])
-                ->add('closed', ChoiceType::class, ['label' => 'Clôturé', 'required' => false, 'choices' => ['Oui' => true, 'Non' => false], 'placeholder' => false])
+                ->add('enabled', ChoiceType::class, [
+                    'label' => 'En ligne',
+                    'required' => false,
+                    'choices' => ['Oui' => true, 'Non' => false],
+                    'placeholder' => false,
+                    'help' => 'Oui = publié en front (active aussi automatiquement le statut « Soumis »).',
+                ])
+                ->add('submitted', ChoiceType::class, [
+                    'label' => 'Soumis',
+                    'required' => false,
+                    'choices' => ['Oui' => true, 'Non' => false],
+                    'placeholder' => false,
+                    'help' => 'Requis pour apparaître en front. Passé automatiquement à Oui si « En ligne » = Oui.',
+                ])
+                ->add('closed', ChoiceType::class, [
+                    'label' => 'Clôturé',
+                    'required' => false,
+                    'choices' => ['Oui' => true, 'Non' => false],
+                    'placeholder' => false,
+                ])
             ->end()
 
         ;

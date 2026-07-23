@@ -3,8 +3,9 @@
 namespace App\Admin;
 
 use Sonata\AdminBundle\Admin\AbstractAdmin;
-use Sonata\AdminBundle\Form\Type\CollectionType;
-use App\Form\ApplicationFileType;
+use Sonata\Form\Type\CollectionType;
+use Sonata\AdminBundle\Form\Type\CollectionType as NativeCollectionType;
+use App\Form\ApplicationLocationPreferenceType;
 use App\Form\Admin\ApplicationLocationPreferenceFilterType;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
@@ -142,8 +143,6 @@ class ApplicationAdmin extends AbstractAdmin
 
         $formMapper
             ->add('wishedSize', null, ['label'=> 'Surface souhaitée (candidature) (m²)'])
-            ->add('lengthOccupation', null, ['label'=> 'Durée d\'occupation'])
-            ->add('lengthTypeOccupation', ChoiceType::class, ['choices' => Application::getAllLengthType(), 'label'=> 'Durée d\'occupation'])
             ->add('startOccupation', DateType::class, ['label'=>"Date d'entrée souhaitée"])
             ->add('description', null, ['label'=>"Description du projet"])
             ->add('openToGlobalProject', ChoiceType::class, ['label'=> "Ouvert à faire partie d'un projet collectif", 'choices' => ['Oui' => true, 'Non' => false]])
@@ -151,18 +150,45 @@ class ApplicationAdmin extends AbstractAdmin
             ->end()
             ->with('Documents')
             ->add('files', CollectionType::class, [
-                'entry_type' => ApplicationFileType::class,
                 'by_reference' => false,
-                'allow_delete' => true,
-                'allow_add' => true,
+                'required' => false,
                 'label' => 'Documents',
             ], [
                 'edit' => 'inline',
                 'inline' => 'table',
+                'admin_code' => 'app.admin.application_file',
             ])
             ->end()
-
         ;
+
+        $space = $application instanceof Application ? $application->getSpace() : null;
+        if ($space instanceof Space && $space->isMultiLocation()) {
+            $locations = $space->getActiveLocations();
+            if (\count($locations) > 0) {
+                $application->syncLocationPreferencesFromSpace();
+                $application->sortLocationPreferencesByRank();
+
+                $formMapper
+                    ->with('Classement des sites (AAC Multi-sites)')
+                    ->add('locationPreferences', NativeCollectionType::class, [
+                        'entry_type' => ApplicationLocationPreferenceType::class,
+                        'entry_options' => [
+                            'locations' => $locations,
+                            'admin_mode' => true,
+                        ],
+                        'by_reference' => false,
+                        'allow_add' => true,
+                        'allow_delete' => true,
+                        'label' => 'Classement des sites',
+                        'help' => 'Rang 1 = premier choix. Ajoutez/supprimez des lignes pour ajuster le classement.',
+                    ], [
+                        'edit' => 'inline',
+                        'inline' => 'table',
+                    ])
+                    ->end()
+                ;
+            }
+        }
     }
 
     // Fields to be shown on filter forms

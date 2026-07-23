@@ -14,10 +14,10 @@
 
 {% block doc_admin_type_widget %}
     {% apply spaceless %}
-        {% set subject =  form.parent.vars.data %}
-        {% if subject.id %}
-            <a href="{{ asset(vich_uploader_asset(subject, name)) }}" target="_blank">
-              {{ subject.filename }}
+        {% set subject = form.parent.vars.data %}
+        {% if subject is not null and subject.id and subject.fileName %}
+            <a href="{{ asset(vich_uploader_asset(subject, 'file')) }}" target="_blank">
+              {{ subject.fileName }}
             </a><br/>
         {% endif %}
         {% set type = type|default('file') %}

@@ -119,9 +119,12 @@
     <div class="pu-apply-zone">
       {% if space.isMultiLocation %}
       <p class="center" style="font-weight: bold; margin-bottom: 5px;">Candidatures ouvertes</p>
+      {% set sitesCount = space.activeLocations|length %}
+      {% if sitesCount > 1 %}
       <p style="font-size: 13px; line-height: 1.45; color: #4b5563; text-align: center; margin-bottom: 15px; padding: 0 10px;">
-        Cet appel à candidatures regroupe plusieurs sites. Vous pourrez sélectionner le ou les sites qui vous intéressent et définir vos priorités lors du remplissage de votre dossier de candidature.
+        Cet appel à candidatures regroupe {{ sitesCount }} sites. Vous pourrez sélectionner le ou les sites qui vous intéressent et définir vos priorités lors du remplissage de votre dossier de candidature.
       </p>
+      {% endif %}
       {% else %}
       <p class="center">Date limite de candidature</p>
       <h5 class="center apply-date-show">
