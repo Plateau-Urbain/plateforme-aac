@@ -7,7 +7,8 @@ sonata_admin:
         use_select2: true
         use_icheck: false
     assets:
-        extra_javascripts: []
+        extra_javascripts:
+            - /js/admin-workflow-toggle.js
         extra_stylesheets:
             - /css/admin-space-list.css
     dashboard:

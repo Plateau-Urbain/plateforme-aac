@@ -22,6 +22,12 @@ class UserAdmin extends AbstractAdmin
     protected $baseRoutePattern = 'utilisateurs';
     protected $baseRouteName = 'utilisateurs';
 
+    /** @var array<string, mixed> */
+    protected array $datagridValues = [
+        '_sort_order' => 'DESC',
+        '_sort_by' => 'createdAt',
+    ];
+
     public function __construct(private \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordHasher)
     {
         parent::__construct();

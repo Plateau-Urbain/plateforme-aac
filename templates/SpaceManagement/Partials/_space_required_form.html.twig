@@ -50,15 +50,16 @@
 <div class="space-required-docs-row">
   <div class="space-required-docs-row__item">
     <h5>Appel à candidature</h5>
-    {% if space.getDocs('document_aac') | length %}
-        {% set fileaac =  space.getDocs('document_aac')[0] %}
-        {% if fileaac.id %}
-        <a target="_blank" href="{{ asset(vich_uploader_asset(fileaac, 'file')) }}"><i class="fa fa-eye"></i></a>
+    {% set docsAac = space.getDocs('document_aac') %}
+    {% if docsAac|length %}
+        {% set fileaac = docsAac[0] %}
+        {% if fileaac.id and fileaac.fileName is not empty %}
+        <a target="_blank" href="{{ vich_uploader_asset(fileaac, 'file') }}"><i class="fa fa-eye"></i></a>
         <a href="{{ path('space_manager_removepicture', { 'id': fileaac.id, 'token': csrf_token('remove_image') }) }}"><i class="fa fa-trash"></i></a>
         {% else %}
         <span class="text-muted">Document en cours d'enregistrement</span>
         {% endif %}
-    {% else %}
+    {% elseif form.doc_aac is defined %}
         <div class="js-doc-upload" data-max-size="10485760" data-label="Appel à candidature">
             {{ form_widget(form.doc_aac, {'attr': {'class': 'form-control overflow'}}) }}
         </div>
@@ -67,15 +68,16 @@
 
   <div class="space-required-docs-row__item">
     <h5>Répartition des espaces</h5>
-    {% if space.getDocs('document_plan') | length %}
-        {% set fileplan =  space.getDocs('document_plan')[0] %}
-        {% if fileplan.id %}
-        <a target="_blank" href="{{ asset(vich_uploader_asset(fileplan, 'file')) }}"><i class="fa fa-eye"></i></a>
+    {% set docsPlan = space.getDocs('document_plan') %}
+    {% if docsPlan|length %}
+        {% set fileplan = docsPlan[0] %}
+        {% if fileplan.id and fileplan.fileName is not empty %}
+        <a target="_blank" href="{{ vich_uploader_asset(fileplan, 'file') }}"><i class="fa fa-eye"></i></a>
         <a href="{{ path('space_manager_removepicture', { 'id': fileplan.id, 'token': csrf_token('remove_image') }) }}"><i class="fa fa-trash"></i></a>
         {% else %}
         <span class="text-muted">Document en cours d'enregistrement</span>
         {% endif %}
-    {% else %}
+    {% elseif form.doc_plan is defined %}
         <div class="js-doc-upload" data-max-size="10485760" data-label="Répartition des espaces">
             {{ form_widget(form.doc_plan, {'attr': {'class': 'form-control overflow'}}) }}
         </div>
@@ -84,15 +86,16 @@
 
   <div class="space-required-docs-row__item">
     <h5>F.A.Q</h5>
-    {% if space.getDocs('document_faq') | length %}
-        {% set filefaq =  space.getDocs('document_faq')[0] %}
-        {% if filefaq.id %}
-        <a target="_blank" href="{{ asset(vich_uploader_asset(filefaq, 'file')) }}"><i class="fa fa-eye"></i></a>
+    {% set docsFaq = space.getDocs('document_faq') %}
+    {% if docsFaq|length %}
+        {% set filefaq = docsFaq[0] %}
+        {% if filefaq.id and filefaq.fileName is not empty %}
+        <a target="_blank" href="{{ vich_uploader_asset(filefaq, 'file') }}"><i class="fa fa-eye"></i></a>
         <a href="{{ path('space_manager_removepicture', { 'id': filefaq.id, 'token': csrf_token('remove_image') }) }}"><i class="fa fa-trash"></i></a>
         {% else %}
         <span class="text-muted">Document en cours d'enregistrement</span>
         {% endif %}
-    {% else %}
+    {% elseif form.doc_faq is defined %}
         <div class="js-doc-upload" data-max-size="10485760" data-label="F.A.Q">
             {{ form_widget(form.doc_faq, {'attr': {'class': 'form-control overflow'}}) }}
         </div>

@@ -153,6 +153,7 @@ class Space implements \Stringable
 
     #[ORM\OneToMany(targetEntity: \App\Entity\SpaceImage::class, mappedBy: 'space', orphanRemoval: true, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['position' => 'ASC'])]
+    #[Assert\Valid]
     protected $pics;
 
     /**
@@ -698,12 +699,26 @@ class Space implements \Stringable
      */
     public function setDocAac(?SpaceImage $doc): self
     {
-        if ($doc === null || $doc->getFile() === null) {
+        if ($doc === null || ($doc->getFile() === null && $doc->getFileName() === null)) {
+            foreach ($this->pics as $pic) {
+                if ($pic->getFileType() === SpaceImage::FILETYPE_DOCUMENT_AAC) {
+                    $this->pics->removeElement($pic);
+                }
+            }
             return $this;
         }
-        if (!$this->pics->contains($doc)) {
-            $this->addDoc($doc, SpaceImage::FILETYPE_DOCUMENT_AAC);
+
+        if ($doc->getFile() !== null) {
+            foreach ($this->pics as $pic) {
+                if ($pic->getFileType() === SpaceImage::FILETYPE_DOCUMENT_AAC && $pic !== $doc) {
+                    $this->pics->removeElement($pic);
+                }
+            }
+            if (!$this->pics->contains($doc)) {
+                $this->addDoc($doc, SpaceImage::FILETYPE_DOCUMENT_AAC);
+            }
         }
+
         return $this;
     }
 
@@ -721,12 +736,26 @@ class Space implements \Stringable
      */
     public function setDocPlan(?SpaceImage $doc): self
     {
-        if ($doc === null || $doc->getFile() === null) {
+        if ($doc === null || ($doc->getFile() === null && $doc->getFileName() === null)) {
+            foreach ($this->pics as $pic) {
+                if ($pic->getFileType() === SpaceImage::FILETYPE_DOCUMENT_PLAN) {
+                    $this->pics->removeElement($pic);
+                }
+            }
             return $this;
         }
-        if (!$this->pics->contains($doc)) {
-            $this->addDoc($doc, SpaceImage::FILETYPE_DOCUMENT_PLAN);
+
+        if ($doc->getFile() !== null) {
+            foreach ($this->pics as $pic) {
+                if ($pic->getFileType() === SpaceImage::FILETYPE_DOCUMENT_PLAN && $pic !== $doc) {
+                    $this->pics->removeElement($pic);
+                }
+            }
+            if (!$this->pics->contains($doc)) {
+                $this->addDoc($doc, SpaceImage::FILETYPE_DOCUMENT_PLAN);
+            }
         }
+
         return $this;
     }
 
@@ -744,12 +773,26 @@ class Space implements \Stringable
      */
     public function setDocFaq(?SpaceImage $doc): self
     {
-        if ($doc === null || $doc->getFile() === null) {
+        if ($doc === null || ($doc->getFile() === null && $doc->getFileName() === null)) {
+            foreach ($this->pics as $pic) {
+                if ($pic->getFileType() === SpaceImage::FILETYPE_DOCUMENT_FAQ) {
+                    $this->pics->removeElement($pic);
+                }
+            }
             return $this;
         }
-        if (!$this->pics->contains($doc)) {
-            $this->addDoc($doc, SpaceImage::FILETYPE_DOCUMENT_FAQ);
+
+        if ($doc->getFile() !== null) {
+            foreach ($this->pics as $pic) {
+                if ($pic->getFileType() === SpaceImage::FILETYPE_DOCUMENT_FAQ && $pic !== $doc) {
+                    $this->pics->removeElement($pic);
+                }
+            }
+            if (!$this->pics->contains($doc)) {
+                $this->addDoc($doc, SpaceImage::FILETYPE_DOCUMENT_FAQ);
+            }
         }
+
         return $this;
     }
 

@@ -20,6 +20,7 @@ use App\Form\SpaceDocumentType;
 use App\Form\SpaceImageType;
 use App\Form\SpaceVisitType;
 use App\Form\SpaceDocAdminType;
+use App\Form\SpaceLocationType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -59,8 +60,21 @@ class SpaceAdmin extends AbstractAdmin
     /** @param iterable<\App\Entity\SpaceImage|\App\Entity\SpaceDocument|\App\Entity\SpaceVisit> $children */
     public function syncSpace(\App\Entity\Space $space, iterable $children): void
     {
+        $pos = 0;
         foreach ($children as $child) {
             $child->setSpace($space);
+            if ($child instanceof \App\Entity\SpaceImage) {
+                if (!$child->getFileType()) {
+                    $child->setFileType(\App\Entity\SpaceImage::FILETYPE_IMAGE);
+                }
+                if ($child->getPosition() === null) {
+                    $child->setPosition($pos);
+                }
+                if ($child->getUpdatedAt() === null) {
+                    $child->setUpdatedAt(new \DateTime());
+                }
+            }
+            $pos++;
         }
     }
     public function prePersist(object $object): void
@@ -68,6 +82,7 @@ class SpaceAdmin extends AbstractAdmin
         $this->syncSpace($object, $object->getPics());
         $this->syncSpace($object, $object->getDocuments());
         $this->syncSpace($object, $object->getVisits());
+        $this->syncSpace($object, $object->getLocations());
     }
 
     /**
@@ -78,6 +93,7 @@ class SpaceAdmin extends AbstractAdmin
         $this->syncSpace($object, $object->getPics());
         $this->syncSpace($object, $object->getDocuments());
         $this->syncSpace($object, $object->getVisits());
+        $this->syncSpace($object, $object->getLocations());
     }
 
     /**
@@ -323,7 +339,7 @@ class SpaceAdmin extends AbstractAdmin
     {
         $formOptions['validation_groups'] = static function (FormInterface $form): array {
             $space = $form->getData();
-            $groups = ['save'];
+            $groups = ['Default', 'save'];
 
             if ($space instanceof Space && $space->isMultiLocation()) {
                 $groups[] = 'multi_location';
@@ -340,6 +356,15 @@ class SpaceAdmin extends AbstractAdmin
     {
         $formMapper
             ->with('General')
+            ->add('workflowType', ChoiceType::class, [
+                'label' => 'Type d\'Appel à candidature',
+                'choices' => [
+                    'AAC Mono-site (Standard)' => Space::WORKFLOW_STANDARD,
+                    'AAC Multi-sites' => Space::WORKFLOW_MULTI_LOCATION,
+                ],
+                'required' => true,
+                'help' => 'AAC Mono-site (1 seul lieu) ou AAC Multi-sites (plusieurs lieux/secteurs).',
+            ])
             ->add('name', null, ['label' => "Nom de l'espace"])
             ->add('managedByLabel', null, [
                 'label' => "Texte du badge (ex: Géré, Commercialisé...)",
@@ -354,9 +379,9 @@ class SpaceAdmin extends AbstractAdmin
                 'admin_code' => 'app.admin.owner',
             ])
             ->add('zipCode', null, ['label' => 'Code postal', 'required' => false])
-            ->add('city', null, ['label' => 'Ville'])
+            ->add('city', null, ['label' => 'Ville', 'required' => false])
             ->add('limitAvailability', null, ['label' => 'Date limite de candidature', 'required' => false])
-            ->add('availability', null, ['label' => 'Durée du projet'])
+            ->add('availability', null, ['label' => 'Durée du projet', 'required' => false])
             ->add('type', null, ['label' => 'Type de locaux', 'required' => true])
             ->add('description', null, ['label' => 'Description', 'attr' => ['class' => 'trumbowyg']])
             ->add('activityDescription', null, ['label' => 'Activités recherchées', 'attr' => ['class' => 'trumbowyg']])
@@ -365,35 +390,21 @@ class SpaceAdmin extends AbstractAdmin
             ->add('nbSpaces', null, ['label' => "Nombre d'espaces", 'required' => false])
             ->add('minSpace', null, ['label' => 'Surface minimale (m²)', 'required' => false])
             ->add('maxSpace', null, ['label' => 'Surface maximale (m²)', 'required' => false])
+            ->end();
 
+        $formMapper->with('Secteurs / Lieux (AAC Multi-sites)')
+                ->add('locations', CollectionType::class, [
+                    'entry_type' => SpaceLocationType::class,
+                    'allow_delete' => true,
+                    'allow_add' => true,
+                    'by_reference' => false,
+                    'label' => 'Secteurs / Lieux rattachés à cet AAC (à renseigner pour un AAC multi-sites)',
+                ], [
+                    'edit' => 'inline',
+                    'inline' => 'table',
+                ])
             ->end()
-            // Section "Prestations et services" désactivée — les tags/attributs ne sont plus utilisés en front-end
-            // ->with('Prestations et services')
-            // ->add('tags', CollectionType::class, array(
-            //         'entry_type' => SpaceAttributeAdminType::class,
-            //         'allow_delete' => true,
-            //         'allow_add' => true,
-            //         'by_reference' => false,
-            //         'label' => 'Attributs',
-            //     ),
-            //     array(
-            //         'edit' => 'inline',
-            //         'inline' => 'table',
-            //     ))
-            // ->end()
-            // Section "Lots" désactivée — la gestion des lots a été retirée du formulaire front-end
-            // ->with('Lots')
-            // ->add('parcels', CollectionType::class, array(
-            //     'entry_type' => ParcelType::class,
-            //     'allow_delete' => true,
-            //     'allow_add' => true,
-            //     'by_reference' => false,
-            //     'label' => 'Lots',
-            // ), array(
-            //     'edit' => 'inline',
-            //     'inline' => 'table',
-            // ))
-            // ->end()
+
             ->with('Photos')
 
             ->add('pics', CollectionType::class, [
@@ -466,29 +477,6 @@ class SpaceAdmin extends AbstractAdmin
             ->end()
 
         ;
-
-        $formMapper->getFormBuilder()->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
-            $space = $event->getData();
-            $form = $event->getForm();
-
-            if (!$space instanceof Space || !$space->isMultiLocation()) {
-                return;
-            }
-
-            foreach (['zipCode', 'limitAvailability', 'nbSpaces', 'minSpace', 'maxSpace'] as $field) {
-                if ($form->has($field)) {
-                    $form->remove($field);
-                }
-            }
-
-            if ($form->has('city')) {
-                $form->remove('city');
-                $form->add('city', null, [
-                    'label' => 'Commune ou territoire',
-                    'required' => true,
-                ]);
-            }
-        });
     }
 
     // Fields to be shown on filter forms

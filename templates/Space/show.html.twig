@@ -294,43 +294,46 @@
   {% set fileAac = space.getDocs('document_aac') %}
   {% set filePlan = space.getDocs('document_plan') %}
   {% set fileFaq = space.getDocs('document_faq') %}
-  {% set hasRessources = (fileAac|length > 0) or (filePlan|length > 0) or (fileFaq|length > 0) %}
+  {% set hasAac = fileAac|length > 0 and fileAac[0].fileName is not empty %}
+  {% set hasPlan = filePlan|length > 0 and filePlan[0].fileName is not empty %}
+  {% set hasFaq = fileFaq|length > 0 and fileFaq[0].fileName is not empty %}
+  {% set hasRessources = hasAac or hasPlan or hasFaq %}
 
   {% if hasRessources %}
   <h4>
       {{ 'Documents ressources' }}
     </h4>
     <div class="pu-col-container content-block ressources">
-          {% if fileAac|length %}
+          {% if hasAac %}
           <div class="ressources-item grey">
             <div class="fd ressources-fd"><div class="pdf-appel"></div></div>
             <div class="lien-pdf red">
                 <p>
-                    <a class="red" href="{{ asset(vich_uploader_asset(fileAac[0], 'file')) }}" target="_blank">
+                    <a class="red" href="{{ vich_uploader_asset(fileAac[0], 'file') }}" target="_blank">
                         Télécharger l'appel à candidatures
                     </a>
                 </p>
             </div>
           </div>
           {% endif %}
-          {% if filePlan|length %}
+          {% if hasPlan %}
           <div class="ressources-item grey">
            <div class="fd ressources-fd"><img src="{{ asset('bundles/app/images/groupe-repartion-espace.png') }}" alt="Répartition des espaces" /></div>
            <div class="lien-pdf red">
                <p>
-                   <a class="red" href="{{ asset(vich_uploader_asset(filePlan[0], 'file')) }}" target="_blank">
+                   <a class="red" href="{{ vich_uploader_asset(filePlan[0], 'file') }}" target="_blank">
                        Répartition des espaces
                    </a>
                </p>
            </div>
         </div>
           {% endif %}
-          {% if fileFaq|length %}
+          {% if hasFaq %}
           <div class="ressources-item grey">
            <div class="fd ressources-fd"><img src="{{ asset('bundles/app/images/groupe-faq.png') }}" alt="F.A.Q" /></div>
            <div class="lien-pdf red">
                <p>
-                   <a class="red" href="{{ asset(vich_uploader_asset(fileFaq[0], 'file')) }}" target="_blank">
+                   <a class="red" href="{{ vich_uploader_asset(fileFaq[0], 'file') }}" target="_blank">
                        F.A.Q
                    </a>
                </p>

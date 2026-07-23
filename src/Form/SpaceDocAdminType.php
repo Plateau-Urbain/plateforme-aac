@@ -10,6 +10,8 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
+use Symfony\Component\Validator\Constraints\File;
+
 /**
  * Sonata-compatible form type for AAC/Plan PDF documents.
  * Unlike SpaceDocType (which is unmapped), this type is mapped to the Space entity
@@ -23,14 +25,32 @@ class SpaceDocAdminType extends AbstractType
             'label'        => false,
             'required'     => false,
             'download_uri' => true,
-            'allow_delete' => false,
+            'allow_delete' => true,
+            'attr'         => [
+                'accept' => 'application/pdf',
+            ],
+            'constraints'  => [
+                new File([
+                    'maxSize' => '10M',
+                    'mimeTypes' => [
+                        'application/pdf',
+                        'application/x-pdf',
+                    ],
+                    'mimeTypesMessage' => 'Seul le format PDF est accepté pour les documents (max 10 Mo).',
+                    'maxSizeMessage' => 'Le document PDF est trop volumineux (maximum 10 Mo).',
+                ]),
+            ],
         ]);
 
         $fileType = $options['file_type'];
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($fileType) {
             $data = $event->getData();
-            if ($data instanceof SpaceImage && $data->getFile() !== null) {
+            if (!$data instanceof SpaceImage) {
+                return;
+            }
+            // Nouveau fichier uploadé : on s'assure que le type est bien renseigné
+            if ($data->getFile() !== null) {
                 $data->setFileType($fileType);
             }
         });
@@ -42,6 +62,7 @@ class SpaceDocAdminType extends AbstractType
             'data_class' => SpaceImage::class,
             'file_type'  => SpaceImage::FILETYPE_DOCUMENT_AAC,
             'required'   => false,
+            'empty_data' => static fn (): SpaceImage => new SpaceImage(),
         ]);
     }
 

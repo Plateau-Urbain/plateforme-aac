@@ -192,7 +192,7 @@ class SpaceImage
     /**
      * Validation conditionnelle selon le type de fichier
      */
-    #[Assert\Callback]
+    #[Assert\Callback(groups: ['Default', 'save', 'standard', 'multi_location'])]
     public function validateFile(ExecutionContextInterface $context)
     {
         if ($this->file === null) {

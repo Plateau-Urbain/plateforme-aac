@@ -10,6 +10,8 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Vich\UploaderBundle\Form\Type\VichImageType;
 
+use Symfony\Component\Validator\Constraints\File;
+
 class SpaceImageType extends AbstractType
 {
     /**
@@ -21,12 +23,41 @@ class SpaceImageType extends AbstractType
             'label' => false,
             'required' => false,
             'download_uri' => false,
-            'image_uri' => true
+            'image_uri' => true,
+            'attr' => [
+                'accept' => 'image/jpeg,image/jpg,image/png,image/webp',
+            ],
+            'constraints' => [
+                new File([
+                    'maxSize' => '600k',
+                    'mimeTypes' => [
+                        'image/jpeg',
+                        'image/jpg',
+                        'image/png',
+                        'image/webp',
+                    ],
+                    'mimeTypesMessage' => 'Seuls les formats JPEG, PNG et WebP sont acceptés pour les photos (max 600 Ko).',
+                    'maxSizeMessage' => 'La photo est trop volumineuse ({{ size }} {{ suffix }}). La taille maximale autorisée est 600 Ko.',
+                    'groups' => ['Default', 'save', 'standard', 'multi_location'],
+                ]),
+            ],
         ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $event): void {
             if ($event->getData() === null) {
                 $event->setData(new SpaceImage());
+            }
+        });
+
+        $builder->addEventListener(FormEvents::SUBMIT, static function (FormEvent $event): void {
+            $data = $event->getData();
+            if ($data instanceof SpaceImage) {
+                if (!$data->getFileType()) {
+                    $data->setFileType(SpaceImage::FILETYPE_IMAGE);
+                }
+                if ($data->getUpdatedAt() === null) {
+                    $data->setUpdatedAt(new \DateTime());
+                }
             }
         });
     }

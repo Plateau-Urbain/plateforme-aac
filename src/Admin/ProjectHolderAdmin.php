@@ -90,14 +90,17 @@ class ProjectHolderAdmin extends AbstractAdmin
         $query->setParameter('roleAdminPattern', '%"ROLE_ADMIN"%');
         $query->setParameter('roleSuperAdminPattern', '%"ROLE_SUPER_ADMIN"%');
 
+        // Tri par défaut : plus récent en premier
+        $query->getQueryBuilder()->addOrderBy($alias . '.createdAt', 'DESC');
+
         return $query;
     }
 
     // setup the default sort column and order
     /** @var array<string, mixed> */
     protected array $datagridValues = [
-        '_sort_order' => 'ASC',
-        '_sort_by' => 'lastname',
+        '_sort_order' => 'DESC',
+        '_sort_by' => 'createdAt',
     ];
 
     // Fields to be shown on create/edit forms
