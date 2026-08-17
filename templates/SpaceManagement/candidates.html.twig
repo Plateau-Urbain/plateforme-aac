@@ -197,6 +197,65 @@
             margin-bottom: 10px;
             font-size: 12px;
         }
+        .panel-actions__row {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel-actions__row .form-control-large {
+            flex: 1;
+            min-width: 0;
+            width: auto !important;
+            margin: 0 !important;
+        }
+        .panel-actions__row .form-control-large .chzn-container {
+            margin-bottom: 0 !important;
+            width: 100% !important;
+        }
+        .panel-actions__row .form-control-large .chzn-single {
+            height: 38px;
+            line-height: 36px;
+        }
+        .panel-actions__row .btn-appli {
+            display: flex;
+            align-items: stretch;
+            flex-shrink: 0;
+            margin: 0;
+        }
+        .panel-actions__row #groupActionBtn {
+            height: 38px !important;
+            min-height: 38px !important;
+            padding: 0 14px !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            line-height: 1 !important;
+        }
+        #management-toolbar .btn,
+        #management-toolbar .btn-line-16,
+        #management-toolbar .btn-line-19,
+        #management-toolbar .btn-success {
+            height: auto !important;
+            min-height: 42px;
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+            
+            margin-bottom: 0;
+        }
+        #management-toolbar .selection-btn-group .btn {
+            min-height: 0;
+            padding: 5px 10px !important;
+            font-size: 12px !important;
+        }
+        #management-toolbar .export-zip-wrap {
+            align-items: flex-end;
+            justify-content: center;
+        }
+        #management-toolbar #exportSelectedBtn {
+            width: auto;
+        }
         .toolbar-grid .ctrl-panel .toolbar-hint {
             margin: -4px 0 10px 0;
             font-size: 12px;
@@ -312,6 +371,42 @@
             background-color: #2D74BA;
             border-color: #2D74BA;
             box-shadow: 0 1px 3px rgba(45, 116, 186, 0.35);
+        }
+        .candidates-sort-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin: 4px 0 14px;
+        }
+        .candidates-sort-bar__label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .candidates-sort-bar .sort {
+            float: none !important;
+            height: auto;
+            margin: 0;
+        }
+        .candidates-sort-bar .sort ul {
+            margin: 0;
+        }
+        .candidates-sort-bar .sort ul > li i {
+            color: #adb2b6;
+         
+            border-color: #ccc;
+        }
+        .candidates-sort-bar .sort ul > li:hover i {
+            
+            color: #000;
+        }
+        .candidates-sort-bar .sort label.checked i,
+        .candidates-sort-bar .sort ul > li.active i {
+            color: #000;
+            
         }
         .actions {
             padding: 10px;
@@ -803,8 +898,8 @@
       <div class="toolbar-grid__actions">
         <div class="ctrl-panel panel-actions">
           <h5><i class="fa fa-cogs"></i> Actions groupées</h5>
-          <div >
-            <div class="form-control-large" style="margin: 0; flex: 1;">
+          <div class="panel-actions__row">
+            <div class="form-control-large">
               <select id="groupActionSelect" data-placeholder="Choisir une action...">
                 <option value=""> </option>
                 <option value="accept">Accepter les candidatures</option>
@@ -812,7 +907,7 @@
               </select>
             </div>
             <div class="btn-appli">
-              <a href="#accept_content" class="btn btn-line-19 btn-form" id="groupActionBtn" style="margin-top: 0;">Appliquer</a>
+              <a href="#accept_content" class="btn btn-line-16 btn-form" id="groupActionBtn">Appliquer</a>
             </div>
           </div>
         </div>
@@ -856,7 +951,7 @@
             <h5 class="toolbar-export-zone__title"><i class="fa fa-star"></i> Export personnalisé</h5>
             <div class="export-compact">
               <p class="export-compact__text">Colonnes au choix, selon les filtres (CSV ou ZIP).</p>
-              <a href="{{ path('space_manager_select_export_fields', { 'id': space.id }) }}" class="btn btn-success btn-line-16 btn-sm" style="background-color: #4CAF50; border-color: #4CAF50; color: white !important; white-space: nowrap;font-size:19px;">
+              <a href="{{ path('space_manager_select_export_fields', { 'id': space.id }) }}" class="btn btn-success btn-line-16 btn-sm" style="background-color: #4CAF50; border-color: #4CAF50; color: white !important; white-space: nowrap;">
                 Configurer et exporter
               </a>
             </div>
@@ -866,9 +961,9 @@
 
       <div class="toolbar-grid__filters">
         <div class="ctrl-panel panel-filters">
-          <h5><i class="fa fa-filter"></i> Filtres et tri</h5>
+          <h5><i class="fa fa-filter"></i> Filtres</h5>
           {% form_theme filterForm 'Form/custom_front_fields.html.twig' %}
-          {{ form_start(filterForm, { 'attr': { 'data-submit': true, 'data-scroll-key': 'candidates_scroll_' ~ space.id }, 'action': '#management-toolbar' } ) }}
+          {{ form_start(filterForm, { 'attr': { 'data-submit': true, 'data-scroll-key': 'candidates_scroll_' ~ space.id, 'id': 'candidates-filter-form' }, 'action': '#management-toolbar' } ) }}
           <div class="filter-field">
             <label class="small">Statut :</label>
             {{ form_widget(filterForm.status_filter) }}
@@ -890,15 +985,19 @@
             </div>
           </div>
           {% endif %}
-          <div class="filter-field" style="margin-top: 6px; padding-top: 8px; border-top: 1px dashed #e0c070; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
-            <label class="small" style="margin: 0; white-space: nowrap;">Ordre :</label>
-            {{ form_widget(filterForm.sort_order) }}
-          </div>
-          {{ form_end(filterForm) }}
+          {% if filterForm._token is defined %}
+            {{ form_widget(filterForm._token) }}
+          {% endif %}
+          {{ form_end(filterForm, { 'render_rest': false }) }}
         </div>
       </div>
 
     </div>
+    </div>
+
+    <div class="candidates-sort-bar">
+      <span class="candidates-sort-bar__label">Ordre</span>
+      {{ form_widget(filterForm.sort_order, { 'attr': { 'form': 'candidates-filter-form' } }) }}
     </div>
  
  
@@ -1161,6 +1260,9 @@
             // (selects via Chosen, radios sort_order maintenant dans le <form>)
             $('form[data-submit]').on('change', 'select, input[type="radio"]', function () {
                 submitFilterForm($(this).closest('form[data-submit]'));
+            });
+            $(document).on('change', '.candidates-sort-bar input[type="radio"]', function () {
+                submitFilterForm($('#candidates-filter-form'));
             });
 
 

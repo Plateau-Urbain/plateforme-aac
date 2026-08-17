@@ -584,18 +584,44 @@
             background: #eee;
             border-radius: 3px;
         }
-        #aac-locations-map .aac-map-popup-suspended {
-            margin-top: 12px;
-            padding: 8px 10px;
-            font-size: 13px;
-            color: #8a6d3b;
-            background: #fcf8e3;
-            border: 1px solid #faebcc;
-            border-radius: 4px;
-        }
     </style>
     {% if space.isMultiLocation and space.locations|length > 0 %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        #aac-locations-map .aac-map-popup-suspended {
+            margin-top: 12px;
+            padding: 8px 10px;
+            background: #e9473c;
+            border: 1px solid #c0392b;
+            border-radius: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        #aac-locations-map .aac-map-popup-suspended > i {
+            flex-shrink: 0;
+            line-height: 1.4;
+            margin-top: 1px;
+        }
+        #aac-locations-map .aac-map-popup-suspended-text {
+            flex: 1;
+            min-width: 0;
+            line-height: 1.4;
+        }
+        #aac-locations-map .aac-map-popup-suspended,
+        #aac-locations-map .aac-map-popup-suspended p,
+        #aac-locations-map .aac-map-popup-suspended span,
+        #aac-locations-map .aac-map-popup-suspended i {
+            font-size: 13px !important;
+            color: #fff !important;
+        }
+        #aac-locations-map .aac-map-popup-suspended-text p {
+            margin: 0;
+        }
+        #aac-locations-map .aac-map-popup-suspended-text p + p {
+            margin-top: 6px;
+        }
+    </style>
     {% endif %}
 {% endblock %}
 
@@ -665,8 +691,20 @@
                 return div.innerHTML;
             }
 
-            function formatMultiline(text) {
-                return escapeHtml(text).replace(/\n/g, '<br>');
+            function sanitizeHtml(text) {
+                var div = document.createElement('div');
+                div.innerHTML = text || '';
+                div.querySelectorAll('script, style, iframe, object, embed').forEach(function (el) {
+                    el.remove();
+                });
+                div.querySelectorAll('*').forEach(function (el) {
+                    Array.from(el.attributes).forEach(function (attr) {
+                        if (attr.name === 'style' || /^on/i.test(attr.name) || (attr.name === 'href' && /^\s*javascript:/i.test(attr.value))) {
+                            el.removeAttribute(attr.name);
+                        }
+                    });
+                });
+                return div.innerHTML;
             }
 
             function buildPopupContent(loc) {
@@ -688,8 +726,11 @@
                     html += '<span class="aac-map-popup-badge">ERP</span>';
                 }
 
-                if (loc.suspended && loc.suspensionMessage) {
-                    html += '<div class="aac-map-popup-suspended"><i class="fa fa-pause-circle"></i> ' + formatMultiline(loc.suspensionMessage) + '</div>';
+                if (loc.suspended) {
+                    var suspendedText = loc.suspensionMessage
+                        ? sanitizeHtml(loc.suspensionMessage)
+                        : 'Aucun local disponible actuellement';
+                    html += '<div class="aac-map-popup-suspended"><i class="fa fa-pause-circle"></i><span class="aac-map-popup-suspended-text">' + suspendedText + '</span></div>';
                 }
 
                 return html;

@@ -1,0 +1,10 @@
+{% if object.fileName and vich_uploader_asset(object, 'file') %}
+    <a href="{{ asset(vich_uploader_asset(object, 'file')) }}"
+       class="btn btn-sm btn-default"
+       title="Télécharger"
+       target="_blank"
+       download="{{ object.originalname ?: object.fileName }}">
+        <i class="fa fa-download"></i>
+        Télécharger
+    </a>
+{% endif %}

@@ -137,9 +137,16 @@
         });
 
         $item.find('.js-remove-location').off('click').on('click', function () {
-            if (!window.confirm('Supprimer ce site ?')) {
+            var visibleCount = $('#locations-collection .location-item:visible').length;
+            if (visibleCount <= 1) {
+                window.alert('Au moins un site doit rester proposé dans cet AAC multi-sites.');
                 return;
             }
+
+            if (!window.confirm('Supprimer ce site ? La suppression sera effective après enregistrement du formulaire.')) {
+                return;
+            }
+
             var $checkbox = $item.find('input[type="checkbox"][name$="[_delete]"]');
             if ($checkbox.length) {
                 $checkbox.prop('checked', true);
@@ -147,7 +154,9 @@
             } else {
                 $item.remove();
             }
+
             renumberLocations();
+
             if ($('#locations-collection .location-item:visible').length === 0) {
                 $('.js-no-locations-msg').show();
             }

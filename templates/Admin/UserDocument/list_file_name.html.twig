@@ -1,0 +1,16 @@
+{% extends '@SonataAdmin/CRUD/base_list_field.html.twig' %}
+
+{% block field %}
+    {% if object.fileName %}
+        {% set fileUrl = vich_uploader_asset(object, 'file') %}
+        {% if fileUrl %}
+            <a href="{{ asset(fileUrl) }}" target="_blank" download="{{ object.originalname ?: object.fileName }}">
+                {{ object.originalname ?: object.fileName }}
+            </a>
+        {% else %}
+            {{ object.originalname ?: object.fileName }}
+        {% endif %}
+    {% else %}
+        <em class="text-muted">Aucun fichier</em>
+    {% endif %}
+{% endblock %}

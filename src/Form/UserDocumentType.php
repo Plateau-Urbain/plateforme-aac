@@ -24,9 +24,10 @@ class UserDocumentType extends AbstractType
         // "Symfony\Component\Form\Extension\Core\Type\FileType" instead.
         $builder->add('file', VichFileType::class, [
             'label' => false,
-            'download_label' => true
-                ]
-            )
+            'required' => false,
+            'allow_delete' => false,
+            'download_uri' => false,
+        ]);
         ;
     }
 

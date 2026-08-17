@@ -65,10 +65,14 @@
     {% elseif app.user.isProfileComplete() %}
         <p>Bonjour <span class="mailto">{{ app.user.firstname }}</span>,</p>
     {% else %}
-        <div style="margin: 20px 0; padding: 20px; font-size: 20px; color: #333;">
-            <i class="fa fa-exclamation-triangle" style="margin-right: 8px; color: #e9473c;"></i>
-            <strong>Votre profil est incomplet :</strong> Votre profil doit être complet pour pouvoir candidater. 
-            <a href="{{ path('security_profil') }}" class="mailto" style="color: #e9473c; font-weight: bold;">Complétez votre profil dès maintenant</a> pour simplifier vos candidatures futures.
+        <div style="margin: 20px 0; font-size: 20px; color: #333; line-height: 1.5;">
+            <p style="margin: 0 0 10px;">
+                <strong>Bienvenue sur la plateforme{% if app.user.firstname %} {{ app.user.firstname }}{% endif %} !</strong>
+            </p>
+            <p style="margin: 0;">
+                Votre profil doit être complet pour pouvoir candidater.
+                <a href="{{ path('security_profil') }}" class="mailto" style="color: #e9473c; font-weight: bold;">Complétez votre profil dès maintenant</a>.
+            </p>
         </div>
     {% endif %}
 
@@ -98,7 +102,7 @@
                 <div class="item col-xs-12 col-md-6 col-lg-4">
                      <div class="space_item {{ space.listingCardClass }}">
                     {% if space.isMultiLocation %}
-                      <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> Multi-sites déjà ouvert</span>
+                      <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> AAC au fil de l'eau</span>
                     {% elseif space.isProposedByAdmin %}
                       <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel ?: 'Géré par Plateau Urbain' }}</span>
                     {% elseif space.owner and space.owner.company %}
@@ -152,9 +156,9 @@
                              {% if space.isMultiLocation %}
                               <p class="apply-date-p" style="color: #000; line-height: 1.3;">
                                   {% if space.orderedActiveLocations|length > 1 %}
-                                      Candidatures ouvertes dans les sites suivants :
+                                      Candidatures ouvertes pour les sites suivants :
                                   {% else %}
-                                      Candidature ouverte dans le site suivant :
+                                      Candidatures ouvertes pour le site suivant :
                                   {% endif %}
                               </p>
                              <div class="location-chips-home" style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 5px;">
@@ -201,7 +205,7 @@
             <div class="item col-xs-12 col-md-6 col-lg-4">
                 <div class="space_item_unavailable {{ space.listingCardClass }}">
                 {% if space.isMultiLocation %}
-                  <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> Multi-sites déjà ouvert</span>
+                  <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> AAC au fil de l'eau</span>
                 {% elseif space.isProposedByAdmin %}
                   <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel ?: 'Géré par Plateau Urbain' }}</span>
                 {% elseif space.owner and space.owner.company %}

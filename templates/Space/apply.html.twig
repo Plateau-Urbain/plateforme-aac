@@ -1,5 +1,12 @@
 {% extends "base.html.twig" %}
 
+{% block prebody %}
+    {# Les suppressions de documents profil stockaient un flash "success" jamais lu sur /profil.
+       On le retire ici pour ne pas empiler "Le document a été supprimé." à la candidature. #}
+    {% set _drain_profile_success = app.flashes('success') %}
+    {{ parent() }}
+{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     <style>
@@ -385,6 +392,11 @@
                 {{ message }}
             </div>
         {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
         {% for message in app.flashes('error_msg') %}
             <div class="alert alert-danger" role="alert">
                 {{ message }}
@@ -403,38 +415,32 @@
                 {% if not form.vars.valid and form.vars.submitted %}
                     {# Capturer le contenu avant de rendre le conteneur pour éviter une barre vide #}
                     {% set errorBlockContent %}
-                        {# Erreurs des champs documents requis de l'espace #}
-                        {% for document in space.documents %}
-                            {% set fieldName = 'document_' ~ document.id %}
-                            {% if form[fieldName] is defined %}
-                                {% for error in form[fieldName].vars.errors %}
-                                    <div>{{ error.message }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                        
                         {# Erreurs des champs du formulaire (enfants, petits-enfants, arrière-petits-enfants) #}
-                        {# Les champs rendus inline avec leur erreur sont exclus pour éviter le doublon #}
+                        {# Les documents obligatoires sont affichés sous leur champ (form_errors) #}
                         {% for child in form %}
-                            {% if child.vars.name not in ['contribution', 'companyStatus', 'category'] and child.vars.errors is defined and child.vars.errors|length > 0 %}
+                            {% if child.vars.name not in ['contribution', 'companyStatus', 'category']
+                                and not (child.vars.name starts with 'document_')
+                                and child.vars.errors is defined and child.vars.errors|length > 0 %}
                                 {% for error in child.vars.errors %}
                                     <div>{{ error.message }}</div>
                                 {% endfor %}
                             {% endif %}
-                            {% for grandChild in child %}
-                                {% if grandChild.vars.errors is defined and grandChild.vars.errors|length > 0 %}
-                                    {% for error in grandChild.vars.errors %}
-                                        <div>{{ error.message }}</div>
-                                    {% endfor %}
-                                {% endif %}
-                                {% for greatGrandChild in grandChild %}
-                                    {% if greatGrandChild.vars.errors is defined and greatGrandChild.vars.errors|length > 0 %}
-                                        {% for error in greatGrandChild.vars.errors %}
+                            {% if not (child.vars.name starts with 'document_') %}
+                                {% for grandChild in child %}
+                                    {% if grandChild.vars.errors is defined and grandChild.vars.errors|length > 0 %}
+                                        {% for error in grandChild.vars.errors %}
                                             <div>{{ error.message }}</div>
                                         {% endfor %}
                                     {% endif %}
+                                    {% for greatGrandChild in grandChild %}
+                                        {% if greatGrandChild.vars.errors is defined and greatGrandChild.vars.errors|length > 0 %}
+                                            {% for error in greatGrandChild.vars.errors %}
+                                                <div>{{ error.message }}</div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
                                 {% endfor %}
-                            {% endfor %}
+                            {% endif %}
                         {% endfor %}
                     {% endset %}
                     {% if errorBlockContent|trim is not empty %}
@@ -588,29 +594,27 @@
                                             </div>
                                         </div>
 
-                                        {% if space.startOccupationRequired %}
-                                            <div class="row">
-                                                <div class="col-sm-6 form-group{% if not form.startOccupation.vars.valid %} has-error{% endif %}">
-                                                    {{ form_label(form.startOccupation, null, {'label_attr': {'class': 'inline-label required'}}) }}
-                                                    {{ form_widget(form.startOccupation, {
-                                                        'attr': {
-                                                            'required': 'required',
-                                                            'aria-required': 'true',
-                                                            'aria-invalid': form_errors(form.startOccupation) ? 'true' : 'false',
-                                                            'aria-describedby': 'startOccupation-error',
-                                                            'data-error-message': 'Veuillez indiquer une date d\'entrée souhaitée'
-                                                        }
-                                                    }) }}
-                                                    {{ form_errors(form.startOccupation, {
-                                                        'attr': {
-                                                            'id': 'startOccupation-error',
-                                                            'role': 'alert',
-                                                            'aria-live': 'polite'
-                                                        }
-                                                    }) }}
-                                                </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 form-group{% if not form.startOccupation.vars.valid %} has-error{% endif %}">
+                                                {{ form_label(form.startOccupation, null, {'label_attr': {'class': 'inline-label required'}}) }}
+                                                {{ form_widget(form.startOccupation, {
+                                                    'attr': {
+                                                        'required': 'required',
+                                                        'aria-required': 'true',
+                                                        'aria-invalid': form_errors(form.startOccupation) ? 'true' : 'false',
+                                                        'aria-describedby': 'startOccupation-error',
+                                                        'data-error-message': 'Veuillez indiquer une date d\'entrée souhaitée'
+                                                    }
+                                                }) }}
+                                                {{ form_errors(form.startOccupation, {
+                                                    'attr': {
+                                                        'id': 'startOccupation-error',
+                                                        'role': 'alert',
+                                                        'aria-live': 'polite'
+                                                    }
+                                                }) }}
                                             </div>
-                                        {% endif %}
+                                        </div>
 
                                         <div class="row">
                                             <div class="col-sm-12 form-group first{% if not form.description.vars.valid %} has-error{% endif %}">
@@ -652,18 +656,20 @@
                                                    {% endif %}
                                                    
                                                     {% if form["document_#{document.id}"] is not defined %}
-                                                        <div class="file-infos clearfix" >
+                                                        <div class="file-infos clearfix">
                                                             <div class="actions overflow">
                                                                 {% set file = application.getFilesType(document.id).0 %}
-                                                                <div style="display:inline-block; width:90%; text-overflow:ellipsis;overflow:hidden">{{ file.filename }}</div>
-                                                                <div style="width: 10%" class="clearfix pull-right">
-                                                                    <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
-                                                                    {% if file.id %}<a href="{{ path('space_removefile', { 'id': file.id, 'service': path('space_apply', { 'space': space.id }), '_token': csrf_token('remove_file_' ~ file.id) }) }}"><i class="fa fa-trash"></i></a>{% endif %}
+                                                                <div>{{ file.filename }}</div>
+                                                                <div class="file-infos-actions">
+                                                                    <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="file-infos-action" title="Voir le fichier"><i class="fa fa-eye"></i></a>
+                                                                    {% if file.id %}
+                                                                        <a href="{{ path('space_removefile', { 'id': file.id, 'service': path('space_apply', { 'space': space.id }), '_token': csrf_token('remove_file_' ~ file.id) }) }}" class="file-infos-action" title="Supprimer le fichier"><i class="fa fa-trash"></i></a>
+                                                                    {% endif %}
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     {% else %}
-                                                        <div class="file-infos clearfix" >
+                                                        <div class="file-infos clearfix">
                                                             <div class="actions overflow">
                                                                 <label class="small">
                                                                     {{ form_widget(attribute(form, "document_#{document.id}")) }}
@@ -692,13 +698,12 @@
 
                                                         {% for file in form.vars.data.getFilesType(null) %}
                                                         <div class="file-infos">
-
-                                                            <div class="actions overflow">
-                                                                <span>{{file.fileName | slice(14, 100)}}</span>
-                                                                <div style="width: 10%" class="clearfix pull-right">
-                                                                    <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
-                                                                    {% if file.id %}<a href="{{ path('space_removefile', { 'id': file.id, 'service': path('space_apply', { 'space': space.id }), '_token': csrf_token('remove_file_' ~ file.id) }) }}"><i class="fa fa-trash"></i></a>{% endif %}
-                                                                </div>
+                                                            <span>{{file.fileName | slice(14, 100)}}</span>
+                                                            <div class="file-infos-actions">
+                                                                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="file-infos-action" title="Voir le fichier"><i class="fa fa-eye"></i></a>
+                                                                {% if file.id %}
+                                                                    <a href="{{ path('space_removefile', { 'id': file.id, 'service': path('space_apply', { 'space': space.id }), '_token': csrf_token('remove_file_' ~ file.id) }) }}" class="file-infos-action" title="Supprimer le fichier"><i class="fa fa-trash"></i></a>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                         {% endfor %}
@@ -720,7 +725,13 @@
                                                         </dd>
                                                     </dl>
 
-                                                    {{ form_widget(form.newDocument, {'attr': {'class': 'form-control'}}) }}
+                                                    <div class="file-infos clearfix">
+                                                        <div class="actions overflow">
+                                                            <label class="small">
+                                                                {{ form_widget(form.newDocument) }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                     {{ form_errors(form.newDocument) }}
                                                 </div>
                                             </div>
@@ -1061,6 +1072,9 @@
             // Validation en temps réel
             $('.form-apply input, .form-apply select, .form-apply textarea').on('blur change', function() {
                 const $field = $(this);
+                if ($field.is('input[type="file"]')) {
+                    return;
+                }
                 
                 // Validation spécifique : Surface souhaitée (entier positif)
                 if ($field.is('#appbundle_application_wishedSize')) {
@@ -1217,13 +1231,10 @@
                     '#appbundle_application_projectHolder_userInfo_lastname',
                     '#appbundle_application_projectHolder_userInfo_phone',
                     '#appbundle_application_projectHolder_userInfo_email',
-                    '#appbundle_application_projectHolder_companyInfo_companyMobile'
+                    '#appbundle_application_projectHolder_companyInfo_companyMobile',
+                    '#appbundle_application_startOccupation'
                 ];
 
-                {% if space.startOccupationRequired %}
-                requiredFields.push('#appbundle_application_startOccupation');
-                {% endif %}
-                
                 requiredFields.forEach(function(fieldId) {
                     const $field = $(fieldId);
                     if ($field.length) {
@@ -1599,16 +1610,65 @@
             function getFileExtension(fileName) {
                 return fileName.split('.').pop().toLowerCase();
             }
-            
+
             function isValidFileFormat(file) {
-                // Vérifier le type MIME
                 const isValidMime = allowedMimeTypes.includes(file.type);
-                
-                // Vérifier l'extension (fallback si le type MIME n'est pas fiable)
                 const extension = getFileExtension(file.name);
                 const isValidExt = allowedExtensions.includes(extension);
-                
                 return isValidMime || isValidExt;
+            }
+            
+            function hidePendingFilePreview($input, clearInput) {
+                const fileInfo = $input.closest('.file-infos');
+                if (!fileInfo.length) {
+                    return;
+                }
+                const objectUrl = $input.data('pendingObjectUrl');
+                if (objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                    $input.removeData('pendingObjectUrl');
+                }
+                fileInfo.find('.file-infos-preview').remove();
+                fileInfo.removeClass('is-pending-upload');
+                if (clearInput) {
+                    $input.val('');
+                }
+            }
+
+            function showPendingFilePreview($input, file) {
+                const fileInfo = $input.closest('.file-infos');
+                if (!fileInfo.length) {
+                    return;
+                }
+                hidePendingFilePreview($input, false);
+                const objectUrl = URL.createObjectURL(file);
+                $input.data('pendingObjectUrl', objectUrl);
+
+                const $preview = $(
+                    '<div class="file-infos-preview">' +
+                        '<span class="file-infos-preview-name"></span>' +
+                        '<div class="file-infos-actions">' +
+                            '<a class="file-infos-action js-pending-preview" target="_blank" rel="noopener" title="Voir le fichier"><i class="fa fa-eye"></i></a>' +
+                            '<a href="#" class="file-infos-action js-pending-remove" title="Supprimer le fichier"><i class="fa fa-trash"></i></a>' +
+                        '</div>' +
+                    '</div>'
+                );
+                $preview.find('.file-infos-preview-name').text(file.name);
+                $preview.find('.js-pending-preview').attr('href', objectUrl);
+                fileInfo.addClass('is-pending-upload').prepend($preview);
+            }
+
+            function refreshPendingFilePreview(fileInput) {
+                const $input = $(fileInput);
+                const file = fileInput.files && fileInput.files[0];
+                const $group = $input.closest('.form-group');
+                $group.find('.js-help-block').remove();
+                $group.removeClass('has-error');
+                if (file && isValidFileFormat(file) && file.size <= maxFileSize) {
+                    showPendingFilePreview($input, file);
+                } else {
+                    hidePendingFilePreview($input, false);
+                }
             }
             
             function validateFileSize(fileInput, documentName) {
@@ -1666,6 +1726,7 @@
             {% for document in space.documents %}
             $('input[name="appbundle_application[document_{{ document.id }}][file]"]').on('change', function() {
                 validateFileSize(this, '{{ document.name }}');
+                refreshPendingFilePreview(this);
             });
             {% endfor %}
             
@@ -1700,6 +1761,14 @@
                         $field.val('');
                     }
                 }
+                refreshPendingFilePreview(this);
+            });
+
+            $(document).on('click', '.js-pending-remove', function(e) {
+                e.preventDefault();
+                const $input = $(this).closest('.file-infos').find('input[type="file"]');
+                hidePendingFilePreview($input, true);
+                $input.trigger('change');
             });
         });
     </script>

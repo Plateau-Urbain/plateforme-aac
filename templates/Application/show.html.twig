@@ -331,25 +331,25 @@
       <h3 class="box-title">
         Documents disponibles
       </h3>
-        <div class="files">
+        <div class="files files-available">
 
           
             <div class="file-infos">
               <span>Pièce d'identité</span>
-              <div class="pull-right actions">
+              <div class="file-infos-actions">
                 {% if application.projectHolder.hasDocuments('id') %}
                 {% set file =  application.projectHolder.getDocumentsType('id')[0] %}
-                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="file-infos-action" title="Voir le fichier"><i class="fa fa-eye"></i></a>
                 {% endif %}
               </div>
             </div>
         
             <div class="file-infos">
               <span>justificatif d'activité</span>
-              <div class="pull-right actions">
+              <div class="file-infos-actions">
                 {% if application.projectHolder.hasDocuments('kbis') %}
                 {% set file =  application.projectHolder.getDocumentsType('kbis')[0] %}
-                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="file-infos-action" title="Voir le fichier"><i class="fa fa-eye"></i></a>
                 {% endif %}
               </div>
             </div>
@@ -358,8 +358,8 @@
           {% for doc in application.projectHolder.getDocumentsType('') %}
               <div class="file-infos">
                 <span>{{doc.fileName | slice(14, 100)}}</span>
-                <div class="pull-right actions">
-                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                <div class="file-infos-actions">
+                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="file-infos-action" title="Voir le fichier"><i class="fa fa-eye"></i></a>
                 </div>
               </div>
           {% endfor %}
@@ -367,8 +367,8 @@
           {% for doc in application.files %}
               <div class="file-infos">
                 <span>{{doc.fileName | slice(14, 100)}}</span>
-                <div class="pull-right actions">
-                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="btn btn-download"><i class="fa fa-eye fa-lg"></i></a>
+                <div class="file-infos-actions">
+                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="file-infos-action" title="Voir le fichier"><i class="fa fa-eye"></i></a>
                 </div>
               </div>
           {% endfor %}

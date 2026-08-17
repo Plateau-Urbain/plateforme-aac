@@ -211,6 +211,31 @@ class UserDocument implements \Stringable
         return preg_replace('/^[^_]*_/', '', (string) $this->fileName);
     }
 
+    public function getSpaceNames(): string
+    {
+        $user = $this->getProjectHolder();
+        if ($user === null) {
+            return '';
+        }
+
+        $names = [];
+        foreach ($user->getApplications() as $application) {
+            $space = $application->getSpace();
+            if ($space === null) {
+                continue;
+            }
+
+            $name = trim((string) $space->getName());
+            if ($name === '') {
+                continue;
+            }
+
+            $names[$space->getId()] = $name;
+        }
+
+        return implode(', ', $names);
+    }
+
     public function __toString(): string
     {
         if ($this->fileName !== null && $this->fileName !== '') {

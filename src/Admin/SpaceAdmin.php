@@ -291,11 +291,6 @@ class SpaceAdmin extends AbstractAdmin
                 'property' => 'priceText',
                 'category' => 'Caractéristiques',
             ],
-            'rollingApplications' => [
-                'label' => 'Candidatures au fil de l\'eau',
-                'property' => 'computed.yesno.rollingApplications',
-                'category' => 'Caractéristiques',
-            ],
             'enabled' => [
                 'label' => 'En ligne',
                 'property' => 'computed.yesno.enabled',
@@ -330,7 +325,6 @@ class SpaceAdmin extends AbstractAdmin
             'computed.workflowTypeLabel' => 'workflowType',
             'computed.ownerLabel' => 'owner.company',
             'computed.yesno.isErp' => 'isErp',
-            'computed.yesno.rollingApplications' => 'rollingApplications',
             'computed.yesno.enabled' => 'enabled',
             'computed.yesno.submitted' => 'submitted',
             'computed.yesno.closed' => 'closed',

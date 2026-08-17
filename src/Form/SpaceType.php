@@ -11,6 +11,7 @@ use App\Entity\SpaceDocument;
 use App\Entity\SpaceVisit;
 use App\Entity\SpaceLocation;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -33,8 +34,10 @@ class SpaceType extends AbstractType
      *
      * @param EntityManagerInterface $em
      */
-    public function __construct(private EntityManagerInterface $em)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+        private RequestStack $requestStack,
+    ) {
     }
 
     /**
@@ -92,6 +95,7 @@ class SpaceType extends AbstractType
                 'label' => false,
                 'allow_add' => true,
                 'allow_delete' => true,
+                'delete_empty' => true,
                 'by_reference' => false,
                 'required' => false,
                 'error_bubbling' => false,
@@ -248,24 +252,27 @@ class SpaceType extends AbstractType
                 }
             }
 
-            // Handles new image (only when a file was uploaded)
-            $newImage = $event->getForm()->get('pics')->getData();
-            if ($newImage instanceof SpaceImage && $newImage->getFile() !== null) {
-                $newImage->setPosition(count($space->getPics()));
-                $space->addPic($newImage);
+            if ($this->shouldAttachPendingPhoto()) {
+                $newImage = $event->getForm()->get('pics')->getData();
+                if ($newImage instanceof SpaceImage && $newImage->getFile() !== null) {
+                    $newImage->setPosition(\count($space->getPics()));
+                    $space->addPic($newImage);
+                }
             }
 
-            // Handles new document (only when a name was provided)
-            $newDocument = $event->getForm()->get('newDocument')->getData();
-            if ($newDocument instanceof SpaceDocument && trim((string) $newDocument->getName()) !== '') {
-                $newDocument->setSpace($space);
-                $space->addDocument($newDocument);
+            if ($this->shouldAttachPendingDocument()) {
+                $newDocument = $event->getForm()->get('newDocument')->getData();
+                if ($newDocument instanceof SpaceDocument && trim((string) $newDocument->getName()) !== '') {
+                    $newDocument->setSpace($space);
+                    $space->addDocument($newDocument);
+                }
             }
 
-            // Handles new visit
-            $newVisit = $event->getForm()->get('newVisit')->getData();
-            if ($newVisit instanceof SpaceVisit && $newVisit->getVisitDate() !== null) {
-                $space->addVisit($newVisit);
+            if ($this->shouldAttachPendingVisit()) {
+                $newVisit = $event->getForm()->get('newVisit')->getData();
+                if ($newVisit instanceof SpaceVisit && $newVisit->getVisitDate() !== null) {
+                    $space->addVisit($newVisit);
+                }
             }
 
             // Handles new required doc
@@ -301,6 +308,48 @@ class SpaceType extends AbstractType
                 return;
             }
         });
+    }
+
+    private function shouldAttachPendingPhoto(): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request === null) {
+            return true;
+        }
+
+        if ($request->request->has('add_photo')) {
+            return true;
+        }
+
+        return !$request->request->has('add_visit') && !$request->request->has('add_document');
+    }
+
+    private function shouldAttachPendingDocument(): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request === null) {
+            return true;
+        }
+
+        if ($request->request->has('add_document')) {
+            return true;
+        }
+
+        return !$request->request->has('add_visit') && !$request->request->has('add_photo');
+    }
+
+    private function shouldAttachPendingVisit(): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request === null) {
+            return true;
+        }
+
+        if ($request->request->has('add_visit')) {
+            return true;
+        }
+
+        return !$request->request->has('add_document') && !$request->request->has('add_photo');
     }
 
     /**

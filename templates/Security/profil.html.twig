@@ -19,19 +19,13 @@
             
             <div class="alert alert-info" role="alert">
                 {% if not app.user.isProfileComplete() %}
-                    {% if app.user.firstname is empty %}
-                        <i class="fa fa-info-circle"></i>
-                        <strong>Votre profil doit être complété pour pouvoir candidater</strong>
-                        <p style="margin:8px 0 0 0;">Bienvenue sur la plateforme ! Certains champs de votre profil sont manquants. Merci de remplir et compléter l'ensemble des sections de votre profil (coordonnées, présentation, projet, réseaux sociaux…) avant de déposer une candidature.{% if next is defined and next %} Une fois vos modifications enregistrées, vous y serez redirigé automatiquement.{% endif %}</p>
-                    {% else %}
-                        <i class="fa fa-info-circle"></i>
-                        <strong>Votre profil doit être complété pour pouvoir candidater</strong>
-                        <p style="margin:8px 0 0 0;">Des champs de votre profil sont manquants ou ont été mis à jour depuis votre dernière connexion. Merci de relire et compléter l'ensemble des sections de votre profil (coordonnées, présentation, projet, réseaux sociaux…) avant de déposer une candidature.{% if next is defined and next %} Une fois vos modifications enregistrées, vous serez automatiquement redirigé vers votre candidature.{% endif %}</p>
-                    {% endif %}
+                    <i class="fa fa-info-circle"></i>
+                    <strong>Votre profil doit être complété pour pouvoir candidater</strong>
+                    <p style="margin:8px 0 0 0;">Merci de compléter l'ensemble des sections de votre profil (coordonnées, présentation, projet, réseaux sociaux…) avant de déposer une candidature. Si vous reprenez une candidature plus ancienne, il est normal que votre profil ne soit plus entièrement à jour.{% if next is defined and next %} Une fois vos modifications enregistrées, vous serez redirigé automatiquement.{% endif %}</p>
                 {% else %}
                     {% if app.user.firstname is empty %}
                         <i class="fa fa-info-circle"></i>
-                        <strong>Bienvenue sur la plateforme !</strong> Veuillez compléter vos informations de profil candidat afin de pouvoir postuler aux espaces proposés.
+                        Veuillez compléter vos informations de profil candidat afin de pouvoir postuler aux espaces proposés.
                     {% else %}
                         <i class="fa fa-info-circle"></i>
                         <strong>Mon Profil :</strong> Vous pouvez ici vérifier, modifier et mettre à jour vos informations de profil candidat.
@@ -51,6 +45,12 @@
     
     
         {% for message in  app.flashes('success_msg') %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('success') %}
             <div class="alert alert-success" role="alert">
                 {{ message }}
             </div>
@@ -525,9 +525,9 @@
                                                 <div class="clearfix actions overflow">
                                                     {% set file =  app.user.getDocumentsType('id')[0] %}
                                                     <div style="display:inline-block; width:80%">{{ file.originalname }}</div>
-                                                    <div style="display:inline-block" class="pull-right">
-                                                        <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
-                                                        <a href="#" class="js-profile-remove-doc btn btn-link" style="padding:0;border:none;background:none;" data-url="{{ path('profile_removedocument', { 'id': file.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ file.id) }}" data-anchor="four"{% if next is defined and next %} data-service="{{ next }}"{% endif %} data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>
+                                                    <div class="pull-right file-infos-actions">
+                                                        <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="file-infos-action" title="Voir le fichier"><i class="fa fa-eye"></i></a>
+                                                        <a href="#" class="file-infos-action js-profile-remove-doc" title="Supprimer le fichier" data-url="{{ path('profile_removedocument', { 'id': file.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ file.id) }}" data-anchor="four"{% if next is defined and next %} data-service="{{ next }}"{% endif %} data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -574,9 +574,9 @@
                                                 <div class="clearfix actions overflow">
                                                     {% set file =  app.user.getDocumentsType('kbis')[0] %}
                                                     <div style="display:inline-block; width:80%">{{ file.originalname }}</div>
-                                                    <div style="display:inline-block" class="pull-right">
-                                                        <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}"><i class="fa fa-eye"></i></a>
-                                                        <a href="#" class="js-profile-remove-doc btn btn-link" style="padding:0;border:none;background:none;" data-url="{{ path('profile_removedocument', { 'id': file.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ file.id) }}" data-anchor="four"{% if next is defined and next %} data-service="{{ next }}"{% endif %} data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>
+                                                    <div class="pull-right file-infos-actions">
+                                                        <a target="_blank" href="{{ asset(vich_uploader_asset(file, 'file')) }}" class="file-infos-action" title="Voir le fichier"><i class="fa fa-eye"></i></a>
+                                                        <a href="#" class="file-infos-action js-profile-remove-doc" title="Supprimer le fichier" data-url="{{ path('profile_removedocument', { 'id': file.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ file.id) }}" data-anchor="four"{% if next is defined and next %} data-service="{{ next }}"{% endif %} data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -608,9 +608,9 @@
                                         {% for doc in form.vars.data.getDocumentsType('') %}
                                             <div class="file-infos">
                                                 <span>{{doc.fileName | slice(14, 100)}}</span>
-                                                <div class="pull-right actions ">
-                                                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="btn btn-show"><i class="fa fa-eye"></i></a>
-                                                    <a href="#" class="js-profile-remove-doc btn btn-delete" data-url="{{ path('profile_removedocument', { 'id': doc.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ doc.id) }}" data-anchor="four"{% if next is defined and next %} data-service="{{ next }}"{% endif %} data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>
+                                                <div class="pull-right file-infos-actions">
+                                                    <a target="_blank" href="{{ asset(vich_uploader_asset(doc, 'file')) }}" class="file-infos-action" title="Voir le fichier"><i class="fa fa-eye"></i></a>
+                                                    <a href="#" class="file-infos-action js-profile-remove-doc" title="Supprimer le fichier" data-url="{{ path('profile_removedocument', { 'id': doc.id }) }}" data-token="{{ csrf_token('remove_user_document_' ~ doc.id) }}" data-anchor="four"{% if next is defined and next %} data-service="{{ next }}"{% endif %} data-confirm="Êtes-vous sûr de vouloir supprimer ce document ?"><i class="fa fa-trash"></i></a>
                                                 </div>
                                             </div>
                                         {% endfor %}
@@ -939,9 +939,8 @@
                 $banner.html(
                     '<div style="padding:14px 18px;margin-bottom:16px;">' +
                     '<strong style="color:#bc1b38;">⚠ Votre profil doit être complété pour pouvoir candidater</strong>' +
-                    '<p style="margin:8px 0 0 0;color:#000;">Des champs de votre profil sont manquants ou ont été mis à jour depuis votre dernière connexion. ' +
-                    'Merci de <strong>relire et compléter l\'ensemble des sections de votre profil</strong> (coordonnées, présentation, projet, réseaux sociaux…) ' +
-                    'avant de déposer une candidature.</p>' +
+                    '<p style="margin:8px 0 0 0;color:#000;">Merci de <strong>compléter l\'ensemble des sections de votre profil</strong> (coordonnées, présentation, projet, réseaux sociaux…) ' +
+                    'avant de déposer une candidature. Si vous reprenez une candidature plus ancienne, il est normal que votre profil ne soit plus entièrement à jour.</p>' +
                     '</div>'
                 ).show();
             }
@@ -1656,15 +1655,17 @@
                 // recharge la page et le navigateur vide tous les inputs file (sécurité
                 // navigateur), ce qui fait "disparaître" le fichier déjà sélectionné.
                 $('.required-files input[type="file"]').each(function() {
-                    const $input = $(this);
-                    const fileInfo = $input.closest('.file-infos');
-                    fileInfo.find('.js-help-block').remove();
-                    if (!this.files || this.files.length === 0) {
+                    const fileInfo = $(this).closest('.file-infos');
+                    clearFileFieldErrors(fileInfo);
+                    const file = this.files && this.files[0];
+                    if (!file) {
                         fileInfo.addClass('has-error');
                         fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Ce fichier est requis</span>');
                         blockSubmit = true;
-                    } else {
-                        fileInfo.removeClass('has-error');
+                    } else if (!isAllowedDocumentFile(file)) {
+                        fileInfo.addClass('has-error');
+                        fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du fichier n\'est pas autorisé. Formats acceptés : PNG, JPEG, GIF, WebP, PDF ou DOC.</span>');
+                        blockSubmit = true;
                     }
                 });
 
@@ -1783,37 +1784,97 @@
                 }
             });
             
+            const allowedDocumentMimeTypes = [
+                'image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp',
+                'application/pdf', 'application/x-pdf', 'application/msword'
+            ];
+            const allowedDocumentExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf', 'doc'];
+
+            function isAllowedDocumentFile(file) {
+                if (file.type && allowedDocumentMimeTypes.indexOf(file.type.toLowerCase()) !== -1) {
+                    return true;
+                }
+                const ext = (file.name.split('.').pop() || '').toLowerCase();
+                return allowedDocumentExtensions.indexOf(ext) !== -1;
+            }
+
+            function clearFileFieldErrors(fileInfo) {
+                fileInfo.find('.help-block').remove();
+                fileInfo.removeClass('has-error');
+            }
+
+            function hidePendingFilePreview($input, clearInput) {
+                const fileInfo = $input.closest('.file-infos');
+                const objectUrl = $input.data('pendingObjectUrl');
+                if (objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                    $input.removeData('pendingObjectUrl');
+                }
+                fileInfo.find('.file-infos-preview').remove();
+                fileInfo.removeClass('is-pending-upload');
+                if (clearInput) {
+                    $input.val('');
+                }
+            }
+
+            function showPendingFilePreview($input, file) {
+                hidePendingFilePreview($input, false);
+                const fileInfo = $input.closest('.file-infos');
+                const objectUrl = URL.createObjectURL(file);
+                $input.data('pendingObjectUrl', objectUrl);
+
+                const $preview = $(
+                    '<div class="file-infos-preview">' +
+                        '<span class="file-infos-preview-name"></span>' +
+                        '<div class="file-infos-actions">' +
+                            '<a class="file-infos-action js-pending-preview" target="_blank" rel="noopener" title="Voir le fichier"><i class="fa fa-eye"></i></a>' +
+                            '<a href="#" class="file-infos-action js-pending-remove" title="Supprimer le fichier"><i class="fa fa-trash"></i></a>' +
+                        '</div>' +
+                    '</div>'
+                );
+                $preview.find('.file-infos-preview-name').text(file.name);
+                $preview.find('.js-pending-preview').attr('href', objectUrl);
+                fileInfo.addClass('is-pending-upload').prepend($preview);
+            }
+
             // Gestion spéciale pour les fichiers
             $('.file-infos input[type="file"]').on('change', function() {
-                const fileInfo = $(this).closest('.file-infos');
+                const $input = $(this);
+                const fileInfo = $input.closest('.file-infos');
                 const file = this.files[0];
-                
-                // Supprimer les anciens messages d'erreur
-                fileInfo.find('.js-help-block').remove();
-                
+
+                clearFileFieldErrors(fileInfo);
+
                 if (file) {
-                    // Vérifier la taille du fichier (10Mo max)
                     if (file.size > 10 * 1024 * 1024) {
+                        hidePendingFilePreview($input, false);
                         fileInfo.addClass('has-error');
                         fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le fichier est trop volumineux (maximum 10Mo)</span>');
+                        removeDocumentCheckmark($input);
+                    } else if (!isAllowedDocumentFile(file)) {
+                        hidePendingFilePreview($input, false);
+                        fileInfo.addClass('has-error');
+                        fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du fichier n\'est pas autorisé. Formats acceptés : PNG, JPEG, GIF, WebP, PDF ou DOC.</span>');
+                        removeDocumentCheckmark($input);
                     } else {
-                        fileInfo.removeClass('has-error');
-                        
-                        // Mettre à jour la coche verte immédiatement après sélection d'un fichier valide
-                        updateDocumentCheckmark($(this));
+                        showPendingFilePreview($input, file);
+                        updateDocumentCheckmark($input);
                     }
                 } else {
-                    // Si aucun fichier sélectionné et que le champ est requis
-                    if ($(this).closest('.required-files').length > 0) {
+                    hidePendingFilePreview($input, false);
+                    if ($input.closest('.required-files').length > 0) {
                         fileInfo.addClass('has-error');
                         fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Ce fichier est requis</span>');
-                        
-                        // Retirer la coche verte si le fichier est supprimé
-                        removeDocumentCheckmark($(this));
-                    } else {
-                        fileInfo.removeClass('has-error');
+                        removeDocumentCheckmark($input);
                     }
                 }
+            });
+
+            $(document).on('click', '.js-pending-remove', function(e) {
+                e.preventDefault();
+                const $input = $(this).closest('.file-infos').find('input[type="file"]');
+                hidePendingFilePreview($input, true);
+                $input.trigger('change');
             });
 
             function updateDocumentCheckmark($input) {

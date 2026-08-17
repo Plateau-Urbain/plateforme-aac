@@ -80,6 +80,23 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .selection-controls__row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 16px;
+        }
+
+        .selection-controls__count {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.2;
+            white-space: nowrap;
         }
         
         .selection-buttons .btn {
@@ -578,27 +595,21 @@
             <div class="field-selection">
                 <!-- Contrôles de sélection -->
                 <div class="selection-controls">
-                    <div class="row">
-                        <div class="col-xs-12 col-md-6">
-                            <div class="selection-buttons">
-                                <button type="button" class="btn btn-sm btn-line-16" id="selectAllBtn">
-                                    <i class="fa fa-check-square"></i> Tout sélectionner
-                                </button>
-                                <button type="button" class="btn btn-sm btn-line-16" id="deselectAllBtn">
-                                    <i class="fa fa-square-o"></i> Tout désélectionner
-                                </button>
-                                <button type="button" class="btn btn-sm btn-line-16 btn-primary" id="presetBtn" title="Pré-sélectionne les champs essentiels pour un premier export rapide">
-                                    <i class="fa fa-star"></i> Sélection type
-                                </button>
-                            </div>
+                    <div class="selection-controls__row">
+                        <div class="selection-buttons">
+                            <button type="button" class="btn btn-sm btn-line-16" id="selectAllBtn">
+                                <i class="fa fa-check-square"></i> Tout sélectionner
+                            </button>
+                            <button type="button" class="btn btn-sm btn-line-16" id="deselectAllBtn">
+                                <i class="fa fa-square-o"></i> Tout désélectionner
+                            </button>
+                            <button type="button" class="btn btn-sm btn-line-16 btn-primary" id="presetBtn" title="Pré-sélectionne les champs essentiels pour un premier export rapide">
+                                <i class="fa fa-star"></i> Sélection type
+                            </button>
                         </div>
-                        <div class="col-xs-12 col-md-6">
-                            <div style="text-align: left; padding-top: 10px;" class="mobile-center">
-                                <h3 style="margin: 0; font-size: 18px;">
-                                    <span class="" id="selectedCount">0 champ sélectionné</span>
-                                </h3>
-                            </div>
-                        </div>
+                        <p class="selection-controls__count">
+                            <span id="selectedCount">0 champ sélectionné</span>
+                        </p>
                     </div>
                 </div>
                 

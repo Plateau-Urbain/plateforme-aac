@@ -2039,10 +2039,14 @@ class SpaceManagementController extends AbstractController
             throw new BadRequestHttpException('Invalid token');
         }
 
-        $spaceId = $image->getSpace()?->getId() ?? 0;
+        $space = $image->getSpace();
+        $spaceId = $space?->getId() ?? 0;
 
         $em = $this->em;
         try {
+            if ($space instanceof Space) {
+                $space->removePic($image);
+            }
             $em->remove($image);
             $em->flush();
         } catch (\Throwable $e) {
@@ -2055,7 +2059,10 @@ class SpaceManagementController extends AbstractController
 
         $this->addFlash('success', 'La photo a été supprimée.');
 
-        $space = $image->getSpace();
+        if ($request->isXmlHttpRequest() && $space instanceof Space) {
+            return $this->renderRefreshedSpaceForm($space);
+        }
+
         $anchor = $space instanceof Space ? $this->getFormSectionAnchor($space, 'photos') : '#two';
 
         return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $spaceId]) . $anchor);

@@ -60,12 +60,12 @@ services:
     app.admin.parcel:
         class: App\Admin\ParcelAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\Parcel, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Parcelles }
+            - { name: sonata.admin, model_class: App\Entity\Parcel, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Parcelles, show_in_dashboard: false }
 
     app.admin.floor:
         class: App\Admin\FloorAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\Floor, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Étages }
+            - { name: sonata.admin, model_class: App\Entity\Floor, manager_type: orm, group: plateau_urbain.admin.group.spaces, label: Étages, show_in_dashboard: false }
 
     app.admin.application:
         class: App\Admin\ApplicationAdmin

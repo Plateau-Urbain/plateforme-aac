@@ -18,8 +18,6 @@ sonata_admin:
                 icon: '<i class="fa fa-building"></i>'
                 items:
                     - app.admin.space
-                    - app.admin.parcel
-                    - app.admin.floor
             plateau_urbain.admin.group.applications:
                 label: 'Candidatures'
                 icon: '<i class="fa fa-file-text"></i>'

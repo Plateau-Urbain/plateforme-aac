@@ -65,8 +65,9 @@
                 min-width: 0;
             }
             #js-form-space .space-form-add-row__action {
-                flex: 0 1 38%;
-                min-width: 140px;
+                flex: 0 0 auto;
+                min-width: 0;
+                width: auto;
             }
             @media (min-width: 768px) {
                 #js-form-space .space-form-add-row {
@@ -78,9 +79,19 @@
                 height: 42px;
                 margin-bottom: 0;
             }
-            #js-form-space .space-form-add-row__action .btn {
-                margin-bottom: 0;
-                width: 100%;
+            #js-form-space .space-form-add-row__action .btn,
+            #js-form-space .space-form-add-btn {
+                margin-bottom: 0 !important;
+                width: auto !important;
+                height: 42px !important;
+                min-height: 42px !important;
+                padding: 0 16px !important;
+                font-size: 14px !important;
+                line-height: 1 !important;
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                white-space: nowrap;
             }
             #js-form-space .space-surfaces-row {
                 display: flex;

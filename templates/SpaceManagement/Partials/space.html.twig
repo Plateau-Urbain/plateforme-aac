@@ -6,7 +6,7 @@
       <div class="col-xs-12 col-md-4">
         <div class="image">
           {% if space.isMultiLocation %}
-            <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> Multi-sites déjà ouvert</span>
+            <span class="pu-multi-badge"><i class="fa fa-layer-group"></i> AAC au fil de l'eau</span>
           {% elseif space.isProposedByAdmin %}
             <span class="pu-managed-badge"><i class="fa fa-shield"></i> {{ space.managedByLabel ?: 'Géré par Plateau Urbain' }}</span>
           {% elseif space.owner and space.owner.company %}

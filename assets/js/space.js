@@ -236,20 +236,23 @@ $(document).ready(function () {
             var formData = new FormData(form[0]);
             var submitButton = $(this);
             var submitName = submitButton.attr('name');
+            var submitValue = submitButton.val();
+
+            if (submitValue === undefined || submitValue === null || submitValue === '') {
+                submitValue = submitButton.text().trim() || '1';
+            }
+
+            // FormData(form) does not include the clicked submit control when we intercept click.
+            if (submitName) {
+                formData.set(submitName, submitValue);
+            }
 
             if (partialAddActions.indexOf(submitName) !== -1) {
                 partialAddScrollTop = $(window).scrollTop();
                 partialAddSectionId = submitButton.closest('.section').attr('id') || null;
             }
 
-            var previewing = submitButton.attr('name') === 'appbundle_space[preview]';
-
-            if (previewing) {
-                var previewName = submitButton.attr('name');
-                if (previewName) {
-                    formData.append(previewName, submitButton.val() || '');
-                }
-            }
+            var previewing = submitName === 'appbundle_space[preview]';
 
             $.ajax({
                 url: action,

@@ -146,24 +146,11 @@ class Application
 
     /**
      * Validation : la "date d'entrée souhaitée" est requise à la soumission
-     * pour les AAC mono-site (standard) et les AAC au fil de l'eau.
+     * pour tous les types d'AAC (standard et multi-sites).
      */
     #[Assert\Callback(groups: ['submit'])]
-    public function validateStartOccupationForIndefiniteAAC(ExecutionContextInterface $context)
+    public function validateStartOccupationRequired(ExecutionContextInterface $context): void
     {
-        $space = $this->getSpace();
-        if (!$space) {
-            return;
-        }
-
-        $requiresStartOccupation = method_exists($space, 'requiresStartOccupation')
-            ? (bool) $space->requiresStartOccupation()
-            : (bool) $space->isRollingAAC();
-
-        if (!$requiresStartOccupation) {
-            return;
-        }
-
         if ($this->startOccupation === null) {
             $context->buildViolation('Veuillez indiquer une date d\'entrée souhaitée.')
                 ->atPath('startOccupation')

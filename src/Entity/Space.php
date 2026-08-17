@@ -171,13 +171,6 @@ class Space implements \Stringable
     private $enabled = false;
 
     /**
-     * Active le mode "candidature au fil de l'eau" pour cet AAC.
-     * Quand c'est actif, la candidature affiche/rend obligatoire la "Date d'entrée souhaitée".
-     */
-    #[ORM\Column(name: 'rolling_applications', type: 'boolean', options: ['default' => false])]
-    private $rollingApplications = false;
-
-    /**
      * @var bool
      */
     #[ORM\Column(name: 'closed', type: 'boolean')]
@@ -1268,109 +1261,6 @@ class Space implements \Stringable
             }
         }
         return false;
-    }
-
-    /**
-     * Détermine si l'AAC est "au fil de l'eau".
-     * On se base sur le nom de l'attribut (ex: "au fil de l'eau", "fil de l'eau", etc.)
-     * et uniquement quand le tag est marqué "Inclus".
-     *
-     * @return bool
-     */
-    public function isRollingAAC()
-    {
-        if ($this->rollingApplications) {
-            return true;
-        }
-
-        foreach ($this->tags as $tag) {
-            if (!$tag || !$tag->isIncluded() || !$tag->getAttribute()) {
-                continue;
-            }
-            $name = (string) $tag->getAttribute()->getName();
-            $normalized = $this->normalizeTagName($name);
-            if ($normalized === '') {
-                continue;
-            }
-
-            // Règle actuelle : “au fil de l’eau”
-            if (str_contains($normalized, 'fil de l eau') || str_contains($normalized, 'fil de leau')) {
-                return true;
-            }
-
-            // Compat : certains espaces peuvent encore utiliser un tag “indéfini”
-            if (str_contains($normalized, 'indefini')) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Alias compat : ancienne règle “indéfini”.
-     *
-     * @return bool
-     */
-    public function isIndefiniteAAC()
-    {
-        return $this->isRollingAAC();
-    }
-
-    /**
-     * Date d'entrée souhaitée : affichée et requise pour les AAC mono-site (standard)
-     * et les AAC au fil de l'eau (pas spécifiquement pour les multi-sites).
-     */
-    public function requiresStartOccupation(): bool
-    {
-        return !$this->isMultiLocation() || $this->isRollingAAC();
-    }
-
-    public function isStartOccupationRequired(): bool
-    {
-        return $this->requiresStartOccupation();
-    }
-
-    /**
-     * @return bool
-     */
-    public function getRollingApplications()
-    {
-        return (bool) $this->rollingApplications;
-    }
-
-    /**
-     * @param bool $rollingApplications
-     * @return $this
-     */
-    public function setRollingApplications($rollingApplications)
-    {
-        $this->rollingApplications = (bool) $rollingApplications;
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @return string
-     */
-    private function normalizeTagName($name)
-    {
-        $name = trim((string) $name);
-        if ($name === '') {
-            return '';
-        }
-        $name = mb_strtolower($name, 'UTF-8');
-        // Retirer les accents pour matcher "indéfini" = "indefini"
-        if (function_exists('iconv')) {
-            $converted = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $name);
-            if ($converted !== false) {
-                $name = $converted;
-            }
-        }
-        // Remplacer la ponctuation par des espaces, puis normaliser
-        $name = preg_replace('/[^a-z0-9]+/', ' ', $name);
-        $name = preg_replace('/\s+/', ' ', (string) $name);
-        $name = trim((string) $name);
-        return $name;
     }
 
     /**

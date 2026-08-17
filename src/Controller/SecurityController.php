@@ -258,7 +258,7 @@ class SecurityController extends AbstractController
         $this->em->remove($userDocument);
         $this->em->flush();
 
-        $this->addFlash('success', 'Le document a été supprimé.');
+        $this->addFlash('success_msg', 'Le document a été supprimé.');
 
         $serviceUrl = $request->get('service');
         if (is_string($serviceUrl) && str_starts_with($serviceUrl, '/') && !str_starts_with($serviceUrl, '//')) {
