@@ -46,6 +46,7 @@ class CompanyType extends AbstractType
                 'label'  => 'Date de création',
                 'input'  => 'datetime',
                 'widget' => 'single_text',
+                'required' => false,
                 'attr'   => ['class' => 'form-control']
             ])
             ->add('companyStatus', ChoiceType::class, [
@@ -129,7 +130,7 @@ class CompanyType extends AbstractType
                 ],
                 'constraints' => [
                     new Regex([
-                        'pattern' => '/^(\+33\s?[1-9](\s?\d{2}){4}|0[1-9](\s?\d{2}){4})$/',
+                        'pattern' => '/^(\+33\s?[1-9](?:[\s.\-]?\d{2}){4}|0[1-9](?:[\s.\-]?\d{2}){4})$/',
                         'message' => 'Le format du téléphone n\'est pas valide. Utilisez le format français (01 23 45 67 89) ou international (+33 1 23 45 67 89).'
                     ])
                 ]
@@ -145,12 +146,12 @@ class CompanyType extends AbstractType
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Le téléphone mobile est obligatoire.',
-                        'groups' => ['projectHolder', 'Default']
+                        'groups' => ['projectHolder', 'owner', 'Default']
                     ]),
                     new Regex([
-                        'pattern' => '/^(\+33\s?[1-9](\s?\d{2}){4}|0[1-9](\s?\d{2}){4})$/',
+                        'pattern' => '/^(\+33\s?[1-9](?:[\s.\-]?\d{2}){4}|0[1-9](?:[\s.\-]?\d{2}){4})$/',
                         'message' => 'Le format du téléphone n\'est pas valide. Utilisez le format français (06 12 34 56 78) ou international (+33 6 12 34 56 78).',
-                        'groups' => ['projectHolder', 'Default']
+                        'groups' => ['projectHolder', 'owner', 'Default']
                     ])
                 ]
             ])

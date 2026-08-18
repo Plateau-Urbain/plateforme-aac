@@ -112,7 +112,7 @@ services:
     app.admin.attribute:
         class: App\Admin\AttributeAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\Attribute, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Attributs }
+            - { name: sonata.admin, model_class: App\Entity\Attribute, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Attributs, show_in_dashboard: false }
 
     app.admin.space_type:
         class: App\Admin\SpaceTypeAdmin
@@ -127,7 +127,7 @@ services:
     app.admin.local_type:
         class: App\Admin\LocalTypeAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\LocalType, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Types de local }
+            - { name: sonata.admin, model_class: App\Entity\LocalType, manager_type: orm, group: plateau_urbain.admin.group.referentials, label: Types de local, show_in_dashboard: false }
 
     app.admin.space_attribute:
         class: App\Admin\SpaceAttributeAdmin

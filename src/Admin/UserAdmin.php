@@ -289,14 +289,6 @@ class UserAdmin extends AbstractAdmin
             ->addIdentifier('email', null, ['label' => 'Email'])
             ->add('firstname', null, ['label' => 'Prénom'])
             ->add('lastname', null, ['label' => 'Nom'])
-            ->add('typeUser', ChoiceType::class, [
-                'label'   => 'Type',
-                'choices' => [
-                    User::PORTEUR => 'Porteur',
-                    User::PROPRIO => 'Propriétaire',
-                    User::ADMIN   => 'Administrateur',
-                ],
-            ])
             ->add('enabled', null, [
                 'label' => 'Actif',
                 'editable' => true,

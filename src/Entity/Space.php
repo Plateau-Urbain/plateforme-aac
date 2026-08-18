@@ -1481,13 +1481,26 @@ class Space implements \Stringable
 
         $activeLocations = 0;
         foreach ($this->locations as $location) {
-            if ($location instanceof SpaceLocation && trim((string) $location->getName()) !== '') {
-                $activeLocations++;
+            if (!$location instanceof SpaceLocation) {
+                continue;
             }
+
+            if (trim((string) $location->getName()) === '') {
+                continue;
+            }
+
+            if (trim((string) $location->getCity()) === ''
+                || trim((string) $location->getZipCode()) === ''
+                || trim((string) $location->getDescription()) === ''
+                || trim((string) $location->getAvailability()) === '') {
+                continue;
+            }
+
+            $activeLocations++;
         }
 
         if ($activeLocations < 1) {
-            $context->buildViolation('Au moins un site complet (nom, ville, code postal) est requis pour publier.')
+            $context->buildViolation('Au moins un site complet (nom, ville, code postal, description et durée du projet) est requis pour publier.')
                 ->atPath('locations')
                 ->addViolation();
         }

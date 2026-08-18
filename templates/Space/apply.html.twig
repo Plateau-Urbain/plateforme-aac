@@ -187,6 +187,16 @@
             transition: background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
         }
 
+        .location-preference-item.is-excluded {
+            opacity: 0.72;
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .location-preference-item.is-excluded .location-preference-info strong {
+            color: #64748b;
+        }
+
         .location-preference-item.is-reordered {
             animation: location-preference-flash 0.75s ease-out;
         }
@@ -1491,12 +1501,14 @@
                     clearInterval(spaceCheckInterval);
                 }
 
-                if (typeof window.initApplicationLocationPreferences === 'function') {
-                    if ($('#location-preferences-list').length) {
-                        $('#location-preferences-list .location-preference-item:visible').each(function (idx) {
-                            $(this).find('.js-location-preference-rank').val(idx + 1);
-                        });
-                    }
+                if (typeof window.renumberLocationPreferences === 'function') {
+                    window.renumberLocationPreferences();
+                } else if ($('#location-preferences-list').length) {
+                    var rank = 0;
+                    $('#location-preferences-list .location-preference-item:visible:not(.is-excluded)').each(function () {
+                        rank += 1;
+                        $(this).find('.js-location-preference-rank').val(rank);
+                    });
                 }
 
                 const $form = $('.form-apply');

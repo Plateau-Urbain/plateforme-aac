@@ -112,6 +112,10 @@ class SecurityController extends AbstractController
         }
 
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
+            if ($user->isProprio() && $user->getTypeUser() !== User::PROPRIO) {
+                $user->setTypeUser(User::PROPRIO);
+            }
+
             $oldPwdRaw = $user->isProprio() && $form->get('userInfo')->has('oldPassword') ? $form->get('userInfo')->get('oldPassword')->getData() : null;
             $old_pwd = is_string($oldPwdRaw) ? $oldPwdRaw : '';
             $newPwdRaw = $user->isProprio() && $form->get('userInfo')->has('plainPassword') ? $form->get('userInfo')->get('plainPassword')->getData() : null;

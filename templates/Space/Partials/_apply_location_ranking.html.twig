@@ -1,20 +1,24 @@
 <div class="row">
     <div class="col-sm-12 form-group location-preferences-block{% if not form.locationPreferences.vars.valid %} has-error{% endif %}">
         <p class="location-preferences-help">
-            Classez les sites proposés par ordre de préférence (1 = votre choix principal).
-            Utilisez les flèches pour modifier l'ordre.
+            Classez les sites qui vous intéressent par ordre de préférence (1 = votre choix principal).
+            Utilisez les flèches pour modifier l'ordre, ou indiquez les sites qui ne vous intéressent pas.
         </p>
 
         <ol id="location-preferences-list" class="location-preferences-list">
             {% for preferenceForm in form.locationPreferences %}
                 {% set location = preferenceForm.vars.data.location %}
-                <li class="location-preference-item" style="display: flex; align-items: center; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.02); gap: 15px;">
-                    <span class="js-preference-rank-label location-preference-rank" style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: #ffffff; font-weight: bold; font-size: 15px; flex-shrink: 0; margin-right: 0;">{{ preferenceForm.vars.data.rank }}</span>
+                {% set isExcluded = preferenceForm.vars.data.excluded %}
+                <li class="location-preference-item{% if isExcluded %} is-excluded{% endif %}" style="display: flex; align-items: center; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.02); gap: 15px;">
+                    <span class="js-preference-rank-label location-preference-rank" style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: #ffffff; font-weight: bold; font-size: 15px; flex-shrink: 0; margin-right: 0;">{{ isExcluded ? '—' : preferenceForm.vars.data.rank }}</span>
                     <div class="location-preference-info" style="flex-grow: 1;">
                         <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
                             <strong style="font-size: 16px; color: #0f172a; font-weight: 700;">{{ location.name }}</strong>
                             {% if location.city %}
                                 <span style="font-size: 13px; color: #64748b; text-transform: capitalize;">{{ location.city }}{% if location.zipCode %} ({{ location.zipCode|slice(0, 2) }}){% endif %}</span>
+                            {% endif %}
+                            {% if isExcluded %}
+                                <span class="label label-default js-excluded-badge" style="font-size: 11px;">Ne m'intéresse pas</span>
                             {% endif %}
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
@@ -40,9 +44,16 @@
                         <button type="button" class="btn btn-default btn-xs js-move-preference-down" title="Descendre" style="padding: 4px 8px; margin: 0;">
                             <i class="fa fa-chevron-down"></i>
                         </button>
+                        <button type="button" class="btn btn-default btn-xs js-exclude-location" title="Ce site ne m'intéresse pas" style="padding: 4px 8px; margin: 0; white-space: nowrap;">
+                            <i class="fa fa-ban"></i>
+                        </button>
+                        <button type="button" class="btn btn-default btn-xs js-restore-location" title="Réintégrer au classement" style="padding: 4px 8px; margin: 0; white-space: nowrap; display: none;">
+                            <i class="fa fa-undo"></i>
+                        </button>
                     </div>
                     <span class="location-preference-hidden-fields">
                         {{ form_widget(preferenceForm.rank) }}
+                        {{ form_widget(preferenceForm.excluded) }}
                         {{ form_widget(preferenceForm.location, { attr: { class: 'js-preference-location-input' } }) }}
                     </span>
                 </li>

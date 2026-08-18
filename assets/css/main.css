@@ -927,7 +927,7 @@ table.lots .help-block:after {
   top: -3px;
   left: -3px;
   background: #FFF;
-  border-bottom-right-radius: 5px;
+  border-bottom-right-radius: 12px;
 }
 #property-listing .item .image .overlay img {
   max-width: 100%;

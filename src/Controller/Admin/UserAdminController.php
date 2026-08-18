@@ -467,11 +467,6 @@ class UserAdminController extends CRUDController
                 'property' => 'companyStructures',
                 'category' => 'Structure du porteur'
             ],
-            'company_site' => [
-                'label' => 'Site web',
-                'property' => 'company_site',
-                'category' => 'Structure du porteur'
-            ],
             'company_blog' => [
                 'label' => 'Blog',
                 'property' => 'company_blog',
@@ -510,41 +505,46 @@ class UserAdminController extends CRUDController
                 'category' => 'Projet et souhaits'
             ],
 
-            // Réseaux sociaux
+            // Site web et réseaux sociaux
+            'company_site' => [
+                'label' => 'Site web',
+                'property' => 'company_site',
+                'category' => 'Site web et réseaux sociaux'
+            ],
             'facebookUrl' => [
                 'label' => 'Facebook',
                 'property' => 'facebookUrl',
-                'category' => 'Réseaux sociaux'
+                'category' => 'Site web et réseaux sociaux'
             ],
             'twitterUrl' => [
                 'label' => 'Twitter',
                 'property' => 'twitterUrl',
-                'category' => 'Réseaux sociaux'
+                'category' => 'Site web et réseaux sociaux'
             ],
             'instagramUrl' => [
                 'label' => 'Instagram',
                 'property' => 'instagramUrl',
-                'category' => 'Réseaux sociaux'
+                'category' => 'Site web et réseaux sociaux'
             ],
             'linkedinUrl' => [
                 'label' => 'LinkedIn',
                 'property' => 'linkedinUrl',
-                'category' => 'Réseaux sociaux'
+                'category' => 'Site web et réseaux sociaux'
             ],
             'youtubeUrl' => [
                 'label' => 'YouTube',
                 'property' => 'youtubeUrl',
-                'category' => 'Réseaux sociaux'
+                'category' => 'Site web et réseaux sociaux'
             ],
             'tiktokUrl' => [
                 'label' => 'TikTok',
                 'property' => 'tiktokUrl',
-                'category' => 'Réseaux sociaux'
+                'category' => 'Site web et réseaux sociaux'
             ],
             'otherUrl' => [
                 'label' => 'Autre',
                 'property' => 'otherUrl',
-                'category' => 'Réseaux sociaux'
+                'category' => 'Site web et réseaux sociaux'
             ],
         ];
     }

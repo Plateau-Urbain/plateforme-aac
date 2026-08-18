@@ -46,6 +46,7 @@ class SpaceLocation
     private ?float $longitude = null;
 
     #[ORM\Column(name: 'description', type: 'text', nullable: true)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner la description du site.', groups: ['save', 'draft'])]
     private ?string $description = null;
 
     #[ORM\Column(name: 'is_erp', type: 'boolean', options: ['default' => false])]
@@ -64,7 +65,7 @@ class SpaceLocation
     private ?\DateTimeInterface $suspendedAt = null;
 
     #[ORM\Column(name: 'availability', type: 'string', length: 255, nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
+    #[Assert\NotBlank(message: 'Veuillez renseigner la durée du projet.', groups: ['save', 'draft'])]
     #[Assert\Length(max: 255, groups: ['save', 'draft'])]
     private ?string $availability = null;
 

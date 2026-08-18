@@ -44,7 +44,8 @@ class SpaceOwnerType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => \App\Entity\User::class,
-            'validation_groups' => ['owner', 'Default']
+            'validation_groups' => ['owner', 'Default'],
+            'allow_extra_fields' => true,
         ]);
     }
 

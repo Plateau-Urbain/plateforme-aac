@@ -56,6 +56,14 @@
                 </div>
             {% endfor %}
 
+            {% if form.vars.submitted is defined and form.vars.submitted and not form.vars.valid %}
+                <div class="alert alert-danger" role="alert">
+                    <strong>Enregistrement impossible.</strong>
+                    Merci de corriger les champs indiqués ci-dessous, puis d’enregistrer à nouveau.
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+
             {{ form_start(form, {'attr': {'class': 'has-crosses', 'id': 'form-profil', 'novalidate': 'novalidate'}}) }}
             <div class="row">
                 <div class=" col-xs-1 bkg ">
@@ -103,7 +111,7 @@
 
                             <div class="row">
                                 <div class="col-sm-4 col-sm-offset-4 center">
-                                    <button type="submit" form="form-profil" class="btn btn-line-form">
+                                    <button type="submit" class="btn btn-line-form">
                                         Enregistrer
                                     </button>
                                 </div>
@@ -146,7 +154,7 @@
 
                             <div class="row">
                                 <div class="col-sm-4 col-sm-offset-4 center">
-                                    <button type="submit" form="form-profil" class="btn btn-line-form">
+                                    <button type="submit" class="btn btn-line-form">
                                         Enregistrer
                                     </button>
                                 </div>
@@ -194,108 +202,36 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-xs-4 col-xs-offset-4 col-md-4 col-md-offset-4">
+                    <div class="save ">
+                        <button type="submit" class="btn btn-line-s">
+                            Enregistrer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2 ">
+                    <center>
+                        <p>
+                            Vous souhaitez vous désinscrire ? Merci d’adresser votre demande à <a class="mailto" href="mailto:contact@plateau-urbain.com">contact@plateau-urbain.com</a>
+                        </p>
+                    </center>
+                </div>
+            </div>
+
+            {# CSRF et champs cachés restants (pas les champs visibles oubliés, qui écraseraient les données) #}
+            {% for child in form %}
+                {% if not child.rendered and child.vars.name starts with('_') %}
+                    {{ form_row(child) }}
+                {% endif %}
+            {% endfor %}
+            {{ form_end(form, {'render_rest': false}) }}
         </div>
     </div>
 </div>
-</div>
 
-
-<div class="row">
-    <div class="col-xs-4 col-xs-offset-4 col-md-4 col-md-offset-4">
-        <div class="save ">
-            <button type="submit" form="form-profil" class="btn btn-line-s">
-                Enregistrer
-            </button>
-        </div>
-    </div>
-</div>
-
-
-
-
-<div class="row">
-    <div class="col-sm-8 col-sm-offset-2 ">
-        <center>
-            <p>
-                Vous souhaitez vous désinscrire ? Merci d’adresser votre demande à <a class="mailto" href="mailto:contact@plateau-urbain.com">contact@plateau-urbain.com</a>
-            </p>
-        </center>
-    </div>
-</div>
-
-
-
-
-    {# Rendre uniquement les champs cachés restants (ex: _token), pas les champs visibles oubliés #}
-    {% for child in form %}
-        {% if not child.rendered and child.vars.name starts with('_') %}
-            {{ form_row(child) }}
-        {% endif %}
-    {% endfor %}
-    {{ form_end(form, {'render_rest': false}) }}
-
-{% endblock %}
-
-{% block javascript %}
-<script type="text/javascript">
-    function initFormListener() {
-        $('button[type="submit"]').click(function() {
-            var button = $(this)
-            var form = document.getElementById(button.attr('form'))
-            var action = $(form).attr('action') || '';
-            var formData = new FormData(form);
-
-            if (form.checkValidity() === false) {
-                return;
-            }
-
-            $.ajax({
-                url: action,
-                type: 'POST',
-                data: formData,
-                async: false,
-                success: function (data) {
-                    successAjax(data);
-                },
-                cache: false,
-                contentType: false,
-                processData: false
-            });
-
-            return false;
-        });
-    }
-
-    function successAjax(data) {
-        $("#js-form-space").html($(data).find('#js-form-space')).find('form').addClass('submitted');
-        $("select").attr("data-placeholder", "Sélectionnez une option");
-        $("select").chosen();
-
-        if($('.form-group.has-error').length > 0) {
-          $.colorbox({html:$('#errorBox').html()});
-        } else {
-          $.colorbox({html:$('#confirmBox').html()});
-        }
-    }
-
-    $(document).ready(function() {
-        initFormListener();
-    });
-</script>
-
-<div id="errorBox" style="display: none;">
-    <div class="colorBox-content">
-        <i class="fa fa-info-circle danger"></i>
-        <p>Le formulaire comporte des erreurs.</p>
-    </div>
-</div>
-
-<div id="confirmBox" style="display: none;">
-    <div class="colorBox-content">
-        <i class="fa fa-check danger"></i>
-        <p>Votre profil est enregistré.</p>
-    </div>
-</div>
-</div>
-</div>
 {% endblock %}

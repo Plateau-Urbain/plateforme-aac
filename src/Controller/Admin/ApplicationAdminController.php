@@ -7,6 +7,7 @@ use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Filter\Model\FilterData;
 use App\Entity\Application;
 use App\Entity\ApplicationLocationPreference;
+use App\Entity\Space;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -32,12 +33,10 @@ class ApplicationAdminController extends CRUDController
      */
     public function selectExportFieldsAction(Request $request): Response
     {
-        // Récupérer tous les champs disponibles
-        $availableFields = $this->getAllAvailableFields();
-        
-        // IMPORTANT: Récupérer TOUS les paramètres de l'URL (filtres + pagination + tri)
-        // car getFilterParameters() de Sonata ne retourne que _sort_by, _sort_order, etc.
         $filterParameters = $request->query->all();
+        $includeLocationPreferenceFields = $this->shouldIncludeLocationPreferenceFields($filterParameters);
+        $availableFields = $this->getAllAvailableFields($includeLocationPreferenceFields);
+        $presetExportFieldKeys = $this->getPresetExportFieldKeys();
 
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('export_fields', $request->request->getString('_token'))) {
@@ -53,7 +52,7 @@ class ApplicationAdminController extends CRUDController
                 $this->addFlash('sonata_flash_error', 'Veuillez sélectionner au moins un champ à exporter.');
                 return $this->renderWithExtraParams('Admin/Application/select_export_fields.html.twig', [
                     'availableFields' => $availableFields,
-                    'presetExportFieldKeys' => $this->getPresetExportFieldKeys(),
+                    'presetExportFieldKeys' => $presetExportFieldKeys,
                     'action' => 'list',
                     'filterParameters' => $filterParameters,
                 ]);
@@ -73,7 +72,7 @@ class ApplicationAdminController extends CRUDController
         
         return $this->renderWithExtraParams('Admin/Application/select_export_fields.html.twig', [
             'availableFields' => $availableFields,
-            'presetExportFieldKeys' => $this->getPresetExportFieldKeys(),
+            'presetExportFieldKeys' => $presetExportFieldKeys,
             'action' => 'list',
             'filterParameters' => $filterParameters,
         ]);
@@ -97,8 +96,16 @@ class ApplicationAdminController extends CRUDController
 
         $selectedFieldKeys = $this->sortSelectedExportFieldKeys($selectedFieldKeys);
 
-        // Récupérer tous les champs disponibles
-        $allFields = $this->getAllAvailableFields();
+        $includeLocationPreferenceFields = $this->shouldIncludeLocationPreferenceFields($request->query->all());
+        $allFields = $this->getAllAvailableFields($includeLocationPreferenceFields);
+
+        if (!$includeLocationPreferenceFields) {
+            $selectedFieldKeys = array_values(array_filter(
+                $selectedFieldKeys,
+                static fn (string $key): bool => $key !== 'locationPreferences'
+                    && !preg_match('/^locationPreference_rank_\d+$/', $key)
+            ));
+        }
 
         // Construire le tableau des champs à exporter
         $exportFields = [];
@@ -350,7 +357,7 @@ class ApplicationAdminController extends CRUDController
      * Retourne tous les champs disponibles pour l'export
      */
     /** @return array<string, array{label: string, property: string, category: string}> */
-    private function getAllAvailableFields(): array
+    private function getAllAvailableFields(bool $includeLocationPreferenceFields = true): array
     {
         // Aligné sur `SpaceManagementController::getAllAvailableFieldsForExport()`
         $fields = [
@@ -627,11 +634,6 @@ class ApplicationAdminController extends CRUDController
                 'property' => 'openToGlobalProject',
                 'category' => 'Candidature - Mon projet'
             ],
-            'locationPreferences' => [
-                'label' => '[Candidature] Classement des sites',
-                'property' => 'locationPreferencesLabelsForExport',
-                'category' => 'Candidature - Mon projet'
-            ],
 
             // Candidature - Documents déposés
             'application_documents_paths' => [
@@ -641,11 +643,25 @@ class ApplicationAdminController extends CRUDController
             ],
         ];
 
-        $maxRank = $this->getMaxLocationPreferenceRank();
-        for ($rank = 1; $rank <= $maxRank; ++$rank) {
-            $fields[sprintf('locationPreference_rank_%d', $rank)] = [
-                'label' => sprintf('[Candidature] Choix %d', $rank),
-                'property' => sprintf('computed.locationPreference.rank.%d', $rank),
+        if ($includeLocationPreferenceFields) {
+            $fields['locationPreferences'] = [
+                'label' => '[Candidature] Classement des sites',
+                'property' => 'locationPreferencesLabelsForExport',
+                'category' => 'Candidature - Mon projet',
+            ];
+
+            $maxRank = $this->getMaxLocationPreferenceRank();
+            for ($rank = 1; $rank <= $maxRank; ++$rank) {
+                $fields[sprintf('locationPreference_rank_%d', $rank)] = [
+                    'label' => sprintf('[Candidature] Choix %d', $rank),
+                    'property' => sprintf('computed.locationPreference.rank.%d', $rank),
+                    'category' => 'Candidature - Mon projet',
+                ];
+            }
+
+            $fields['locationPreferences_excluded'] = [
+                'label' => '[Candidature] Sites non retenus',
+                'property' => 'excludedLocationPreferencesLabelsForExport',
                 'category' => 'Candidature - Mon projet',
             ];
         }
@@ -656,18 +672,11 @@ class ApplicationAdminController extends CRUDController
     /** @return string[] */
     private function getPresetExportFieldKeys(): array
     {
-        $keys = $this->getExportFieldOrderPreset();
-
-        if ($this->getMaxLocationPreferenceRank() > 0) {
-            $keys = array_values(array_filter($keys, static fn (string $key): bool => $key !== 'locationPreferences'));
-        } else {
-            $keys = array_values(array_filter(
-                $keys,
-                static fn (string $key): bool => !preg_match('/^locationPreference_rank_\d+$/', $key)
-            ));
-        }
-
-        return $keys;
+        return array_values(array_filter(
+            $this->getExportFieldOrderPreset(),
+            static fn (string $key): bool => $key !== 'locationPreferences'
+                && !preg_match('/^locationPreference_rank_\d+$/', $key)
+        ));
     }
 
     /** @return string[] */
@@ -704,6 +713,7 @@ class ApplicationAdminController extends CRUDController
         }
 
         return array_merge($orderPreset, [
+            'locationPreferences_excluded',
             'locationPreferences',
         ]);
     }
@@ -749,6 +759,47 @@ class ApplicationAdminController extends CRUDController
             ->getSingleScalarResult();
 
         return max($maxRank, 0);
+    }
+
+    /**
+     * @param array<string, mixed> $filterParameters
+     */
+    private function shouldIncludeLocationPreferenceFields(array $filterParameters): bool
+    {
+        $space = $this->getFilteredSpaceFromParameters($filterParameters);
+        if ($space instanceof Space && !$space->isMultiLocation()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array<string, mixed> $filterParameters
+     */
+    private function getFilteredSpaceFromParameters(array $filterParameters): ?Space
+    {
+        $filters = $filterParameters['filter'] ?? $filterParameters;
+        if (!is_array($filters)) {
+            return null;
+        }
+
+        $spaceFilter = $filters['space'] ?? null;
+        $spaceId = null;
+        if (is_array($spaceFilter)) {
+            $spaceId = $spaceFilter['value'] ?? null;
+            if (is_array($spaceId)) {
+                $spaceId = $spaceId[0] ?? null;
+            }
+        } elseif (is_numeric($spaceFilter)) {
+            $spaceId = $spaceFilter;
+        }
+
+        if ($spaceId === null || $spaceId === '') {
+            return null;
+        }
+
+        return $this->em->getRepository(Space::class)->find($spaceId);
     }
 
     /**

@@ -172,6 +172,7 @@ class Application
         }
 
         $coveredLocationIds = [];
+        $rankedCount = 0;
         foreach ($this->locationPreferences as $preference) {
             $location = $preference->getLocation();
             if (!$location || $location->isSuspended()) {
@@ -190,12 +191,18 @@ class Application
             if ($locationId !== null) {
                 $coveredLocationIds[] = $locationId;
             }
+
+            if ($preference->isExcluded()) {
+                continue;
+            }
+
+            $rankedCount++;
         }
 
         foreach ($activeLocations as $activeLocation) {
             $activeId = $activeLocation->getId();
             if ($activeId !== null && !in_array($activeId, $coveredLocationIds, true)) {
-                $context->buildViolation('Veuillez classer tous les sites proposés par ordre de préférence.')
+                $context->buildViolation('Veuillez classer les sites qui vous intéressent ou indiquer ceux qui ne vous intéressent pas.')
                     ->atPath('locationPreferences')
                     ->addViolation();
 
@@ -203,15 +210,27 @@ class Application
             }
         }
 
+        if ($rankedCount < 1) {
+            $context->buildViolation('Veuillez classer au moins un site.')
+                ->atPath('locationPreferences')
+                ->addViolation();
+
+            return;
+        }
+
         $ranks = [];
         foreach ($this->locationPreferences as $preference) {
+            if ($preference->isExcluded()) {
+                continue;
+            }
+
             if ($preference->getRank() !== null) {
                 $ranks[] = $preference->getRank();
             }
         }
 
         sort($ranks);
-        $expectedRanks = range(1, count($activeLocations));
+        $expectedRanks = range(1, $rankedCount);
         if ($ranks !== $expectedRanks) {
             $context->buildViolation('Le classement des sites est incomplet ou invalide.')
                 ->atPath('locationPreferences')
@@ -539,12 +558,38 @@ class Application
      */
     public function getLocationPreferencesOrdered(): array
     {
-        $preferences = $this->locationPreferences->toArray();
+        $preferences = array_values(array_filter(
+            $this->locationPreferences->toArray(),
+            static fn (ApplicationLocationPreference $preference): bool => !$preference->isExcluded()
+        ));
         usort($preferences, static function (ApplicationLocationPreference $a, ApplicationLocationPreference $b): int {
             return ($a->getRank() ?? PHP_INT_MAX) <=> ($b->getRank() ?? PHP_INT_MAX);
         });
 
         return $preferences;
+    }
+
+    /**
+     * @return ApplicationLocationPreference[]
+     */
+    public function getExcludedLocationPreferences(): array
+    {
+        return array_values(array_filter(
+            $this->locationPreferences->toArray(),
+            static fn (ApplicationLocationPreference $preference): bool => $preference->isExcluded()
+        ));
+    }
+
+    public function normalizeLocationPreferenceRanks(): void
+    {
+        $rank = 1;
+        foreach ($this->getLocationPreferencesOrdered() as $preference) {
+            $preference->setRank($rank++);
+        }
+
+        foreach ($this->getExcludedLocationPreferences() as $preference) {
+            $preference->setRank(null);
+        }
     }
 
     public function addLocationPreference(ApplicationLocationPreference $preference): self
@@ -644,6 +689,44 @@ class Application
             $city = $location->getCity();
             $label = $city ? sprintf('%s — %s', $name, $city) : $name;
             $parts[] = sprintf('Site %d: %s', $preference->getRank(), $label);
+        }
+
+        $excludedLabels = [];
+        foreach ($this->getExcludedLocationPreferences() as $preference) {
+            $location = $preference->getLocation();
+            if (!$location || $location->isSuspended()) {
+                continue;
+            }
+
+            $name = (string) ($location->getName() ?? '');
+            $city = $location->getCity();
+            $excludedLabels[] = $city ? sprintf('%s — %s', $name, $city) : $name;
+        }
+
+        if ($excludedLabels !== []) {
+            $parts[] = 'Non retenus: ' . implode(', ', $excludedLabels);
+        }
+
+        return implode('; ', $parts);
+    }
+
+    public function getExcludedLocationPreferencesLabelsForExport(): string
+    {
+        $space = $this->getSpace();
+        if (!$space || !$space->isMultiLocation()) {
+            return '';
+        }
+
+        $parts = [];
+        foreach ($this->getExcludedLocationPreferences() as $preference) {
+            $location = $preference->getLocation();
+            if (!$location || $location->isSuspended()) {
+                continue;
+            }
+
+            $name = (string) ($location->getName() ?? '');
+            $city = $location->getCity();
+            $parts[] = $city ? sprintf('%s — %s', $name, $city) : $name;
         }
 
         return implode('; ', $parts);

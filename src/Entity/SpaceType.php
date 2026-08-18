@@ -26,6 +26,12 @@ class SpaceType implements \Stringable
     protected $name;
 
     /**
+     * @var bool
+     */
+    #[ORM\Column(name: 'is_active', type: 'boolean', options: ['default' => true])]
+    private $isActive = true;
+
+    /**
      * Get id.
      *
      * @return int
@@ -57,6 +63,34 @@ class SpaceType implements \Stringable
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsActive()
+    {
+        return (bool) $this->isActive;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->getIsActive();
+    }
+
+    /**
+     * @param bool $isActive
+     *
+     * @return SpaceType
+     */
+    public function setIsActive($isActive)
+    {
+        $this->isActive = (bool) $isActive;
+
+        return $this;
     }
 
     public function __toString(): string

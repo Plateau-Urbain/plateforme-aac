@@ -1079,6 +1079,13 @@
                       </li>
                     {% endif %}
                   {% endfor %}
+                  {% for pref in application.excludedLocationPreferences %}
+                    {% if pref.location and not pref.location.suspended %}
+                      <li style="color: #777;"><em>Non retenu :</em>
+                        {{ pref.location.name }}{% if pref.location.city %} — {{ pref.location.city }}{% endif %}
+                      </li>
+                    {% endif %}
+                  {% endfor %}
                 </ul>
               </li>
               {% endif %}

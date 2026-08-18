@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'application_location_preference')]
@@ -24,10 +25,11 @@ class ApplicationLocationPreference
     #[Assert\NotNull(groups: ['submit'])]
     private ?SpaceLocation $location = null;
 
-    #[ORM\Column(name: 'rank', type: 'integer')]
-    #[Assert\NotNull(groups: ['submit'])]
-    #[Assert\Positive(groups: ['submit'])]
+    #[ORM\Column(name: 'rank', type: 'integer', nullable: true)]
     private ?int $rank = null;
+
+    #[ORM\Column(name: 'excluded', type: 'boolean', options: ['default' => false])]
+    private bool $excluded = false;
 
     public function getId(): ?int
     {
@@ -68,5 +70,34 @@ class ApplicationLocationPreference
         $this->rank = $rank;
 
         return $this;
+    }
+
+    public function isExcluded(): bool
+    {
+        return $this->excluded;
+    }
+
+    public function setExcluded(bool $excluded): self
+    {
+        $this->excluded = $excluded;
+        if ($excluded) {
+            $this->rank = null;
+        }
+
+        return $this;
+    }
+
+    #[Assert\Callback(groups: ['submit'])]
+    public function validateRankWhenNotExcluded(ExecutionContextInterface $context): void
+    {
+        if ($this->excluded) {
+            return;
+        }
+
+        if ($this->rank === null || $this->rank < 1) {
+            $context->buildViolation('Veuillez classer ce site ou indiquer qu\'il ne vous intéresse pas.')
+                ->atPath('rank')
+                ->addViolation();
+        }
     }
 }

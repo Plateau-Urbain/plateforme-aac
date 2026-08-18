@@ -700,6 +700,7 @@ class SpaceManagementController extends AbstractController
                 $rank = $index + 1;
                 $exportColumns[sprintf('Choix %d', $rank)] = sprintf('locationPreferenceRank%d', $rank);
             }
+            $exportColumns['Sites non retenus'] = 'excludedLocationPreferencesLabelsForExport';
         }
 
         $exportColumns['Quelles idées avez-vous pour participer au projet collectif ?'] = 'contribution';
@@ -848,6 +849,7 @@ class SpaceManagementController extends AbstractController
             for ($rank = 1; $rank <= $rankCount; $rank++) {
                 $orderPreset[] = sprintf('locationPreference_rank_%d', $rank);
             }
+            $orderPreset[] = 'locationPreferences_excluded';
         }
 
         $orderPreset = array_merge($orderPreset, [
@@ -1448,6 +1450,11 @@ class SpaceManagementController extends AbstractController
                     'category' => 'Candidature - Mon projet',
                 ];
             }
+            $fields['locationPreferences_excluded'] = [
+                'label' => '[Candidature] Sites non retenus',
+                'property' => 'excludedLocationPreferencesLabelsForExport',
+                'category' => 'Candidature - Mon projet',
+            ];
         } else {
             unset($fields['locationPreferences']);
         }
@@ -2813,6 +2820,8 @@ class SpaceManagementController extends AbstractController
             'name'              => 'Nom du site',
             'zipCode'           => 'Code postal',
             'city'              => 'Ville',
+            'description'       => 'Description',
+            'availability'      => 'Durée du projet',
             'suspensionMessage' => 'Message de suspension',
         ];
 

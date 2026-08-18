@@ -15,6 +15,9 @@ use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Doctrine\ORM\EntityRepository;
+use App\Entity\SpaceType as SpaceTypeEntity;
 use App\Repository\UserRepository;
 use App\Form\SpaceDocumentType;
 use App\Form\SpaceImageType;
@@ -392,7 +395,33 @@ class SpaceAdmin extends AbstractAdmin
             ->add('city', null, ['label' => 'Ville', 'required' => false])
             ->add('limitAvailability', null, ['label' => 'Date limite de candidature', 'required' => false])
             ->add('availability', null, ['label' => 'Durée du projet', 'required' => false])
-            ->add('type', null, ['label' => 'Type de locaux', 'required' => true])
+            ->add('type', EntityType::class, [
+                'class' => SpaceTypeEntity::class,
+                'label' => 'Type de locaux',
+                'required' => true,
+                'choice_label' => static function ($type) {
+                    if (!$type instanceof SpaceTypeEntity) {
+                        return '';
+                    }
+                    if (!$type->getIsActive()) {
+                        return $type->getName() . ' (archivé — veuillez choisir un type actuel)';
+                    }
+
+                    return $type->getName();
+                },
+                'query_builder' => function (EntityRepository $repo) {
+                    $qb = $repo->createQueryBuilder('st')
+                        ->where('st.isActive = :active')
+                        ->setParameter('active', true);
+                    $subject = $this->getSubject();
+                    if ($subject instanceof Space && $subject->getType() instanceof SpaceTypeEntity && $subject->getType()->getId()) {
+                        $qb->orWhere('st.id = :current')
+                            ->setParameter('current', $subject->getType()->getId());
+                    }
+
+                    return $qb->orderBy('st.name', 'ASC');
+                },
+            ])
             ->add('description', null, ['label' => 'Description', 'attr' => ['class' => 'trumbowyg']])
             ->add('activityDescription', null, ['label' => 'Activités recherchées', 'attr' => ['class' => 'trumbowyg']])
             ->add('price', null, ['label' => 'Prix au m² mensuel', 'required' => false])

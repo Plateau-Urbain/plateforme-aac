@@ -8958,7 +8958,7 @@ p.ville {
 }
 
 p.apply-date-b {
-  font-family: "ginkabold", sans-serif;
+  font-family: "ginkamedium", sans-serif;
 }
 
 p.apply-date-p {
@@ -9365,7 +9365,7 @@ form .main .section-title {
   color: #fff;
   padding: 9px 9px;
   border-bottom-left-radius: 12px;
-  border-top-right-radius: 12px;
+  border-top-right-radius: 9px;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -9387,7 +9387,7 @@ form .main .section-title {
   color: #fff;
   padding: 9px 9px;
   border-bottom-left-radius: 12px;
-  border-top-right-radius: 12px;
+  border-top-right-radius: 9px;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -12463,7 +12463,8 @@ form .main .section-title.form-sixth:after {
   background: #e7b15a;
   color: #fff;
   padding: 9px 9px;
-  border-bottom-left-radius: 3px;
+  border-bottom-left-radius: 12px;
+  border-top-right-radius: 9px;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -12517,9 +12518,9 @@ form .main .section-title.form-sixth:after {
 /* Chips de lieux pour les cartes de la page d'accueil */
 .chip-location-home {
   display: inline-block;
-  background-color: #1f2937;
+  background-color: #e9473c;
   color: #fff;
-  font-size: 11px;
+  font-size: 16px;
   letter-spacing: 0.3px;
   padding: 4px 10px;
   border-radius: 20px;
@@ -12637,7 +12638,8 @@ body.theme-v2 .space_item_suspended {
     color: #1e293b !important;
     border-radius: var(--v2-radius-md) !important;
     box-shadow: var(--v2-shadow-sm) !important;
-    transition: all 0.25s ease-in-out !important;
+    transform: translateY(0);
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease !important;
 }
 
 /* 1. État normal : Fond teinte pâle + Bordure fine de catégorie */
@@ -12677,7 +12679,7 @@ body.theme-v2 .space-card--multi-location {
     border: 1px solid rgba(105, 189, 147, 0.35) !important;
 }
 
-/* 2. État au survol (Hover) : La bordure s'épaissit à 2px, ombre portée + micro-translation (le fond reste pâle) */
+/* 2. Survol : la bordure reste à 1px (pas de saut de layout), un halo + ombre donnent l'effet d'épaisseur */
 body.theme-v2 #js-results .space_item.space-card--by-admin:hover,
 body.theme-v2 #js-results .space_item_unavailable.space-card--by-admin:hover,
 body.theme-v2 #property-listing.management-list .space-card.space-card--by-admin:hover,
@@ -12686,8 +12688,9 @@ body.theme-v2 #property-listing .space_item.space-card--by-admin:hover,
 body.theme-v2 .space-card.space-card--by-admin:hover,
 body.theme-v2 .space_item.space-card--by-admin:hover {
     background-color: rgba(45, 116, 186, 0.18) !important;
-    border: 2px solid #2d74ba !important;
-    box-shadow: 0 10px 25px rgba(45, 116, 186, 0.2) !important;
+    border-color: #2d74ba !important;
+    box-shadow: 0 0 0 1px #2d74ba, 0 10px 24px rgba(45, 116, 186, 0.18) !important;
+    transform: translateY(-2px);
 }
 
 body.theme-v2 #js-results .space_item.space-card--by-proprio:hover,
@@ -12698,9 +12701,9 @@ body.theme-v2 #property-listing .space_item.space-card--by-proprio:hover,
 body.theme-v2 .space-card.space-card--by-proprio:hover,
 body.theme-v2 .space_item.space-card--by-proprio:hover {
     background-color: rgba(242, 190, 106, 0.26) !important;
-    border: 2px solid #f2be6a !important;
-    box-shadow: 0 10px 25px rgba(242, 190, 106, 0.25) !important;
-  
+    border-color: #f2be6a !important;
+    box-shadow: 0 0 0 1px #f2be6a, 0 10px 24px rgba(242, 190, 106, 0.22) !important;
+    transform: translateY(-2px);
 }
 
 body.theme-v2 #js-results .space_item.space-card--multi-location:hover,
@@ -12711,9 +12714,9 @@ body.theme-v2 #property-listing .space_item.space-card--multi-location:hover,
 body.theme-v2 .space-card.space-card--multi-location:hover,
 body.theme-v2 .space_item.space-card--multi-location:hover {
     background-color: rgba(105, 189, 147, 0.22) !important;
-    border: 2px solid #69bd93 !important;
-    box-shadow: 0 10px 25px rgba(105, 189, 147, 0.25) !important;
-  
+    border-color: #69bd93 !important;
+    box-shadow: 0 0 0 1px #69bd93, 0 10px 24px rgba(105, 189, 147, 0.22) !important;
+    transform: translateY(-2px);
 }
 
 /* Lisibilité de la surface de lecture (Invariante au survol) */
@@ -12751,8 +12754,7 @@ body.theme-v2 .space_item_unavailable .availability-overlay {
 
 body.theme-v2 .space_item .availability-text,
 body.theme-v2 .space_item_unavailable .availability-text {
-    color: #1e293b !important;
-    font-weight: 600 !important;
+    color: #fff !important;
 }
 
 /* Badge de statut / filtres */
@@ -12792,7 +12794,7 @@ body.theme-v2 .space_item .foot p.apply-date-p,
 body.theme-v2 .space_item_unavailable .foot p.apply-date-p,
 body.theme-v2 .foot .apply-date-p,
 body.theme-v2 .apply-date-p {
-    color: #e9473c !important;
+    color: #0f172a !important;
     font-size:16px;
     font-weight: 600;
 }
@@ -12801,6 +12803,6 @@ body.theme-v2 .space_item .foot p.apply-date-b,
 body.theme-v2 .space_item_unavailable .foot p.apply-date-b,
 body.theme-v2 .foot .apply-date-b,
 body.theme-v2 .apply-date-b {
-    color: #e9473c !important;
+    color: #0f172a !important;
 
 }

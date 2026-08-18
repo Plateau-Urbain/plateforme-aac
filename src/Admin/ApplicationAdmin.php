@@ -59,11 +59,17 @@ class ApplicationAdmin extends AbstractAdmin
     public function prePersist(object $object): void
     {
         $this->ensureProjectHolder($object);
+        if ($object instanceof Application) {
+            $object->normalizeLocationPreferenceRanks();
+        }
     }
 
     public function preUpdate(object $object): void
     {
         $this->ensureProjectHolder($object);
+        if ($object instanceof Application) {
+            $object->normalizeLocationPreferenceRanks();
+        }
     }
 
     private function ensureProjectHolder(object $object): void
@@ -180,7 +186,7 @@ class ApplicationAdmin extends AbstractAdmin
                         'allow_add' => true,
                         'allow_delete' => true,
                         'label' => 'Classement des sites',
-                        'help' => 'Rang 1 = premier choix. Ajoutez/supprimez des lignes pour ajuster le classement.',
+                        'help' => 'Rang 1 = premier choix. Cochez « Ne m\'intéresse pas » pour exclure un site du classement.',
                     ], [
                         'edit' => 'inline',
                         'inline' => 'table',

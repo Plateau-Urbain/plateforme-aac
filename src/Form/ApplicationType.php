@@ -324,6 +324,8 @@ class ApplicationType extends AbstractType
                         $preference->setApplication($application);
                     }
                 }
+
+                $application->normalizeLocationPreferenceRanks();
             }
 
             // Bloquer les emojis côté serveur (la DB n'accepte pas utf8mb4 sur certains champs).

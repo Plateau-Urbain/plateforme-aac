@@ -401,21 +401,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
     /**
      * Is proprio.
      *
-     * @return int
+     * typeUser is often NULL on historical accounts; ROLE_OWNER is the reliable marker.
      */
-    public function isProprio()
+    public function isProprio(): bool
     {
-        return $this->typeUser == self::PROPRIO;
+        if ($this->typeUser === self::PROPRIO) {
+            return true;
+        }
+
+        return \in_array('ROLE_OWNER', $this->roles ?? [], true);
     }
 
     /**
      * is porteur.
      *
-     * @return int
+     * Use strict comparison: PORTEUR is 0, and `null == 0` is true in PHP.
+     * Historical candidates may have a null typeUser; owners are excluded first.
      */
-    public function isPorteur()
+    public function isPorteur(): bool
     {
-        return $this->typeUser == self::PORTEUR;
+        if ($this->isProprio() || $this->typeUser === self::ADMIN) {
+            return false;
+        }
+
+        return $this->typeUser === self::PORTEUR
+            || $this->typeUser === null
+            || \in_array('ROLE_PROJECT_HOLDER', $this->roles ?? [], true);
     }
 
     /**
@@ -1682,11 +1693,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
                 empty($this->preferredDepartments) || empty($this->monthlyBudgetMax)) {
                 return false;
             }
-        }
 
-        // Vérifier les documents obligatoires
-        if (!$this->hasDocuments(UserDocument::ID_TYPE) || !$this->hasDocuments(UserDocument::KBIS_TYPE)) {
-            return false;
+            if (!$this->hasDocuments(UserDocument::ID_TYPE) || !$this->hasDocuments(UserDocument::KBIS_TYPE)) {
+                return false;
+            }
         }
 
         return true;
@@ -1756,11 +1766,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
             }
         }
 
-        if (!$this->hasDocuments(UserDocument::ID_TYPE)) {
-            $missing[] = 'Pièce d\'identité';
-        }
-        if (!$this->hasDocuments(UserDocument::KBIS_TYPE)) {
-            $missing[] = 'Kbis ou document équivalent';
+        if ($this->isPorteur()) {
+            if (!$this->hasDocuments(UserDocument::ID_TYPE)) {
+                $missing[] = 'Pièce d\'identité';
+            }
+            if (!$this->hasDocuments(UserDocument::KBIS_TYPE)) {
+                $missing[] = 'Kbis ou document équivalent';
+            }
         }
 
         return $missing;

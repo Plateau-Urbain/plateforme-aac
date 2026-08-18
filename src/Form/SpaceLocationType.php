@@ -51,13 +51,13 @@ class SpaceLocationType extends AbstractType
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
-                'attr' => ['class' => 'form-control', 'rows' => 3],
-                'required' => false,
+                'attr' => ['class' => 'form-control', 'rows' => 3, 'required' => 'required'],
+                'required' => true,
                 'error_bubbling' => false,
             ])
             ->add('availability', null, [
                 'label' => 'Durée du projet',
-                'attr' => ['class' => 'form-control', 'placeholder' => '1 an, 6 mois…'],
+                'attr' => ['class' => 'form-control', 'placeholder' => '1 an, 6 mois…', 'required' => 'required'],
                 'required' => true,
                 'error_bubbling' => false,
             ])

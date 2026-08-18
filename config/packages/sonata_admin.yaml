@@ -42,10 +42,8 @@ sonata_admin:
                 icon: '<i class="fa fa-list"></i>'
                 items:
                     - app.admin.category
-                    - app.admin.attribute
                     - app.admin.space_type
                     - app.admin.use_type
-                    - app.admin.local_type
 
 sonata_block:
     default_contexts: [sonata_page_bundle]

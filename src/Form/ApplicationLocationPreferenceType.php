@@ -6,6 +6,8 @@ use App\Entity\ApplicationLocationPreference;
 use App\Entity\SpaceLocation;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,12 +29,25 @@ class ApplicationLocationPreferenceType extends AbstractType
             ->add('rank', $adminMode ? IntegerType::class : HiddenType::class, array_filter([
                 'label' => $adminMode ? 'Rang' : false,
                 'required' => false,
-                'empty_data' => $adminMode ? 1 : '1',
+                'empty_data' => $adminMode ? 1 : '',
                 'attr' => $adminMode
                     ? ['min' => 1]
                     : ['class' => 'js-location-preference-rank'],
             ], static fn ($v) => $v !== null))
+            ->add('excluded', $adminMode ? CheckboxType::class : HiddenType::class, [
+                'label' => $adminMode ? 'Ne m\'intéresse pas' : false,
+                'required' => false,
+                'attr' => $adminMode ? [] : ['class' => 'js-location-preference-excluded'],
+            ])
         ;
+
+        // HiddenType soumet une chaîne ("0"/"1") ; on convertit vers bool pour l'entité.
+        if (!$adminMode) {
+            $builder->get('excluded')->addModelTransformer(new CallbackTransformer(
+                static fn ($value): string => $value ? '1' : '0',
+                static fn ($value): bool => $value === '1' || $value === true || $value === 1
+            ));
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

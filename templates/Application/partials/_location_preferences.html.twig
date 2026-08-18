@@ -1,23 +1,35 @@
-{% if application.space.isMultiLocation and application.locationPreferencesOrdered|length > 1 %}
+{% if application.space.isMultiLocation and application.locationPreferences|length > 1 %}
 <tr>
     <th>Classement des sites</th>
     <td>
-        <ol class="application-location-preferences-read">
-            {% for preference in application.locationPreferencesOrdered %}
-                <li>
-                    <strong>{{ preference.location.name }}</strong>
-                    {% if preference.location.city %}
-                        — {{ preference.location.city }}
-                    {% endif %}
-                    {% if preference.location.availability %}
-                        ({{ preference.location.availability }})
-                    {% endif %}
-                    {% if preference.location.isErp %}
-                        <span class="label label-info" style="font-size: 10px; margin-left: 5px;">ERP</span>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ol>
+        {% if application.locationPreferencesOrdered|length > 0 %}
+            <ol class="application-location-preferences-read">
+                {% for preference in application.locationPreferencesOrdered %}
+                    <li>
+                        <strong>{{ preference.rank }}.</strong>
+                        <strong>{{ preference.location.name }}</strong>
+                        {% if preference.location.city %}
+                            — {{ preference.location.city }}
+                        {% endif %}
+                        {% if preference.location.availability %}
+                            ({{ preference.location.availability }})
+                        {% endif %}
+                        {% if preference.location.isErp %}
+                            <span class="label label-info" style="font-size: 10px; margin-left: 5px;">ERP</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+
+        {% if application.excludedLocationPreferences|length > 0 %}
+            <p style="margin: 8px 0 0 0;">
+                <strong>Sites non retenus :</strong>
+                {% for preference in application.excludedLocationPreferences %}
+                    {{ preference.location.name }}{% if preference.location.city %} — {{ preference.location.city }}{% endif %}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+        {% endif %}
     </td>
 </tr>
 {% endif %}

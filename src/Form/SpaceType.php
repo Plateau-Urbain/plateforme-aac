@@ -10,7 +10,9 @@ use App\Entity\SpaceImage;
 use App\Entity\SpaceDocument;
 use App\Entity\SpaceVisit;
 use App\Entity\SpaceLocation;
+use App\Entity\SpaceType as SpaceTypeEntity;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,6 +25,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
@@ -72,7 +75,7 @@ class SpaceType extends AbstractType
                     'error_bubbling' => false,
                 ]
             )
-            ->add('type', null, ['label' => 'Type de locaux', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
+            ->add('type', EntityType::class, $this->getTypeFieldOptions())
             ->add('price', NumberType::class, [
                 'label'    => 'Prix au m² mensuel',
                 'attr'     => ['class' => 'form-control', 'step' => '0.01', 'placeholder' => 'Ex: 12.50'],
@@ -223,6 +226,9 @@ class SpaceType extends AbstractType
             if (!$data instanceof Space) {
                 return;
             }
+
+            $currentTypeId = $data->getType() instanceof SpaceTypeEntity ? $data->getType()->getId() : null;
+            $form->add('type', EntityType::class, $this->getTypeFieldOptions($currentTypeId));
 
             $currentAttributes = $data->getTags()->map(function ($spaceAttribute) {
                 return $spaceAttribute->getAttribute();
@@ -400,5 +406,40 @@ class SpaceType extends AbstractType
     protected function getAttributes()
     {
         return $this->em->getRepository(\App\Entity\Attribute::class)->findAll();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getTypeFieldOptions(?int $currentTypeId = null): array
+    {
+        return [
+            'class' => SpaceTypeEntity::class,
+            'label' => 'Type de locaux',
+            'choice_label' => static function ($type) {
+                if (!$type instanceof SpaceTypeEntity) {
+                    return '';
+                }
+                if (!$type->getIsActive()) {
+                    return $type->getName() . ' (archivé — veuillez choisir un type actuel)';
+                }
+
+                return $type->getName();
+            },
+            'query_builder' => static function (EntityRepository $repo) use ($currentTypeId) {
+                $qb = $repo->createQueryBuilder('st')
+                    ->where('st.isActive = :active')
+                    ->setParameter('active', true);
+                if ($currentTypeId) {
+                    $qb->orWhere('st.id = :current')
+                        ->setParameter('current', $currentTypeId);
+                }
+
+                return $qb->orderBy('st.name', 'ASC');
+            },
+            'attr' => ['class' => 'form-control'],
+            'required' => true,
+            'error_bubbling' => false,
+        ];
     }
 }

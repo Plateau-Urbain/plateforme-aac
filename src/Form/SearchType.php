@@ -3,6 +3,8 @@
 
 namespace App\Form;
 
+use App\Entity\SpaceType as SpaceTypeEntity;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,10 +24,16 @@ class SearchType extends AbstractType
         // be removed in 3.0. Use "choice_label" instead
         $builder
             ->add('localType', \Symfony\Bridge\Doctrine\Form\Type\EntityType::class, //'entity',
-              ['class'=>\App\Entity\SpaceType::class,
+              ['class'=> SpaceTypeEntity::class,
                 //'property' => 'name',
                 'choice_label' => 'name',
                 'required'  => false,
+                'query_builder' => static function (EntityRepository $repo) {
+                    return $repo->createQueryBuilder('st')
+                        ->where('st.isActive = :active')
+                        ->setParameter('active', true)
+                        ->orderBy('st.name', 'ASC');
+                },
                 'attr'      => [
                 'data-placeholder'=>"Type de local"]]) //liste déroulante)
             // Accessing type "choice" by its string name is deprecated since

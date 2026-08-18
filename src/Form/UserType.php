@@ -31,12 +31,11 @@ class UserType extends AbstractType
             ->add('firstname', TextType::class, ['label' => "Prénom", 'attr' => ['class' => 'form-control']])
             ->add('lastname', TextType::class, ['label' => "Nom", 'attr' => ['class' => 'form-control']])
             ->add('email', EmailType::class, [
-                'label' => "Email", 
+                'label' => "Email",
                 'attr' => [
                     'class' => 'form-control',
-                    'readonly' => true
+                    'readonly' => true,
                 ],
-                'disabled' => true
             ])
             ->add('phone', TelType::class, [
                 'label' => "Téléphone", 
@@ -52,7 +51,7 @@ class UserType extends AbstractType
                         'groups' => ['projectHolder', 'Default']
                     ]),
                     new Regex([
-                        'pattern' => '/^(\+33\s?[1-9](\s?\d{2}){4}|0[1-9](\s?\d{2}){4})$/',
+                        'pattern' => '/^(\+33\s?[1-9](?:[\s.\-]?\d{2}){4}|0[1-9](?:[\s.\-]?\d{2}){4})$/',
                         'message' => 'Le format du téléphone n\'est pas valide. Utilisez le format français (01 23 45 67 89) ou international (+33 1 23 45 67 89).',
                         'groups' => ['projectHolder', 'Default']
                     ])

@@ -3,12 +3,15 @@
 namespace App\Admin;
 
 use Sonata\AdminBundle\Admin\AbstractAdmin;
+use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
+use Sonata\AdminBundle\Filter\Model\FilterData;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
+use Sonata\DoctrineORMAdminBundle\Filter\CallbackFilter;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -21,9 +24,51 @@ class OwnerAdmin extends AbstractAdmin
     protected $baseRouteName = 'owner';
     protected $baseRoutePattern = 'owner';
 
+    private const SORT_CHOICES = [
+        'Structure (A → Z)' => 'company_asc',
+        'Structure (Z → A)' => 'company_desc',
+        'Email (A → Z)' => 'email_asc',
+        'Email (Z → A)' => 'email_desc',
+        'Nom (A → Z)' => 'lastname_asc',
+        'Nom (Z → A)' => 'lastname_desc',
+    ];
+
+    /** @var array<string, array{0: string, 1: string}> */
+    private const SORT_MAP = [
+        'company_asc' => ['company', 'ASC'],
+        'company_desc' => ['company', 'DESC'],
+        'email_asc' => ['email', 'ASC'],
+        'email_desc' => ['email', 'DESC'],
+        'lastname_asc' => ['lastname', 'ASC'],
+        'lastname_desc' => ['lastname', 'DESC'],
+    ];
+
     public function __construct(private UserPasswordHasherInterface $passwordHasher)
     {
         parent::__construct();
+    }
+
+    protected function configureDefaultSortValues(array &$sortValues): void
+    {
+        $sortValues[DatagridInterface::SORT_BY] = 'company';
+        $sortValues[DatagridInterface::SORT_ORDER] = 'ASC';
+    }
+
+    /**
+     * @param array<string, mixed> $parameters
+     *
+     * @return array<string, mixed>
+     */
+    protected function configureFilterParameters(array $parameters): array
+    {
+        $sortValue = $parameters['sortBy']['value'] ?? null;
+        if (\is_string($sortValue) && isset(self::SORT_MAP[$sortValue])) {
+            [$sortBy, $sortOrder] = self::SORT_MAP[$sortValue];
+            $parameters[DatagridInterface::SORT_BY] = $sortBy;
+            $parameters[DatagridInterface::SORT_ORDER] = $sortOrder;
+        }
+
+        return $parameters;
     }
 
     protected function configureRoutes(RouteCollectionInterface $collection): void
@@ -57,13 +102,6 @@ class OwnerAdmin extends AbstractAdmin
 
         return $query;
     }
-
-    // setup the default sort column and order
-    /** @var array<string, mixed> */
-    protected array $datagridValues = [
-        '_sort_order' => 'ASC',
-        '_sort_by' => 'lastname',
-    ];
 
     // Fields to be shown on create/edit forms
     protected function configureFormFields(FormMapper $formMapper): void
@@ -112,7 +150,21 @@ class OwnerAdmin extends AbstractAdmin
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
-            ->add('email')
+            ->add('sortBy', CallbackFilter::class, [
+                'label' => 'Trier par',
+                'callback' => static function (ProxyQueryInterface $query, string $alias, string $field, FilterData $data): bool {
+                    return $data->hasValue() && $data->getValue() !== null && $data->getValue() !== '';
+                },
+                'field_type' => ChoiceType::class,
+                'field_options' => [
+                    'choices' => self::SORT_CHOICES,
+                    'placeholder' => 'Choisir',
+                ],
+            ])
+            ->add('company', null, ['label' => 'Structure'])
+            ->add('email', null, ['label' => 'Email'])
+            ->add('lastname', null, ['label' => 'Nom'])
+            ->add('firstname', null, ['label' => 'Prénom'])
         ;
     }
 
@@ -121,15 +173,17 @@ class OwnerAdmin extends AbstractAdmin
     {
         $listMapper
             ->addIdentifier('email', null, [
+                'label' => 'Email',
                 'route' => ['name' => 'edit'],
             ])
+            ->add('company', null, ['label' => 'Structure'])
             ->add('firstname', null, ['label' => 'Prénom'])
-            ->add('lastName', null, ['label' => 'Nom'])
+            ->add('lastname', null, ['label' => 'Nom'])
             ->add('enabled', null, [
                 'label' => 'Activé',
                 'editable' => true,
             ])
-            ->add('locked', null, ['label' => 'Verouillé'])
+            ->add('locked', null, ['label' => 'Verrouillé'])
         ;
     }
 
@@ -142,6 +196,8 @@ class OwnerAdmin extends AbstractAdmin
     
     public function preUpdate(object $object): void
     {
+        $object->setTypeUser(User::PROPRIO);
+        $object->addRole('ROLE_OWNER');
         $object->setEmailCanonical(strtolower($object->getEmail()));
         if ($object->getPlainPassword()) {
             $object->setPassword($this->passwordHasher->hashPassword($object, $object->getPlainPassword()));
@@ -154,6 +210,7 @@ class OwnerAdmin extends AbstractAdmin
 
     public function prePersist(object $object): void
     {
+        $object->setTypeUser(User::PROPRIO);
         $object->addRole('ROLE_OWNER');
 
         // Synchroniser l'email canonique
