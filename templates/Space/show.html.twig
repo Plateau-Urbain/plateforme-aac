@@ -132,7 +132,11 @@
       </h5>
       {% endif %}
       <p class="center">
-        {% if not space.isEnabled() %}
+        {% if not space.submitted and not space.enabled %}
+          <a href="{{ path('space_manager_edit', { 'id': space.id }) }}" class="btn btn-line-19">
+            {{ "Modifier l'espace"}}
+          </a>
+        {% elseif space.submitted and not space.enabled and is_granted('ROLE_ADMIN') %}
           <a href="{{ path('space_manager_edit', { 'id': space.id }) }}" class="btn btn-line-19">
             {{ "Modifier l'espace"}}
           </a>
