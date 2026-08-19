@@ -103,10 +103,10 @@ class SecurityController extends AbstractController
 
         if ($user->isProprio() && $role === 'proprio') {
             $form = $this->createForm(SpaceOwnerType::class, $user);
-            $template = 'Security/profilProprio.html.twig';
+            $template = 'security/profilProprio.html.twig';
         } elseif ($role === 'candidat') {
             $form = $this->createForm(ProjectOwnerType::class, $user, ['noPlainPassword' => true]);
-            $template = 'Security/profil.html.twig';
+            $template = 'security/profil.html.twig';
         } else {
             throw new AccessDeniedException();
         }
@@ -208,7 +208,7 @@ class SecurityController extends AbstractController
             $request->query->getInt('page', 1)
         );
 
-        return $this->render('Security/myApplications.html.twig', [
+        return $this->render('security/myApplications.html.twig', [
             "applications" => $pagination,
             'filterForm' => $filterForm->createView()
         ]);
@@ -234,7 +234,7 @@ class SecurityController extends AbstractController
         $prevApplication = $repository->getApplicantPrevApplication($application, $user);
         $nextApplication = $repository->getApplicantNextApplication($application, $user);
 
-        return $this->render('Security/showMyApplication.html.twig', [
+        return $this->render('security/showMyApplication.html.twig', [
             'prevApplication'   => $prevApplication,
             'nextApplication'   => $nextApplication,
             'application'       => $application

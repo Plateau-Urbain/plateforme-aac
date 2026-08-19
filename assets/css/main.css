@@ -187,7 +187,7 @@ label.control-label.bold {
   line-height: 28px;
 }
 .file-infos .actions .btn {
-  line-height: 14px;
+  line-height: 16px;
   height: auto;
   padding: 1px;
   width: 30px;
@@ -927,7 +927,7 @@ table.lots .help-block:after {
   top: -3px;
   left: -3px;
   background: #FFF;
-  border-bottom-right-radius: 12px;
+  border-bottom-right-radius: 5px;
 }
 #property-listing .item .image .overlay img {
   max-width: 100%;
@@ -1107,7 +1107,7 @@ table.lots .help-block:after {
 }
 .foot .statut-aac {
   position: absolute;
-  top: 15px;
+  top: 13px;
   right: 10px;
   background: #FFF;
   border-radius: 5px;
