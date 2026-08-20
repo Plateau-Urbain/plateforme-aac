@@ -107,11 +107,11 @@ class SpaceRepository extends ServiceEntityRepository
         }
 
         if (!empty($params['minimumSurface'])) {
-            $qb->andWhere('p.surface >= :minimumSurface')->setParameter('minimumSurface',$params['minimumSurface'] );
+            $qb->andWhere('p.maxSurface >= :minimumSurface')->setParameter('minimumSurface',$params['minimumSurface'] );
         }
 
         if (!empty($params['maximumSurface'])) {
-            $qb->andWhere('p.surface <= :maximumSurface')->setParameter('maximumSurface',$params['maximumSurface'] );
+            $qb->andWhere('p.minSurface <= :maximumSurface')->setParameter('maximumSurface',$params['maximumSurface'] );
         }
 
         if (!empty($params['unavailable'])) {
