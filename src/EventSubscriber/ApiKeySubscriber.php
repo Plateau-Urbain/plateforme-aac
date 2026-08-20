@@ -8,11 +8,14 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Authentifie les routes /api/* par clé statique (header X-API-Key).
+ * Authentifie les routes /api/v1/* par clé statique (header X-API-Key).
  *
  * Suffisant pour un usage serveur-à-serveur (ex. WordPress corporate consommant
  * les fiches espaces publiques) : pas de session, pas d'utilisateur, une seule clé
  * partagée avec les consommateurs autorisés.
+ *
+ * Les routes internes comme /api/geocode sont intentionnellement exclues
+ * car elles sont appelées depuis le navigateur sans clé.
  */
 class ApiKeySubscriber implements EventSubscriberInterface
 {
@@ -34,7 +37,7 @@ class ApiKeySubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        if (!str_starts_with($request->getPathInfo(), '/api/')) {
+        if (!str_starts_with($request->getPathInfo(), '/api/v1/')) {
             return;
         }
 
