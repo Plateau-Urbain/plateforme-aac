@@ -7,6 +7,7 @@ parameters:
     mail_confirmation_from: '%env(MAIL_CONFIRMATION_FROM)%'
     mail_confirmation_to: '%env(MAIL_CONFIRMATION_TO)%'
     base_url: '%env(APP_BASE_URL)%'
+    api_key: '%env(API_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -39,6 +40,10 @@ services:
         arguments:
             $mailConfirmationFrom: '%mail_confirmation_from%'
             $baseUrl: '%base_url%'
+
+    App\EventSubscriber\ApiKeySubscriber:
+        arguments:
+            $apiKey: '%api_key%'
 
     App\Menu\Builder: ~
 
