@@ -153,9 +153,7 @@ class SpaceManagementController extends AbstractController
 
             if ($this->isPreviewClicked($form)) {
                 if (!$form->isValid()) {
-                    $this->addFlash('error', $this->formatFormErrors($form));
-
-                    return $this->render($this->getSpaceFormTemplate($space), ['form' => $form->createView(), 'space' => $space]);
+                    return $this->renderInvalidSpaceForm($form, $space);
                 }
 
                 $this->em->persist($space);
@@ -177,7 +175,7 @@ class SpaceManagementController extends AbstractController
                 return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $space->getId()]));
             }
 
-            $this->addFlash('error', $this->formatFormErrors($form));
+            return $this->renderInvalidSpaceForm($form, $space);
         }
 
         return $this->render($this->getSpaceFormTemplate($space), ['form' => $form->createView(), 'space' => $space]);
@@ -209,9 +207,7 @@ class SpaceManagementController extends AbstractController
 
             if ($this->isPreviewClicked($form)) {
                 if (!$form->isValid()) {
-                    $this->addFlash('error', $this->formatFormErrors($form));
-
-                    return $this->render($this->getSpaceFormTemplate($space), ['form' => $form->createView(), 'space' => $space]);
+                    return $this->renderInvalidSpaceForm($form, $space);
                 }
 
                 $this->em->persist($space);
@@ -233,7 +229,7 @@ class SpaceManagementController extends AbstractController
                 return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $space->getId()]));
             }
 
-            $this->addFlash('error', $this->formatFormErrors($form));
+            return $this->renderInvalidSpaceForm($form, $space);
         }
 
         return $this->render($this->getSpaceFormTemplate($space), ['form' => $form->createView(), 'space' => $space]);
@@ -276,12 +272,7 @@ class SpaceManagementController extends AbstractController
 
             if ($this->isPreviewClicked($form)) {
                 if (!$form->isValid()) {
-                    $this->addFlash('error', $this->formatFormErrors($form));
-
-                    return $this->render($this->getSpaceFormTemplate($space), [
-                        'form'  => $form->createView(),
-                        'space' => $space,
-                    ]);
+                    return $this->renderInvalidSpaceForm($form, $space);
                 }
 
                 $this->em->flush();
@@ -301,7 +292,7 @@ class SpaceManagementController extends AbstractController
                 return $this->redirect($this->generateUrl('space_manager_edit', ['id' => $space->getId()]));
             }
 
-            $this->addFlash('error', $this->formatFormErrors($form));
+            return $this->renderInvalidSpaceForm($form, $space);
         }
 
         return $this->render($this->getSpaceFormTemplate($space), [
@@ -2320,6 +2311,10 @@ class SpaceManagementController extends AbstractController
         $isAdmin = $this->isGranted('ROLE_ADMIN');
         
         $space->setSubmitted(true);
+
+        if ($space->getId() === null) {
+            $this->em->persist($space);
+        }
         
         // Si c'est un admin, on publie directement l'espace
         if ($isAdmin) {
@@ -2758,6 +2753,58 @@ class SpaceManagementController extends AbstractController
         }
 
         return $this->redirectToRoute($space->isMultiLocation() ? 'space_manager_add_multi' : 'space_manager_add');
+    }
+
+    private function renderInvalidSpaceForm(FormInterface $form, Space $space): Response
+    {
+        $this->persistSpaceDraftAfterInvalidSubmit($space);
+        $this->addFlash('error', $this->formatFormErrors($form));
+
+        return $this->render($this->getSpaceFormTemplate($space), [
+            'form' => $form->createView(),
+            'space' => $space,
+        ]);
+    }
+
+    private function persistSpaceDraftAfterInvalidSubmit(Space $space): void
+    {
+        $this->detachInvalidNewSpaceImages($space);
+
+        if ($space->getId() === null) {
+            $this->em->persist($space);
+        }
+
+        $this->em->flush();
+    }
+
+    private function detachInvalidNewSpaceImages(Space $space): void
+    {
+        foreach ($space->getPics() as $pic) {
+            if (!$pic instanceof SpaceImage || $pic->getId() !== null) {
+                continue;
+            }
+            if ($this->validator->validate($pic)->count() > 0) {
+                $space->removePic($pic);
+            }
+        }
+
+        foreach ($space->getDocs() as $doc) {
+            if (!$doc instanceof SpaceImage || $doc->getId() !== null) {
+                continue;
+            }
+            if ($this->validator->validate($doc)->count() > 0) {
+                $space->removeDoc($doc);
+            }
+        }
+
+        foreach ($space->getVisits() as $visit) {
+            if (!$visit instanceof SpaceVisit || $visit->getId() !== null) {
+                continue;
+            }
+            if ($visit->getStartTime() === null || $visit->getEndTime() === null) {
+                $space->removeVisit($visit);
+            }
+        }
     }
 
     private function persistSpaceAndCompletePartialAction(

@@ -98,7 +98,7 @@ class SpaceType extends AbstractType
                 'label' => false,
                 'allow_add' => true,
                 'allow_delete' => true,
-                'delete_empty' => true,
+                'delete_empty' => fn ($location) => !$location instanceof SpaceLocation || trim((string) $location->getName()) === '',
                 'by_reference' => false,
                 'required' => false,
                 'error_bubbling' => false,
@@ -135,11 +135,12 @@ class SpaceType extends AbstractType
                 'newVisit',
                 SpaceVisitType::class,
                 [
-                'label'            => 'Ajouter une visite',
-                'mapped'           => false,
-                'data'             => new SpaceVisit(),
-                'required'         => false,
+                'label'             => 'Ajouter une visite',
+                'mapped'            => false,
+                'data'              => new SpaceVisit(),
+                'required'          => false,
                 'validation_groups' => false,
+                'allow_extra_fields' => true,
             ]
             );
 
@@ -208,13 +209,14 @@ class SpaceType extends AbstractType
                 if ($form->has('newVisit')) {
                     $form->remove('newVisit');
                     $form->add('newVisit', SpaceVisitType::class, [
-                        'label' => 'Ajouter une visite',
-                        'mapped' => false,
-                        'data' => new SpaceVisit(),
-                        'required' => false,
-                        'validation_groups' => false,
-                        'multi_location' => true,
-                        'space' => $data,
+                        'label'              => 'Ajouter une visite',
+                        'mapped'             => false,
+                        'data'               => new SpaceVisit(),
+                        'required'           => false,
+                        'validation_groups'  => false,
+                        'allow_extra_fields' => true,
+                        'multi_location'     => true,
+                        'space'              => $data,
                     ]);
                 }
             } else {
@@ -276,7 +278,11 @@ class SpaceType extends AbstractType
 
             if ($this->shouldAttachPendingVisit()) {
                 $newVisit = $event->getForm()->get('newVisit')->getData();
-                if ($newVisit instanceof SpaceVisit && $newVisit->getVisitDate() !== null) {
+                if ($newVisit instanceof SpaceVisit
+                    && $newVisit->getVisitDate() !== null
+                    && $newVisit->getStartTime() !== null
+                    && $newVisit->getEndTime() !== null
+                ) {
                     $space->addVisit($newVisit);
                 }
             }

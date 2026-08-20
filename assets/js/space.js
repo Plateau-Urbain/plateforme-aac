@@ -145,8 +145,8 @@ $(document).ready(function () {
     function getPhotoFileValidationError(file) {
         var maxSize = 600 * 1024;
 
-        if (/[^a-zA-Z0-9._-]/.test(file.name)) {
-            return 'Le fichier "' + file.name + '" a un nom non valide. Utilisez uniquement des lettres sans accent, chiffres, points, tirets et underscores.';
+        if (/[\/\\]/.test(file.name)) {
+            return 'Le fichier "' + file.name + '" a un nom non valide.';
         }
 
         if (file.size > maxSize) {
@@ -317,6 +317,16 @@ $(document).ready(function () {
 
             showPhotoFileValidationError('');
         });
+
+        // Efface l'erreur serveur de document dès qu'un fichier est sélectionné dans .js-doc-upload
+        $(document)
+            .off('change.docfilevalidation', '#js-form-space .js-doc-upload input[type="file"]')
+            .on('change.docfilevalidation', '#js-form-space .js-doc-upload input[type="file"]', function () {
+                if (this.files.length > 0) {
+                    $('#js-form-space .space-doc-error').remove();
+                    dismissStalePublishFlash();
+                }
+            });
     }
 
     $('#addAttribute').on('click', function (e) {
@@ -324,26 +334,86 @@ $(document).ready(function () {
         addForm($('table.tags'));
     });
 
+    function dismissStalePublishFlash() {
+        $('.alert-danger').not('#file-validation-errors').each(function () {
+            var text = $(this).text();
+            if (text.indexOf('Publication impossible') !== -1 || text.indexOf('n\'a pas pu être publié') !== -1) {
+                $(this).remove();
+            }
+        });
+    }
+
+    function clearPriceRowError($priceRow) {
+        $priceRow.removeClass('has-error');
+        $priceRow.find('.form-group').removeClass('has-error');
+        $priceRow.find('.space-price-row__errors').remove();
+        $priceRow.find('span.help-block').remove();
+        dismissStalePublishFlash();
+    }
+
+    function isPriceRowSatisfied($priceRow) {
+        var filled = false;
+        $priceRow.find('input, textarea').each(function () {
+            if (this.type === 'file') {
+                return;
+            }
+            if (($(this).val() || '').trim() !== '') {
+                filled = true;
+            }
+        });
+        return filled;
+    }
+
     // Efface l'état d'erreur dès que l'utilisateur corrige un champ
     $(document).on('input change', '#js-form-space .has-error input, #js-form-space .has-error select, #js-form-space .has-error textarea', function () {
+        if (this.type === 'file') {
+            return;
+        }
+
+        var $priceRow = $(this).closest('.space-price-row');
+        if ($priceRow.length) {
+            if (isPriceRowSatisfied($priceRow)) {
+                clearPriceRowError($priceRow);
+            }
+            return;
+        }
+
         var $group = $(this).closest('.has-error');
         if (!$group.length) {
             return;
         }
 
+        if (this.value.trim() !== '') {
+            $group.removeClass('has-error').find('span.help-block').remove();
+            dismissStalePublishFlash();
+        }
+    });
+
+    // Efface le has-error-location du panneau de site dès que tous ses champs en erreur sont corrigés
+    $(document).on('input change', '#js-form-space .location-item input, #js-form-space .location-item select, #js-form-space .location-item textarea', function () {
         if (this.type === 'file') {
             return;
         }
-
-        if (this.value.trim() !== '') {
-            $group.removeClass('has-error').find('.help-block').remove();
+        var $panel = $(this).closest('.location-item.has-error-location');
+        if (!$panel.length) {
+            return;
         }
+        setTimeout(function () {
+            if (!$panel.find('.has-error').length) {
+                $panel.removeClass('has-error-location');
+                if (!$('#js-form-space .has-error-location').length) {
+                    $('#js-form-space .space-locations-error').remove();
+                    dismissStalePublishFlash();
+                }
+            }
+        }, 0);
     });
 
     $(document).on('tbwchange tbwpaste', 'textarea', function () {
         var $group = $(this).closest('.has-error');
         if ($group.length && $(this).trumbowyg('html').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim() !== '') {
-            $group.removeClass('has-error').find('.help-block').remove();
+            $group.removeClass('has-error').find('span.help-block').remove();
+            dismissStalePublishFlash();
         }
     });
 

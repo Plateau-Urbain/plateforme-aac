@@ -1227,7 +1227,10 @@ class Space implements \Stringable
     #[Assert\Callback(groups: ['save'])]
     public function validatePrice(ExecutionContextInterface $context)
     {
-        if (empty($this->price) && empty($this->priceText)) {
+        $hasNumericPrice = $this->price !== null;
+        $hasCustomPrice = trim((string) $this->priceText) !== '';
+
+        if (!$hasNumericPrice && !$hasCustomPrice) {
             $context->buildViolation('Vous devez renseigner soit le prix au m² mensuel, soit le prix personnalisé.')
                 ->atPath('price')
                 ->addViolation();

@@ -193,7 +193,11 @@
         }
     }
 </style>
-{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+{% set spaceFormAction = space.id
+    ? path('space_manager_edit', {id: space.id})
+    : path('space_manager_add')
+%}
+{{ form_start(form, {'action': spaceFormAction, 'attr': {'novalidate': 'novalidate'}}) }}
 
 <div class="row">
         <div class=" col-xs-1 bkg ">
@@ -288,22 +292,22 @@
 
          {% set priceHasError = not form.price.vars.valid %}
          {% set priceTextHasError = not form.priceText.vars.valid %}
-         <div class="space-price-row">
+         <div class="space-price-row{% if priceHasError or priceTextHasError %} has-error{% endif %}">
             <div class="space-price-row__fields">
-                <div class="form-group{% if priceHasError or priceTextHasError %} has-error{% endif %}">
+                <div class="form-group">
                     {{ form_label(form.price) }}
                     {{ form_widget(form.price) }}
                 </div>
                 <div class="space-price-row__separator ou-separator">
                     <span>ou</span>
                 </div>
-                <div class="form-group{% if priceHasError or priceTextHasError %} has-error{% endif %}">
+                <div class="form-group">
                     {{ form_label(form.priceText) }}
                     {{ form_widget(form.priceText, { 'attr': { 'placeholder': 'Lorem ipsum', 'class': 'form-control' } }) }}
                 </div>
             </div>
             {% if priceHasError or priceTextHasError %}
-            <div class="space-price-row__errors has-error">
+            <div class="space-price-row__errors">
                 {{ form_errors(form.price) }}
                 {{ form_errors(form.priceText) }}
             </div>

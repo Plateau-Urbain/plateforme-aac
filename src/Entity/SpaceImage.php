@@ -208,8 +208,8 @@ class SpaceImage
             $errorMessage = 'Seuls les formats JPEG, PNG et WebP sont acceptés pour les photos (max 600 Ko)';
 
             $originalName = $this->file->getClientOriginalName();
-            if ($originalName !== null && preg_match('/[^a-zA-Z0-9._-]/', $originalName)) {
-                $context->buildViolation('Le fichier "' . $originalName . '" a un nom non valide. Utilisez uniquement des lettres sans accent, chiffres, points, tirets et underscores.')
+            if ($originalName !== null && preg_match('/[\/\\\\]|\\0/', $originalName)) {
+                $context->buildViolation('Le fichier "' . $originalName . '" a un nom non valide.')
                     ->atPath('file')
                     ->addViolation();
             }
