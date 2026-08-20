@@ -496,7 +496,7 @@
                                         </dd>
                                         <br/>
                                          <dd>
-                                         Formats autorisés : JPG, GIF, PNG, WEBP, PDF ou DOC.<br/>
+                                         Formats autorisés : JPG, GIF, PNG, WEBP, PDF, DOC ou DOCX.<br/>
                                          Chaque fichier ne doit pas excéder 10Mo.
                                          </dd>
                                                     
@@ -1664,7 +1664,7 @@
                         blockSubmit = true;
                     } else if (!isAllowedDocumentFile(file)) {
                         fileInfo.addClass('has-error');
-                        fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du fichier n\'est pas autorisé. Formats acceptés : PNG, JPEG, GIF, WebP, PDF ou DOC.</span>');
+                        fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du fichier n\'est pas autorisé. Formats acceptés : PNG, JPEG, GIF, WebP, PDF, DOC ou DOCX.</span>');
                         blockSubmit = true;
                     }
                 });
@@ -1786,9 +1786,10 @@
             
             const allowedDocumentMimeTypes = [
                 'image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp',
-                'application/pdf', 'application/x-pdf', 'application/msword'
+                'application/pdf', 'application/x-pdf', 'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             ];
-            const allowedDocumentExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf', 'doc'];
+            const allowedDocumentExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf', 'doc', 'docx'];
 
             function isAllowedDocumentFile(file) {
                 if (file.type && allowedDocumentMimeTypes.indexOf(file.type.toLowerCase()) !== -1) {
@@ -1854,7 +1855,7 @@
                     } else if (!isAllowedDocumentFile(file)) {
                         hidePendingFilePreview($input, false);
                         fileInfo.addClass('has-error');
-                        fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du fichier n\'est pas autorisé. Formats acceptés : PNG, JPEG, GIF, WebP, PDF ou DOC.</span>');
+                        fileInfo.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Le format du fichier n\'est pas autorisé. Formats acceptés : PNG, JPEG, GIF, WebP, PDF, DOC ou DOCX.</span>');
                         removeDocumentCheckmark($input);
                     } else {
                         showPendingFilePreview($input, file);

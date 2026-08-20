@@ -659,7 +659,7 @@
                                                    {% if loop.first %}
                                                        <dl class="dl-horizontal info-block" style="margin-top: 10px; margin-bottom: 10px;">
                                                            <dd>
-                                                               <i class="fa fa-info-circle"></i> <strong>Formats autorisés :</strong> JPG, GIF, PNG, WEBP, PDF ou DOC.<br/>
+                                                               <i class="fa fa-info-circle"></i> <strong>Formats autorisés :</strong> JPG, GIF, PNG, WEBP, PDF, DOC ou DOCX.<br/>
                                                                <i class="fa fa-exclamation-triangle text-warning"></i> <strong>Taille maximale :</strong> 10 Mo par fichier. Les fichiers plus volumineux seront rejetés.
                                                            </dd>
                                                        </dl>
@@ -730,7 +730,7 @@
 
                                                     <dl class="dl-horizontal info-block">
                                                         <dd>
-                                                            <i class="fa fa-info-circle"></i> <strong>Formats autorisés :</strong> JPG, GIF, PNG, WEBP, PDF ou DOC.<br/>
+                                                            <i class="fa fa-info-circle"></i> <strong>Formats autorisés :</strong> JPG, GIF, PNG, WEBP, PDF, DOC ou DOCX.<br/>
                                                             <i class="fa fa-exclamation-triangle text-warning"></i> <strong>Taille maximale :</strong> 10 Mo par fichier. Les fichiers plus volumineux seront rejetés.
                                                         </dd>
                                                     </dl>
@@ -1417,7 +1417,7 @@
                             const extension = getFileExtension(file.name);
                             
                             $('#file-validation-errors').show();
-                            $('#file-validation-errors').append('<div class="file-error-item" data-document="{{ document.name }}" role="alert"><i class="fa fa-exclamation-triangle"></i> Le fichier "{{ document.name }}" a un format non autorisé (.' + extension + '). Formats acceptés : JPG, GIF, PNG, PDF ou DOC</div>');
+                            $('#file-validation-errors').append('<div class="file-error-item" data-document="{{ document.name }}" role="alert"><i class="fa fa-exclamation-triangle"></i> Le fichier "{{ document.name }}" a un format non autorisé (.' + extension + '). Formats acceptés : JPG, GIF, PNG, PDF, DOC ou DOCX</div>');
                             
                             if (!firstErrorSection) {
                                 firstErrorSection = $('.files').closest('.section');
@@ -1703,11 +1703,11 @@
                     if (!isValidFileFormat(file)) {
                         hasError = true;
                         const extension = getFileExtension(file.name);
-                        const errorMsgInline = '<div class="file-error-inline" role="alert"><i class="fa fa-exclamation-triangle"></i> Format non autorisé (.' + extension + '). Formats acceptés : JPG, GIF, PNG, PDF ou DOC</div>';
+                        const errorMsgInline = '<div class="file-error-inline" role="alert"><i class="fa fa-exclamation-triangle"></i> Format non autorisé (.' + extension + '). Formats acceptés : JPG, GIF, PNG, PDF, DOC ou DOCX</div>';
                         formGroup.append(errorMsgInline);
                         
                         $('#file-validation-errors').show();
-                        $('#file-validation-errors').append('<div class="file-error-item" data-document="' + documentName + '" role="alert"><i class="fa fa-exclamation-triangle"></i> Le fichier "' + documentName + '" a un format non autorisé. Formats acceptés : JPG, GIF, PNG, PDF ou DOC</div>');
+                        $('#file-validation-errors').append('<div class="file-error-item" data-document="' + documentName + '" role="alert"><i class="fa fa-exclamation-triangle"></i> Le fichier "' + documentName + '" a un format non autorisé. Formats acceptés : JPG, GIF, PNG, PDF, DOC ou DOCX</div>');
                         
                         $field.val('');
                     }
@@ -1755,7 +1755,7 @@
                     // Vérifier le format du fichier
                     if (!isValidFileFormat(file)) {
                         const extension = getFileExtension(file.name);
-                        const errorMsgInline = '<div class="file-error-inline" role="alert"><i class="fa fa-exclamation-triangle"></i> Format non autorisé (.' + extension + '). Formats acceptés : JPG, GIF, PNG, PDF ou DOC</div>';
+                        const errorMsgInline = '<div class="file-error-inline" role="alert"><i class="fa fa-exclamation-triangle"></i> Format non autorisé (.' + extension + '). Formats acceptés : JPG, GIF, PNG, PDF, DOC ou DOCX</div>';
                         formGroup.append(errorMsgInline);
                         
                         // Vider le champ

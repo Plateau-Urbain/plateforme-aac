@@ -1792,7 +1792,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
             "image/webp",
             "application/pdf",
             "application/x-pdf",
-            "application/msword"
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         ];
 
         foreach ($this->getDocuments() as $doc) {

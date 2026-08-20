@@ -1,0 +1,9 @@
+{% extends '@SonataAdmin/CRUD/base_list_field.html.twig' %}
+
+{% block field %}
+    {% if object.projectHolder %}
+        <a href="{{ path('project-holder_edit', { id: object.projectHolder.id }) }}">
+            {{ object.projectHolder.email }}
+        </a>
+    {% endif %}
+{% endblock %}

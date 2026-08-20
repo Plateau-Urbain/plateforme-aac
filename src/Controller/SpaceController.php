@@ -7,11 +7,9 @@ use App\Entity\ApplicationFile;
 use App\Entity\Space;
 use App\Entity\User;
 use App\Form\ApplicationType;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,11 +18,6 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 /**
  * Space controller.
@@ -33,12 +26,8 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 class SpaceController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface     $em,
-        private readonly UserRepository             $userRepository,
-        private readonly UserCheckerInterface       $userChecker,
-        private readonly TokenStorageInterface      $tokenStorage,
-        private readonly EventDispatcherInterface   $eventDispatcher,
-        private readonly LoggerInterface            $logger,
+        private readonly EntityManagerInterface $em,
+        private readonly LoggerInterface        $logger,
     ) {}
 
     /**
@@ -77,8 +66,6 @@ class SpaceController extends AbstractController
     #[Route('/fiche/{space}/apply', name: 'space_apply')]
     public function applyAction(Space $space, Request $request, MailerInterface $mailer): array|Response
     {
-        $connect_after_application = false;
-
         if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $this->getUser();
             assert($user instanceof User);
@@ -112,10 +99,9 @@ class SpaceController extends AbstractController
                 return $this->redirect($profilUrl);
             }
         } else {
-            // Utilisateur anonyme : créer un compte temporaire rempli par le formulaire
-            $user                      = new User();
-            $user->setEnabled(true);
-            $connect_after_application = true;
+            return $this->redirectToRoute('app_login', [
+                'next' => $this->generateUrl('space_apply', ['space' => $space->getId()]),
+            ]);
         }
 
         if ($space->isClosed()) {
@@ -134,11 +120,6 @@ class SpaceController extends AbstractController
         if (!$application instanceof Application) {
             $application = Application::createFromUser($user);
             $application->setSpace($space);
-
-            // Persister l'utilisateur anonyme dès l'ouverture du formulaire
-            if ($user->getId() === null) {
-                $this->persistUser($user);
-            }
         } elseif ($application->getStatus() === Application::UNREAD_STATUS) {
             return $this->redirectToRoute('my_application_show', ['id' => $application->getId()]);
         }
@@ -169,17 +150,6 @@ class SpaceController extends AbstractController
 
         $form->handleRequest($request);
 
-        // Vérifier la duplication d'email pour un utilisateur anonyme
-        if ($form->isSubmitted() && $user->getId() === null) {
-            $userInfoData = $form->get('projectHolder')->get('userInfo')->getData();
-            $email = $userInfoData instanceof \App\Entity\User ? $userInfoData->getEmail() : '';
-            if ($this->userRepository->findOneBy(['email' => $email])) {
-                $this->addFlash('error_sign', 'Cette adresse email est déjà utilisée.');
-
-                return $this->redirectToRoute('homepage');
-            }
-        }
-
         if ($form->isSubmitted() && $form->isValid()) {
             $application->setProjectHolder($user);
 
@@ -200,9 +170,7 @@ class SpaceController extends AbstractController
 
                 $this->addFlash('warning', "Cet espace a été temporairement suspendu. Votre candidature a été sauvegardée en brouillon.");
                 $application->setStatus(Application::DRAFT_STATUS);
-                $this->persistUser($user);
                 $this->em->persist($application);
-                $this->em->persist($user);
                 $this->em->flush();
 
                 return $this->redirectToRoute('my_applications_list');
@@ -214,9 +182,7 @@ class SpaceController extends AbstractController
                 $application->setStatus(Application::DRAFT_STATUS);
             }
 
-            $this->persistUser($user);
             $this->em->persist($application);
-            $this->em->persist($user);
             $this->em->flush();
 
             try {
@@ -232,10 +198,6 @@ class SpaceController extends AbstractController
                     'exception'      => $e,
                     'application_id' => $application->getId(),
                 ]);
-            }
-
-            if ($connect_after_application) {
-                $this->autoLoginUser($user, $request);
             }
 
             if ($application->getStatus() === Application::DRAFT_STATUS) {
@@ -303,39 +265,6 @@ class SpaceController extends AbstractController
     // -------------------------------------------------------------------------
     // Méthodes privées
     // -------------------------------------------------------------------------
-
-    /**
-     * Persiste un utilisateur et hache son mot de passe si un plainPassword est présent.
-     */
-    private function persistUser(User $user): void
-    {
-        $this->em->persist($user);
-    }
-
-    /**
-     * Connecte automatiquement un utilisateur après une candidature anonyme.
-     */
-    private function autoLoginUser(User $user, Request $request): void
-    {
-        try {
-            $this->userChecker->checkPreAuth($user);
-            $this->userChecker->checkPostAuth($user);
-        } catch (AuthenticationException $e) {
-            $this->logger->warning('Auto-login bloqué après candidature anonyme', [
-                'user_id' => $user->getId(),
-                'reason'  => $e->getMessage(),
-            ]);
-
-            return;
-        }
-
-        $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
-        $this->tokenStorage->setToken($token);
-        $request->getSession()->migrate(false);
-
-        $event = new InteractiveLoginEvent($request, $token);
-        $this->eventDispatcher->dispatch($event, 'security.interactive_login');
-    }
 
     /**
      * Collecte les erreurs d'upload PHP et retourne les messages lisibles.

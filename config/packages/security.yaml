@@ -45,6 +45,7 @@ security:
         - { path: ^/admin/login_check, roles: PUBLIC_ACCESS }
         - { path: ^/espace-manager/, roles: ROLE_OWNER }
         - { path: ^/appels-a-candidature/, roles: ROLE_OWNER }
+        - { path: ^/espaces/fiche/.+/apply, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/espaces/, roles: PUBLIC_ACCESS }
         - { path: ^/mes-candidatures, roles: ROLE_USER }
         - { path: ^/recherche/, roles: PUBLIC_ACCESS }

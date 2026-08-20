@@ -267,8 +267,53 @@
     {% if space.isMultiLocation and space.locations|length > 0 %}
     <h4>Site(s) proposé(s)</h4>
     <div class="pu-col-container content-block">
-        <p class="text-muted aac-map-hint"><i class="fa fa-map-marker"></i> Cliquez sur un repère pour afficher le détail du site.</p>
+        <p class="text-muted aac-map-hint"><i class="fas fa-location-dot"></i> Cliquez sur un repère pour centrer la carte sur le site.</p>
         <div id="aac-locations-map"></div>
+    </div>
+
+    <h4>Détail des sites</h4>
+    <div class="pu-col-container content-block">
+        <div class="pu-locations-list">
+            {% for location in space.locations %}
+            <div class="pu-location-card{% if location.suspended %} pu-location-card--suspended{% endif %}">
+                <div class="pu-location-card-header">
+                    <span class="pu-location-index">{{ loop.index }}</span>
+                    <h5 class="pu-location-name">{{ location.name }}</h5>
+                    <div class="pu-location-badges">
+                        {% if location.erp %}
+                            <span class="pu-badge pu-badge--erp">ERP</span>
+                        {% endif %}
+                        {% if location.suspended %}
+                            <span class="pu-badge pu-badge--suspended">Suspendu</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="pu-location-card-meta">
+                    {% if location.fullAddress %}
+                        <span class="pu-location-meta-item">
+                            <i class="fas fa-location-dot" aria-hidden="true"></i>
+                            {{ location.fullAddress }}
+                        </span>
+                    {% endif %}
+                    {% if location.availability %}
+                        <span class="pu-location-meta-item">
+                            <i class="far fa-clock" aria-hidden="true"></i>
+                            Durée du projet&nbsp;: {{ location.availability }}
+                        </span>
+                    {% endif %}
+                </div>
+                {% if location.description %}
+                    <div class="pu-location-description">{{ location.description | raw }}</div>
+                {% endif %}
+                {% if location.suspended and location.suspensionMessage %}
+                    <div class="pu-location-suspension-notice">
+                        <i class="fas fa-circle-pause" aria-hidden="true"></i>
+                        <div>{{ location.suspensionMessage | raw }}</div>
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 
@@ -287,7 +332,7 @@
       <ul class="property-amenities-list">
         {% for v in space.visits %}
           <li>
-            <i class="fa fa-calendar" aria-hidden="true" style="margin-right:8px;"></i>
+            <i class="fas fa-calendar" aria-hidden="true" style="margin-right:8px;"></i>
             {% if space.isMultiLocation and v.location %}
               <strong>{{ v.location.name }}</strong> —
             {% endif %}
@@ -536,9 +581,152 @@
             .pu-gallery-thumb { width: 60px; height: 42px; }
         }
 
-        .aac-location-suspended {
-            opacity: 0.85;
+        /* Popup */
+        .aac-map-popup-address {
+            display: block;
+            margin-top: 3px;
+            font-size: 12px;
+            color: #666;
         }
+        .aac-map-popup-address .fa {
+            margin-right: 3px;
+            color: #999;
+        }
+        .aac-map-popup-availability {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #555;
+        }
+        .aac-map-popup-availability .fa {
+            margin-right: 4px;
+        }
+        .aac-map-popup-badges {
+            margin-top: 6px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .aac-map-popup-badge {
+            display: inline-block;
+            padding: 2px 7px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #3730a3;
+            background: #e0e7ff;
+            border-radius: 3px;
+        }
+        .aac-map-popup-suspended-notice {
+            margin-top: 8px;
+            padding: 6px 8px;
+            background: #fee2e2;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #991b1b;
+            line-height: 1.4;
+        }
+        .aac-map-popup-suspended-notice .fa {
+            margin-right: 4px;
+        }
+
+        /* Cartes de sites */
+        .pu-locations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .pu-location-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 16px 18px;
+            background: #fff;
+        }
+        .pu-location-card--suspended {
+            border-color: #fca5a5;
+            background: #fff8f8;
+        }
+        .pu-location-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .pu-location-index {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #1C244B;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pu-location-name {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1C244B;
+            flex: 1;
+        }
+        .pu-location-badges {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .pu-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+        .pu-badge--erp {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        .pu-badge--suspended {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .pu-location-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .pu-location-meta-item {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .pu-location-meta-item .fa {
+            margin-right: 4px;
+            color: #9ca3af;
+        }
+        .pu-location-description {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.6;
+        }
+        .pu-location-suspension-notice {
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            border-radius: 4px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            font-size: 13px;
+            color: #991b1b;
+        }
+        .pu-location-suspension-notice .fa {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
         .aac-map-hint {
             margin-bottom: 12px;
             font-size: 14px;
@@ -556,76 +744,19 @@
             border-radius: 4px;
         }
         #aac-locations-map .leaflet-popup-content {
-            margin: 14px 18px;
+            margin: 12px 16px;
             line-height: 1.4;
-            min-width: 200px;
-            max-width: 320px;
+            min-width: 160px;
         }
         #aac-locations-map .aac-map-popup-name {
             display: block;
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 700;
             color: #1C244B;
-            margin-bottom: 4px;
-        }
-        #aac-locations-map .aac-map-popup-address {
-            display: block;
-            font-size: 14px;
-            color: #666;
-        }
-        #aac-locations-map .aac-map-popup-description {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #333;
-        }
-        #aac-locations-map .aac-map-popup-badge {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 3px 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-            background: #eee;
-            border-radius: 3px;
         }
     </style>
     {% if space.isMultiLocation and space.locations|length > 0 %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <style>
-        #aac-locations-map .aac-map-popup-suspended {
-            margin-top: 12px;
-            padding: 8px 10px;
-            background: #e9473c;
-            border: 1px solid #c0392b;
-            border-radius: 4px;
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-        }
-        #aac-locations-map .aac-map-popup-suspended > i {
-            flex-shrink: 0;
-            line-height: 1.4;
-            margin-top: 1px;
-        }
-        #aac-locations-map .aac-map-popup-suspended-text {
-            flex: 1;
-            min-width: 0;
-            line-height: 1.4;
-        }
-        #aac-locations-map .aac-map-popup-suspended,
-        #aac-locations-map .aac-map-popup-suspended p,
-        #aac-locations-map .aac-map-popup-suspended span,
-        #aac-locations-map .aac-map-popup-suspended i {
-            font-size: 13px !important;
-            color: #fff !important;
-        }
-        #aac-locations-map .aac-map-popup-suspended-text p {
-            margin: 0;
-        }
-        #aac-locations-map .aac-map-popup-suspended-text p + p {
-            margin-top: 6px;
-        }
-    </style>
     {% endif %}
 {% endblock %}
 
@@ -671,7 +802,6 @@
                     zipCode: {{ location.zipCode|default('')|json_encode|raw }},
                     city: {{ location.city|default('')|json_encode|raw }},
                     fullAddress: {{ location.fullAddress|json_encode|raw }},
-                    description: {{ location.description|default('')|json_encode|raw }},
                     availability: {{ location.availability|default('')|json_encode|raw }},
                     isErp: {{ location.isErp ? 'true' : 'false' }},
                     suspended: {{ location.suspended ? 'true' : 'false' }},
@@ -695,46 +825,28 @@
                 return div.innerHTML;
             }
 
-            function sanitizeHtml(text) {
-                var div = document.createElement('div');
-                div.innerHTML = text || '';
-                div.querySelectorAll('script, style, iframe, object, embed').forEach(function (el) {
-                    el.remove();
-                });
-                div.querySelectorAll('*').forEach(function (el) {
-                    Array.from(el.attributes).forEach(function (attr) {
-                        if (attr.name === 'style' || /^on/i.test(attr.name) || (attr.name === 'href' && /^\s*javascript:/i.test(attr.value))) {
-                            el.removeAttribute(attr.name);
-                        }
-                    });
-                });
-                return div.innerHTML;
-            }
-
             function buildPopupContent(loc) {
                 var html = '<span class="aac-map-popup-name">' + escapeHtml(loc.name) + '</span>';
 
                 if (loc.fullAddress) {
-                    html += '<span class="aac-map-popup-address">' + escapeHtml(loc.fullAddress) + '</span>';
-                }
-
-                if (loc.description) {
-                    html += '<div class="aac-map-popup-description">' + loc.description + '</div>';
+                    html += '<span class="aac-map-popup-address"><i class="fas fa-location-dot"></i> ' + escapeHtml(loc.fullAddress) + '</span>';
                 }
 
                 if (loc.availability) {
-                    html += '<div style="margin-top: 5px; font-size: 12px; color: #5a3808; font-weight: bold;"><i class="fa fa-clock-o"></i> Durée du projet : ' + escapeHtml(loc.availability) + '</div>';
+                    html += '<div class="aac-map-popup-availability"><i class="far fa-clock"></i> Durée du projet\u00a0: ' + escapeHtml(loc.availability) + '</div>';
                 }
 
+                var badges = '';
                 if (loc.isErp) {
-                    html += '<span class="aac-map-popup-badge">ERP</span>';
+                    badges += '<span class="aac-map-popup-badge">ERP</span>';
+                }
+                if (badges) {
+                    html += '<div class="aac-map-popup-badges">' + badges + '</div>';
                 }
 
                 if (loc.suspended) {
-                    var suspendedText = loc.suspensionMessage
-                        ? sanitizeHtml(loc.suspensionMessage)
-                        : 'Aucun local disponible actuellement';
-                    html += '<div class="aac-map-popup-suspended"><i class="fa fa-pause-circle"></i><span class="aac-map-popup-suspended-text">' + suspendedText + '</span></div>';
+                    var msg = loc.suspensionMessage || 'Candidatures suspendues pour ce site.';
+                    html += '<div class="aac-map-popup-suspended-notice"><i class="fas fa-circle-pause"></i> ' + escapeHtml(msg) + '</div>';
                 }
 
                 return html;
@@ -758,7 +870,7 @@
                 var marker = L.marker([lat, lng], {
                     opacity: loc.suspended ? 0.5 : 1
                 }).addTo(map);
-                marker.bindPopup(buildPopupContent(loc), { maxWidth: 340 });
+                marker.bindPopup(buildPopupContent(loc), { maxWidth: 280 });
                 bounds.push([lat, lng]);
             }
 

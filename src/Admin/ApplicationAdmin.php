@@ -119,7 +119,7 @@ class ApplicationAdmin extends AbstractAdmin
 
         $formMapper
             ->with('General')
-            ->add('status', ChoiceType::class, ['label' => 'Statut', 'choices' => Application::getStatusLabels()])
+            ->add('status', ChoiceType::class, ['label' => 'Statut', 'choices' => array_flip(Application::getStatusLabels())])
             ->add('space', null, ['label' => 'Espace'])
             ->add('projectHolder', null, [
                 'query_builder' => fn (UserRepository $repository) => $repository->createPorteursQueryBuilder(),
@@ -152,7 +152,7 @@ class ApplicationAdmin extends AbstractAdmin
             ->add('startOccupation', DateType::class, ['label'=>"Date d'entrée souhaitée"])
             ->add('description', null, ['label'=>"Description du projet"])
             ->add('openToGlobalProject', ChoiceType::class, ['label'=> "Ouvert à faire partie d'un projet collectif", 'choices' => ['Oui' => true, 'Non' => false]])
-            ->add('contribution', null, ['label'=> "Contribution au projet global du propriétaire"])
+            ->add('contribution', null, ['label'=> "Quelles idées avez-vous pour participer au projet collectif ?"])
             ->end()
             ->with('Documents')
             ->add('files', CollectionType::class, [
@@ -209,7 +209,7 @@ class ApplicationAdmin extends AbstractAdmin
                 'label' => 'Statut',
                 'field_type' => ChoiceType::class,
                 'field_options' => [
-                    'choices' => Application::getStatusLabels(),
+                    'choices' => array_flip(Application::getStatusLabels()),
                 ],
             ])
             ->add('selected', null, ['label' => 'Sélectionné'])
@@ -328,7 +328,7 @@ class ApplicationAdmin extends AbstractAdmin
             ->end()
             ->with('Description du projet', ['class' => 'col-md-12'])
                 ->add('description', TextType::class, ['label' => 'Description'])
-                ->add('contribution', TextType::class, ['label' => 'Contribution au projet du propriétaire'])
+                ->add('contribution', TextType::class, ['label' => 'Quelles idées avez-vous pour participer au projet collectif ?'])
                 ->add('openToGlobalProject', null, ['label' => 'Ouvert au projet collectif'])
             ->end()
             ->with('Informations sur l\'occupation', ['class' => 'col-md-6'])
@@ -361,8 +361,7 @@ class ApplicationAdmin extends AbstractAdmin
             ->add('category', null, ['label' => "Type d'usage"])
             ->add('projectHolder', null, [
                 'label' => 'Porteur de projet',
-                'admin_code' => 'app.admin.project_holder',
-                'associated_property' => 'email',
+                'template' => 'Admin/list_project_holder_link.html.twig',
             ])
             ->add('created', 'datetime', ['label' => 'Date de création', 'format' => 'd/m/Y H:i'])
             ->add(ListMapper::NAME_ACTIONS, null, [
@@ -448,7 +447,7 @@ class ApplicationAdmin extends AbstractAdmin
           'Surface souhaitée (candidature)' => 'wishedSize',
           'Durée d\'occupation souhaitée' => 'fullLengthOccupation',
           'Date d\'entrée souhaitée' => 'startOccupation',
-          'Contribution au projet du propriétaire' => 'contribution'
+          'Quelles idées avez-vous pour participer au projet collectif ?' => 'contribution'
         ];
     }
 

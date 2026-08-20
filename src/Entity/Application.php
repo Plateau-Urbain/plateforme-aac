@@ -665,8 +665,12 @@ class Application
     public function sortLocationPreferencesByRank(): void
     {
         $ordered = $this->getLocationPreferencesOrdered();
+        $excluded = $this->getExcludedLocationPreferences();
         $this->locationPreferences->clear();
         foreach ($ordered as $preference) {
+            $this->locationPreferences->add($preference);
+        }
+        foreach ($excluded as $preference) {
             $this->locationPreferences->add($preference);
         }
     }
@@ -1037,7 +1041,8 @@ class Application
             "image/webp",
             "application/pdf",
             "application/x-pdf",
-            "application/msword"
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         ];
 
         $constraints = [
