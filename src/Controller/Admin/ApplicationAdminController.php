@@ -11,11 +11,16 @@ use App\Entity\Space;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
+use Sonata\Exporter\Handler;
+use Sonata\Exporter\Source\DoctrineORMQuerySourceIterator;
 use Sonata\Exporter\Writer\CsvWriter;
 
 /** @extends CRUDController<Application> */
 class ApplicationAdminController extends CRUDController
 {
+    private const EXPORT_BATCH_SIZE = 100;
+
     public function __construct(private EntityManagerInterface $em) {}
 
     /**
@@ -288,36 +293,46 @@ class ApplicationAdminController extends CRUDController
             }
         }
         
-        $datagrid->getPager()->setMaxPerPage(PHP_INT_MAX);
-        $datagrid->buildPager();
+        $proxyQuery = $datagrid->getQuery();
+        assert($proxyQuery instanceof ProxyQuery);
+        $exportQb = clone $proxyQuery->getQueryBuilder();
+        $rootAliases = $exportQb->getRootAliases();
+        $rootAlias = $rootAliases[0] ?? null;
+        if (!\is_string($rootAlias) || $rootAlias === '') {
+            throw new \RuntimeException('Impossible de déterminer l\'alias racine pour l\'export des candidatures.');
+        }
+        $exportQb->resetDQLPart('select')->select($rootAlias);
+        $query = $exportQb->getQuery();
+        $query->setMaxResults(null);
+        $query->setFirstResult(0);
 
-        // Export CSV manuel si des champs calculés sont sélectionnés
+        $filename = 'export_candidatures_' . date('Y-m-d_H-i-s') . '.csv';
+
         if ($hasComputedFields) {
-            $applications = $datagrid->getResults();
             $headers = array_keys($exportFields);
 
-            $callback = function () use ($applications, $exportFields, $headers) {
+            $callback = function () use ($query, $exportFields, $headers): void {
                 echo "\xEF\xBB\xBF";
-                $rows = [];
-                $rows[] = $headers;
+                $this->writeCsvRow($headers);
 
-                foreach ($applications as $application) {
+                $em = $query->getEntityManager();
+                $exported = 0;
+                foreach ($query->toIterable() as $application) {
+                    if (!$application instanceof Application) {
+                        continue;
+                    }
+
                     $row = [];
                     foreach ($exportFields as $property) {
                         $row[] = (string) $this->resolveExportValue($application, $property);
                     }
-                    $rows[] = $row;
-                }
+                    $this->writeCsvRow($row);
 
-                foreach ($rows as $row) {
-                    $escapedRow = array_map(function ($cell) {
-                        return '"' . str_replace('"', '""', (string) $cell) . '"';
-                    }, $row);
-                    echo implode(';', $escapedRow) . "\r\n";
+                    if (++$exported % self::EXPORT_BATCH_SIZE === 0) {
+                        $em->clear();
+                    }
                 }
             };
-
-            $filename = 'export_candidatures_' . date('Y-m-d_H-i-s') . '.csv';
 
             return new StreamedResponse($callback, 200, [
                 'Content-Type' => 'text/csv; charset=utf-8',
@@ -325,32 +340,33 @@ class ApplicationAdminController extends CRUDController
             ]);
         }
 
-        // Export direct via query source iterator
-        $proxyQuery = $datagrid->getQuery();
-        assert($proxyQuery instanceof \Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery);
-        $query = $proxyQuery->getQuery();
-        $query->setMaxResults(null);
-        $query->setFirstResult(0);
-        $sourceIterator = new \Sonata\Exporter\Source\DoctrineORMQuerySourceIterator(
+        $sourceIterator = new DoctrineORMQuerySourceIterator(
             $query,
             $exportFields,
-            'd/m/Y H:i'
+            'd/m/Y H:i',
+            self::EXPORT_BATCH_SIZE
         );
-        
-        // Préparer le CSV
+
         $writer = new CsvWriter('php://output');
-        $filename = 'export_candidatures_' . date('Y-m-d_H-i-s') . '.csv';
-        
-        $callback = function () use ($sourceIterator, $writer) {
-            // Pour Sonata Exporter moderne
-            $handler = \Sonata\Exporter\Handler::create($sourceIterator, $writer);
+
+        $callback = static function () use ($sourceIterator, $writer): void {
+            $handler = Handler::create($sourceIterator, $writer);
             $handler->export();
         };
-        
+
         return new StreamedResponse($callback, 200, [
             'Content-Type' => 'text/csv; charset=utf-8',
             'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
         ]);
+    }
+
+    /**
+     * @param list<string> $row
+     */
+    private function writeCsvRow(array $row): void
+    {
+        $escapedRow = array_map(static fn (string $cell): string => '"'.str_replace('"', '""', $cell).'"', $row);
+        echo implode(';', $escapedRow)."\r\n";
     }
     
     /**

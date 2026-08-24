@@ -6,6 +6,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Persistence\Proxy;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use App\Entity\User;
@@ -201,7 +202,7 @@ class Space implements \Stringable
     #[ORM\Column(type: 'datetime', name: 'submitted_at', nullable: true)]
     private $submittedAt;
 
-    #[ORM\OneToMany(targetEntity: \App\Entity\Application::class, mappedBy: 'space')]
+    #[ORM\OneToMany(targetEntity: \App\Entity\Application::class, mappedBy: 'space', fetch: 'EXTRA_LAZY')]
     private $application;
 
     #[ORM\OneToMany(targetEntity: \App\Entity\SpaceVisit::class, mappedBy: 'space', cascade: ['persist', 'remove'])]
@@ -1118,9 +1119,20 @@ class Space implements \Stringable
     /**
      * @return string
      */
-    public  function __toString(): string
+    public function __toString(): string
     {
-        return $this->getName().' - '.($this->getOwner() != null ? $this->getOwner()->getCompany() : '');
+        $name = (string) $this->getName();
+        $owner = $this->owner ?? null;
+        if (!$owner instanceof User) {
+            return $name;
+        }
+        if ($owner instanceof Proxy && !$owner->__isInitialized()) {
+            return $name;
+        }
+
+        $company = $owner->getCompany();
+
+        return $company ? $name.' - '.$company : $name;
     }
 
     /**

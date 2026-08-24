@@ -278,7 +278,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
     #[Assert\NotBlank(groups: ['projectHolder'])]
     protected $useType;
 
-    #[ORM\OneToMany(targetEntity: \App\Entity\Application::class, mappedBy: 'projectHolder', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: \App\Entity\Application::class, mappedBy: 'projectHolder', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     protected $applications;
 
     #[ORM\OneToMany(targetEntity: \App\Entity\UserDocument::class, mappedBy: 'projectHolder', orphanRemoval: true, cascade: ['persist', 'remove'])]

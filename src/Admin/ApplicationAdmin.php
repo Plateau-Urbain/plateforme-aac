@@ -12,9 +12,11 @@ use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Sonata\AdminBundle\Form\Type\ModelAutocompleteType;
 use Sonata\DoctrineORMAdminBundle\Filter\ChoiceFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\DateRangeFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\DateTimeRangeFilter;
+use Sonata\DoctrineORMAdminBundle\Filter\ModelFilter;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
@@ -29,7 +31,6 @@ use App\Entity\ApplicationLocationPreference;
 use App\Entity\Space;
 use App\Entity\SpaceLocation;
 use App\Entity\User;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 /** @extends AbstractAdmin<Application> */
@@ -51,6 +52,17 @@ class ApplicationAdmin extends AbstractAdmin
     {
         $sortValues[DatagridInterface::SORT_ORDER] = 'DESC';
         $sortValues[DatagridInterface::SORT_BY] = 'created';
+        $sortValues[DatagridInterface::PER_PAGE] = 25;
+    }
+
+    public function getPerPageOptions(): array
+    {
+        $perPageOptions = [10, 25, 50, 100];
+        $perPageOptions[] = $this->getMaxPerPage();
+        $perPageOptions = array_unique($perPageOptions);
+        sort($perPageOptions);
+
+        return $perPageOptions;
     }
 
     /**
@@ -92,11 +104,10 @@ class ApplicationAdmin extends AbstractAdmin
     {
         assert($query instanceof ProxyQuery);
         $alias = $query->getRootAliases()[0];
-        // LEFT JOINs pour le tri/filtre — sans addSelect() pour éviter l'hydratation
-        // eager de milliers d'objets liés en mémoire lors de l'affichage de la liste.
-        $query->leftJoin($alias.'.projectHolder', 'application_holder');
-        $query->leftJoin($alias.'.space', 'application_space');
-        $query->leftJoin('application_space.owner', 'application_space_owner');
+        // Fetch-join ManyToOne de la page courante uniquement (le pager limite déjà le résultat).
+        $query->leftJoin($alias.'.projectHolder', 'application_holder')->addSelect('application_holder');
+        $query->leftJoin($alias.'.space', 'application_space')->addSelect('application_space');
+        $query->leftJoin($alias.'.category', 'application_category')->addSelect('application_category');
 
         return $query;
     }
@@ -121,10 +132,14 @@ class ApplicationAdmin extends AbstractAdmin
             ->with('General')
             ->add('status', ChoiceType::class, ['label' => 'Statut', 'choices' => array_flip(Application::getStatusLabels())])
             ->add('space', null, ['label' => 'Espace'])
-            ->add('projectHolder', null, [
-                'query_builder' => fn (UserRepository $repository) => $repository->createPorteursQueryBuilder(),
-            ], [
+            ->add('projectHolder', ModelAutocompleteType::class, [
                 'label' => 'Porteur de projet',
+                'property' => ['firstname', 'lastname', 'email', 'company'],
+                'minimum_input_length' => 2,
+                'items_per_page' => 20,
+                'placeholder' => 'Rechercher un porteur (nom, email, structure)…',
+                'btn_add' => false,
+            ], [
                 'admin_code' => 'app.admin.project_holder',
             ])
             ->add('name', null, ['label'=>"Nom du projet"] )
@@ -214,15 +229,30 @@ class ApplicationAdmin extends AbstractAdmin
             ])
             ->add('selected', null, ['label' => 'Sélectionné'])
             ->add('category', null, ['label' => "Type d'usage"])
-            ->add('projectHolder', null, [
-                'field_options' => [
-                    'query_builder' => fn (UserRepository $repository) => $repository->createPorteursQueryBuilder(),
-                ],
-            ], [
+            ->add('projectHolder', ModelFilter::class, [
                 'label' => 'Porteur de projet',
                 'admin_code' => 'app.admin.project_holder',
+                'field_type' => ModelAutocompleteType::class,
+                'field_options' => [
+                    'property' => ['firstname', 'lastname', 'email', 'company'],
+                    'minimum_input_length' => 2,
+                    'items_per_page' => 20,
+                    'placeholder' => 'Rechercher un porteur (nom, email, structure)…',
+                    'btn_add' => false,
+                ],
             ])
-            ->add('space', null, ['label' => 'Espace'])
+            ->add('space', ModelFilter::class, [
+                'label' => 'Espace',
+                'admin_code' => 'app.admin.space',
+                'field_type' => ModelAutocompleteType::class,
+                'field_options' => [
+                    'property' => ['name', 'city'],
+                    'minimum_input_length' => 2,
+                    'items_per_page' => 20,
+                    'placeholder' => 'Rechercher un espace…',
+                    'btn_add' => false,
+                ],
+            ])
             ->add('locationPreference', CallbackFilter::class, [
                 'label' => 'Choix de site (AAC multi-sites)',
                 'callback' => function (ProxyQueryInterface $query, string $alias, string $field, FilterData $data): bool {
