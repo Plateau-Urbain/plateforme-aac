@@ -99,6 +99,7 @@ class UserDocumentAdmin extends AbstractAdmin
                 'sortable' => true,
                 'sort_parent_association_mappings' => [['fieldName' => 'projectHolder']],
                 'sort_field_mapping' => ['fieldName' => 'email'],
+                'template' => 'Admin/list_project_holder_link.html.twig',
             ])
             ->add('spaceNames', null, [
                 'label' => 'Espace',

@@ -71,8 +71,10 @@ class ApplicationFileAdmin extends AbstractAdmin
         assert($query instanceof ProxyQuery);
         $alias = $query->getRootAliases()[0];
 
-        // Help Doctrine build consistent joins for nested sorting.
+        // Help Doctrine build consistent joins for nested sorting / list links.
         $query->leftJoin($alias.'.application', 'a')->addSelect('a');
+        $query->leftJoin('a.projectHolder', 'ph')->addSelect('ph');
+        $query->leftJoin('a.space', 's')->addSelect('s');
 
         return $query;
     }
@@ -95,6 +97,7 @@ class ApplicationFileAdmin extends AbstractAdmin
                 'sortable' => true,
                 'sort_parent_association_mappings' => [['fieldName' => 'application'], ['fieldName' => 'projectHolder']],
                 'sort_field_mapping' => ['fieldName' => 'email'],
+                'template' => 'Admin/ApplicationFile/list_project_holder_email.html.twig',
             ])
             ->add('application.space.name', null, [
                 'label' => 'Espace',
