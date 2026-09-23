@@ -2920,9 +2920,6 @@ class SpaceManagementController extends AbstractController
         );
     }
 
-    /**
-     * @return list<string>
-     */
     private function collectFormErrors(FormInterface $form, array $breadcrumbs = []): array
     {
         $items = [];
