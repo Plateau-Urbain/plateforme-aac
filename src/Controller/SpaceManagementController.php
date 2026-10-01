@@ -143,6 +143,10 @@ class SpaceManagementController extends AbstractController
             'method' => 'post'
         ]);
 
+        if ($this->isPostTooLarge($request)) {
+            return $this->redirectAfterPostTooLarge($this->generateUrl('space_manager_add'));
+        }
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
@@ -196,6 +200,10 @@ class SpaceManagementController extends AbstractController
             'action' => $this->generateUrl('space_manager_add_multi'),
             'method' => 'post',
         ]);
+
+        if ($this->isPostTooLarge($request)) {
+            return $this->redirectAfterPostTooLarge($this->generateUrl('space_manager_add_multi'));
+        }
 
         $form->handleRequest($request);
 
@@ -261,6 +269,10 @@ class SpaceManagementController extends AbstractController
             'action' => $this->generateUrl('space_manager_edit', ['id' => $space->getId()]),
             'method' => 'post',
         ]);
+
+        if ($this->isPostTooLarge($request)) {
+            return $this->redirectAfterPostTooLarge($this->generateUrl('space_manager_edit', ['id' => $space->getId()]));
+        }
 
         $form->handleRequest($request);
 
@@ -2755,6 +2767,33 @@ class SpaceManagementController extends AbstractController
         return $this->redirectToRoute($space->isMultiLocation() ? 'space_manager_add_multi' : 'space_manager_add');
     }
 
+    /**
+     * PHP discards the whole body when post_max_size is exceeded: the form would be
+     * submitted empty and the draft flush would write NULL into required columns.
+     */
+    private function isPostTooLarge(Request $request): bool
+    {
+        if (!$request->isMethod('POST')) {
+            return false;
+        }
+
+        $contentLength = (int) $request->server->get('CONTENT_LENGTH', 0);
+
+        return $contentLength > 0
+            && $request->request->count() === 0
+            && $request->files->count() === 0;
+    }
+
+    private function redirectAfterPostTooLarge(string $url): RedirectResponse
+    {
+        $this->addFlash('error', sprintf(
+            'L\'envoi est trop volumineux (limite serveur : %s pour l\'ensemble des fichiers envoyés en une fois). Aucune modification n\'a été enregistrée. Déposez les documents un par un ou réduisez leur taille.',
+            (string) ini_get('post_max_size')
+        ));
+
+        return $this->redirect($url);
+    }
+
     private function renderInvalidSpaceForm(FormInterface $form, Space $space): Response
     {
         $this->persistSpaceDraftAfterInvalidSubmit($space);
@@ -2867,9 +2906,13 @@ class SpaceManagementController extends AbstractController
             'name'              => 'Nom du site',
             'zipCode'           => 'Code postal',
             'city'              => 'Ville',
-            'description'       => 'Description',
-            'availability'      => 'Durée du projet',
-            'suspensionMessage' => 'Message de suspension',
+            'description'         => 'Descriptif du projet',
+            'activityDescription' => 'Activités recherchées',
+            'aacDocument'         => 'Document d\'appel à candidature',
+            'planDocument'        => 'Répartition des espaces',
+            'faqDocument'         => 'F.A.Q',
+            'availability'        => 'Durée du projet',
+            'suspensionMessage'   => 'Message de suspension',
         ];
 
         $missing = [];

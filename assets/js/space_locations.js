@@ -124,9 +124,42 @@
         $item.toggleClass('suspended-location', suspended);
     }
 
+    function bindLocationDocuments($item) {
+        var allowedExtensions = /\.(pdf|doc|docx)$/i;
+        var maxSize = 10 * 1024 * 1024;
+
+        $item.find('.js-location-doc input[type="file"]').each(function () {
+            var input = this;
+            if (input.getAttribute('data-doc-bound')) {
+                return;
+            }
+            input.setAttribute('data-doc-bound', '1');
+            var label = input.getAttribute('data-doc-label') || 'Le document';
+
+            input.addEventListener('change', function () {
+                var file = this.files && this.files[0];
+                if (!file) {
+                    return;
+                }
+
+                if (!allowedExtensions.test(file.name)) {
+                    this.value = '';
+                    window.alert(label + ' : le document doit être au format PDF, DOC ou DOCX.');
+                    return;
+                }
+
+                if (file.size > maxSize) {
+                    this.value = '';
+                    window.alert(label + ' : le document est trop volumineux (10 Mo maximum).');
+                }
+            });
+        });
+    }
+
     function bindLocationItem($item) {
         initLocationMap($item);
         toggleSuspensionMessage($item);
+        bindLocationDocuments($item);
 
         $item.find('.js-geocode-location').off('click').on('click', function () {
             geocodeLocation($item);
@@ -181,6 +214,15 @@
         var $item = $('<div class="location-item panel panel-default"></div>').html(newForm);
         $collection.append($item);
         $('.js-no-locations-msg').hide();
+
+        if ($.fn.trumbowyg) {
+            $item.find('textarea').trumbowyg({
+                lang: 'fr',
+                resetCss: true,
+                removeformatPasted: true,
+                autogrow: true
+            });
+        }
 
         bindLocationItem($item);
         renumberLocations();

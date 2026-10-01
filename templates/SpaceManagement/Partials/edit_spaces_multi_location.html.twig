@@ -176,6 +176,31 @@
             #js-form-space .form-contener.bleu .alert-success strong {
                 color: #111;
             }
+            #js-form-space .js-location-doc .vich-file > a {
+                display: none;
+            }
+            #js-form-space .location-doc-current {
+                margin: 4px 0 6px;
+                padding: 8px 12px;
+                background: #fff;
+                border-radius: 4px;
+                color: #1f2937;
+                font-size: 14px;
+                word-break: break-word;
+            }
+            #js-form-space .location-doc-current a {
+                color: #1C244B;
+                font-weight: 600;
+                text-decoration: underline;
+            }
+            #js-form-space .location-doc-current .fa {
+                margin-right: 6px;
+                color: #e9473c;
+            }
+            #js-form-space .js-location-doc .vich-file .checkbox {
+                margin-top: 8px;
+                margin-bottom: 0;
+            }
         </style>
 
         {% set spaceFormAction = space.id
@@ -271,16 +296,9 @@
                         <div class="row">
                             <div class="col-sm-12 form-group{% if not form.description.vars.valid %} has-error{% endif %}">
                                 {{ form_label(form.description) }}
+                                {{ form_help(form.description) }}
                                 {{ form_widget(form.description) }}
                                 {{ form_errors(form.description) }}
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm-12 form-group{% if not form.activityDescription.vars.valid %} has-error{% endif %}">
-                                {{ form_label(form.activityDescription) }}
-                                {{ form_widget(form.activityDescription) }}
-                                {{ form_errors(form.activityDescription) }}
                             </div>
                         </div>
 
@@ -330,13 +348,13 @@
                     </div>
                 </div>
 
-                <div id="five" class="section{% if (form.doc_aac is defined and not form.doc_aac.vars.valid) or (space.getDocs('document_aac') | length == 0 and form.vars.submitted and not form.vars.valid) %} section-has-error{% endif %}">
+                <div id="five" class="section">
                     <span class="section-title form-five"></span>
                     <div class="form-contener bleu">
                         <h3>Documents ressources</h3>
                         <div class="row">
                             <div class="col-sm-12">
-                                {% include 'SpaceManagement/Partials/_space_required_form.html.twig' with { 'form': form, 'space': space } %}
+                                {% include 'SpaceManagement/Partials/_space_required_form.html.twig' with { 'form': form, 'space': space, 'show_aac_doc': false } %}
                             </div>
                         </div>
                     </div>

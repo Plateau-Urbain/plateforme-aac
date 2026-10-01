@@ -187,10 +187,22 @@ class SpaceType extends AbstractType
             $form = $event->getForm();
 
             if ($data instanceof Space && $data->isMultiLocation()) {
-                foreach (['availability', 'limitAvailability', 'zipCode', 'nbSpaces', 'minSpace', 'maxSpace', 'isErp'] as $field) {
+                foreach (['availability', 'limitAvailability', 'zipCode', 'nbSpaces', 'minSpace', 'maxSpace', 'isErp', 'activityDescription', 'doc_aac'] as $field) {
                     if ($form->has($field)) {
                         $form->remove($field);
                     }
+                }
+
+                if ($form->has('description')) {
+                    $form->remove('description');
+                    $form->add('description', null, [
+                        'label' => 'Présentation générale (facultatif)',
+                        'attr' => ['class' => 'form-control'],
+                        'required' => false,
+                        'help' => 'Texte d\'introduction commun à tous les sites. Le descriptif du projet et les activités recherchées se renseignent site par site.',
+                        'help_attr' => ['class' => 'help-block'],
+                        'error_bubbling' => false,
+                    ]);
                 }
 
                 if ($form->has('city')) {

@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 
 class SpaceLocationType extends AbstractType
 {
@@ -50,9 +51,17 @@ class SpaceLocationType extends AbstractType
                 'empty_data' => null,
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Description',
+                'label' => 'Descriptif du projet',
                 'attr' => ['class' => 'form-control', 'rows' => 3, 'required' => 'required'],
                 'required' => true,
+                'error_bubbling' => false,
+            ])
+            ->add('activityDescription', TextareaType::class, [
+                'label' => 'Activités recherchées',
+                'attr' => ['class' => 'form-control', 'rows' => 3],
+                'required' => false,
+                'help' => 'Obligatoire pour publier.',
+                'help_attr' => ['class' => 'help-block'],
                 'error_bubbling' => false,
             ])
             ->add('availability', null, [
@@ -61,6 +70,21 @@ class SpaceLocationType extends AbstractType
                 'required' => true,
                 'error_bubbling' => false,
             ])
+            ->add('aacDocument', VichFileType::class, $this->documentOptions(
+                "Document d'appel à candidature (facultatif)",
+                'PDF, DOC ou DOCX, 10 Mo maximum.',
+                static fn (SpaceLocation $location): ?string => $location->getAacDocumentDisplayName(),
+            ))
+            ->add('planDocument', VichFileType::class, $this->documentOptions(
+                'Répartition des espaces (facultatif)',
+                'PDF, DOC ou DOCX, 10 Mo maximum.',
+                static fn (SpaceLocation $location): ?string => $location->getPlanDocumentDisplayName(),
+            ))
+            ->add('faqDocument', VichFileType::class, $this->documentOptions(
+                'F.A.Q (facultatif)',
+                'PDF, DOC ou DOCX, 10 Mo maximum.',
+                static fn (SpaceLocation $location): ?string => $location->getFaqDocumentDisplayName(),
+            ))
             ->add('isErp', CheckboxType::class, [
                 'label' => 'Le site est un ERP (Établissement Recevant du Public)',
                 'required' => false,
@@ -92,6 +116,29 @@ class SpaceLocationType extends AbstractType
                 $location->setDisplayOrder(0);
             }
         });
+    }
+
+    private function documentOptions(string $label, string $help, callable $displayName): array
+    {
+        return [
+            'label' => $label,
+            'required' => false,
+            'allow_delete' => true,
+            'download_uri' => true,
+            'download_label' => static fn (SpaceLocation $location): array => [
+                'download_label' => $displayName($location),
+                'download_label_translation_domain' => false,
+            ],
+            'delete_label' => 'Supprimer ce document',
+            'delete_label_translation_domain' => false,
+            'help' => $help,
+            'help_attr' => ['class' => 'help-block'],
+            'attr' => [
+                'accept' => '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'data-doc-label' => preg_replace('/ \(facultatif\)$/', '', $label),
+            ],
+            'error_bubbling' => false,
+        ];
     }
 
     public function configureOptions(OptionsResolver $resolver): void

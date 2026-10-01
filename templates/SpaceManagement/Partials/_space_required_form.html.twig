@@ -1,4 +1,5 @@
-{% if space.getDocs('document_aac') | length == 0 %}
+{% set show_aac_doc = show_aac_doc ?? true %}
+{% if show_aac_doc and space.getDocs('document_aac') | length == 0 %}
     {% if form.doc_aac is defined and form.doc_aac.vars.errors | length %}
     <div class="space-doc-error alert alert-danger has-error" role="alert">
         {% for error in form.doc_aac.vars.errors %}{{ error.message }}{% endfor %}
@@ -48,6 +49,7 @@
 </style>
 
 <div class="space-required-docs-row">
+  {% if show_aac_doc %}
   <div class="space-required-docs-row__item">
     <h5>Appel à candidature</h5>
     {% set docsAac = space.getDocs('document_aac') %}
@@ -65,6 +67,7 @@
         </div>
     {% endif %}
   </div>
+  {% endif %}
 
   <div class="space-required-docs-row__item">
     <h5>Répartition des espaces</h5>

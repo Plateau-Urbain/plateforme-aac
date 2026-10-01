@@ -118,12 +118,18 @@
 
     <div class="pu-apply-zone">
       {% if space.isMultiLocation %}
-      <p class="center" style="font-weight: bold; margin-bottom: 5px;">Candidatures ouvertes</p>
+      <h5 class="center apply-date-show pu-apply-title">Candidatures ouvertes</h5>
       {% set sitesCount = space.activeLocations|length %}
       {% if sitesCount > 1 %}
-      <p style="font-size: 13px; line-height: 1.45; color: #4b5563; text-align: center; margin-bottom: 15px; padding: 0 10px;">
-        Cet appel à candidatures regroupe {{ sitesCount }} sites. Vous pourrez sélectionner le ou les sites qui vous intéressent et définir vos priorités lors du remplissage de votre dossier de candidature.
-      </p>
+      <div class="pu-apply-sites">
+        <span class="pu-apply-sites-count">
+          <i class="fas fa-location-dot" aria-hidden="true"></i>
+          {{ sitesCount }} sites proposés
+        </span>
+        <p class="pu-apply-sites-text">
+          Choisissez un ou plusieurs sites et classez-les par ordre de préférence dans votre dossier de candidature.
+        </p>
+      </div>
       {% endif %}
       {% else %}
       <p class="center">Date limite de candidature</p>
@@ -248,6 +254,14 @@
 
 
 
+    {% if space.isMultiLocation %}
+      {% if space.description|striptags|replace({'&nbsp;': ' '})|trim is not empty %}
+      <h4>Présentation générale</h4>
+      <div class="pu-col-container content-block">
+        <div>{{ space.description | raw }}</div>
+      </div>
+      {% endif %}
+    {% else %}
     <h4 >
       {{ 'Descriptif du projet' }}
     </h4>
@@ -255,69 +269,116 @@
       <p>{{ space.description | raw }}</p>
     </div>
 
-
-
     <h4>
       {{ 'Activités recherchées' }}
     </h4>
     <div class="pu-col-container content-block">
       <p>{{ space.activityDescription | raw }}</p>
     </div>
+    {% endif %}
 
     {% if space.isMultiLocation and space.locations|length > 0 %}
     <h4>Site(s) proposé(s)</h4>
     <div class="pu-col-container content-block">
-        <p class="text-muted aac-map-hint"><i class="fas fa-location-dot"></i> Cliquez sur un repère pour centrer la carte sur le site.</p>
+        <p class="text-muted aac-map-hint"><i class="fas fa-location-dot"></i> Cliquez sur un repère pour afficher le détail du site.</p>
         <div id="aac-locations-map"></div>
     </div>
 
-    <h4>Détail des sites</h4>
     <div class="pu-col-container content-block">
-        <div class="pu-locations-list">
+        <div class="pu-sites-accordion">
             {% for location in space.locations %}
-            <div class="pu-location-card{% if location.suspended %} pu-location-card--suspended{% endif %}">
-                <div class="pu-location-card-header">
+            {% set siteVisits = space.visits|filter(v => v.location and v.location.id == location.id) %}
+            <details class="pu-site{% if location.suspended %} pu-site--suspended{% endif %}" id="site-{{ location.id }}"{% if loop.first %} open{% endif %}>
+                <summary class="pu-site-summary">
                     <span class="pu-location-index">{{ loop.index }}</span>
-                    <h5 class="pu-location-name">{{ location.name }}</h5>
-                    <div class="pu-location-badges">
+                    <span class="pu-site-summary-main">
+                        <h3 class="pu-site-name">{{ location.name }}</h3>
+                        {% set siteAddress = location.fullAddress ?: location.city %}
+                        {% if siteAddress %}
+                            <span class="pu-site-summary-address">
+                                <i class="fas fa-location-dot" aria-hidden="true"></i>
+                                {{ siteAddress }}
+                            </span>
+                        {% endif %}
+                        {% if location.availability %}
+                            <span class="pu-site-summary-meta">Durée du projet&nbsp;: {{ location.availability }}</span>
+                        {% endif %}
+                    </span>
+                    <span class="pu-location-badges">
                         {% if location.erp %}
                             <span class="pu-badge pu-badge--erp">ERP</span>
                         {% endif %}
                         {% if location.suspended %}
                             <span class="pu-badge pu-badge--suspended">Suspendu</span>
                         {% endif %}
+                    </span>
+                    <i class="fas fa-chevron-down pu-site-chevron" aria-hidden="true"></i>
+                </summary>
+
+                <div class="pu-site-body">
+                    {% if location.suspended and location.suspensionMessage %}
+                        <div class="pu-location-suspension-notice">
+                            <i class="fas fa-circle-pause" aria-hidden="true"></i>
+                            <div>{{ location.suspensionMessage | raw }}</div>
+                        </div>
+                    {% endif %}
+
+                    {% if location.description %}
+                        <h4>Descriptif du projet</h4>
+                        <div class="pu-site-text">{{ location.description | raw }}</div>
+                    {% endif %}
+
+                    {% if location.activityDescription %}
+                        <h4>Activités recherchées</h4>
+                        <div class="pu-site-text">{{ location.activityDescription | raw }}</div>
+                    {% endif %}
+
+                    {% if siteVisits|length %}
+                        <h4>Visites prévues</h4>
+                        <ul class="pu-site-visits">
+                            {% for v in siteVisits %}
+                                <li>
+                                    <i class="fas fa-calendar" aria-hidden="true"></i>
+                                    {{ v.visitDate|date('d/m/Y') }} de {{ v.startTime|date('H:i') }} à {{ v.endTime|date('H:i') }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <p class="pu-site-note">Si votre candidature est sélectionnée, vous recevrez un mail pour vous inscrire à l’une de ces visites (la visite du site est obligatoire).</p>
+                    {% endif %}
+
+                    <div class="pu-site-actions">
+                        {% if location.aacDocumentName %}
+                            <a class="pu-site-action pu-site-action--primary" href="{{ vich_uploader_asset(location, 'aacDocument') }}" target="_blank" rel="noopener">
+                                <i class="far fa-file-pdf" aria-hidden="true"></i>
+                                Télécharger l'appel à candidatures
+                            </a>
+                        {% endif %}
+                        {% if location.planDocumentName %}
+                            <a class="pu-site-action" href="{{ vich_uploader_asset(location, 'planDocument') }}" target="_blank" rel="noopener">
+                                <i class="far fa-file-pdf" aria-hidden="true"></i>
+                                Répartition des espaces
+                            </a>
+                        {% endif %}
+                        {% if location.faqDocumentName %}
+                            <a class="pu-site-action" href="{{ vich_uploader_asset(location, 'faqDocument') }}" target="_blank" rel="noopener">
+                                <i class="far fa-circle-question" aria-hidden="true"></i>
+                                F.A.Q
+                            </a>
+                        {% endif %}
+                        <button type="button" class="pu-site-action js-show-site-on-map" data-location-id="{{ location.id }}">
+                            <i class="fas fa-map-location-dot" aria-hidden="true"></i>
+                            Voir sur la carte
+                        </button>
                     </div>
                 </div>
-                <div class="pu-location-card-meta">
-                    {% if location.fullAddress %}
-                        <span class="pu-location-meta-item">
-                            <i class="fas fa-location-dot" aria-hidden="true"></i>
-                            {{ location.fullAddress }}
-                        </span>
-                    {% endif %}
-                    {% if location.availability %}
-                        <span class="pu-location-meta-item">
-                            <i class="far fa-clock" aria-hidden="true"></i>
-                            Durée du projet&nbsp;: {{ location.availability }}
-                        </span>
-                    {% endif %}
-                </div>
-                {% if location.description %}
-                    <div class="pu-location-description">{{ location.description | raw }}</div>
-                {% endif %}
-                {% if location.suspended and location.suspensionMessage %}
-                    <div class="pu-location-suspension-notice">
-                        <i class="fas fa-circle-pause" aria-hidden="true"></i>
-                        <div>{{ location.suspensionMessage | raw }}</div>
-                    </div>
-                {% endif %}
-            </div>
+            </details>
             {% endfor %}
         </div>
     </div>
     {% endif %}
 
-    {% if space.visits | length %}
+    {% set globalVisits = space.isMultiLocation ? space.visits|filter(v => not v.location) : space.visits %}
+    {% if globalVisits | length %}
     <h4>
       Dates et horaires des visites prévues
     </h4>
@@ -330,12 +391,9 @@
         {%- endif -%}
       </p>
       <ul class="property-amenities-list">
-        {% for v in space.visits %}
+        {% for v in globalVisits %}
           <li>
             <i class="fas fa-calendar" aria-hidden="true" style="margin-right:8px;"></i>
-            {% if space.isMultiLocation and v.location %}
-              <strong>{{ v.location.name }}</strong> —
-            {% endif %}
             {{ v.visitDate|date('d/m/Y') }} de {{ v.startTime|date('H:i') }} à {{ v.endTime|date('H:i') }}
           </li>
         {% endfor %}
@@ -346,7 +404,7 @@
   {% set fileAac = space.getDocs('document_aac') %}
   {% set filePlan = space.getDocs('document_plan') %}
   {% set fileFaq = space.getDocs('document_faq') %}
-  {% set hasAac = fileAac|length > 0 and fileAac[0].fileName is not empty %}
+  {% set hasAac = not space.isMultiLocation and fileAac|length > 0 and fileAac[0].fileName is not empty %}
   {% set hasPlan = filePlan|length > 0 and filePlan[0].fileName is not empty %}
   {% set hasFaq = fileFaq|length > 0 and fileFaq[0].fileName is not empty %}
   {% set hasRessources = hasAac or hasPlan or hasFaq %}
@@ -581,94 +639,365 @@
             .pu-gallery-thumb { width: 60px; height: 42px; }
         }
 
-        /* Popup */
-        .aac-map-popup-address {
+        /* Zone de candidature multi-sites */
+        .pu-apply-title {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        .pu-apply-sites {
+            max-width: 360px;
+            margin: 16px auto 24px;
+            padding: 0 10px;
+            text-align: center;
+            color: #000;
+        }
+        .pu-apply-sites-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: #000;
+            color: #fff;
+            font-family: ginkamedium, sans-serif;
+            font-size: 14px;
+        }
+        .pu-apply-sites-text {
+            margin: 12px 0 0;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #000;
+        }
+
+        /* Popup de la carte */
+        #aac-locations-map .aac-map-popup .leaflet-popup-content-wrapper {
+            padding: 0;
+            border: 1px solid #000;
+            border-radius: 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+            overflow: hidden;
+        }
+        #aac-locations-map .aac-map-popup .leaflet-popup-content {
+            margin: 0;
+            min-width: 260px;
+            line-height: 1.4;
+            color: #000;
+        }
+        #aac-locations-map .aac-map-popup .leaflet-popup-tip {
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+        #aac-locations-map .aac-map-popup a.leaflet-popup-close-button {
+            top: 8px;
+            right: 8px;
+            color: #000;
+            font-size: 20px;
+        }
+        .aac-map-popup-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 36px 14px 16px;
+            background: #f5f4f2;
+            border-bottom: 1px solid #000;
+        }
+        #aac-locations-map .aac-map-popup-name {
             display: block;
-            margin-top: 3px;
-            font-size: 12px;
-            color: #666;
+            font-family: ginkamedium, sans-serif;
+            font-size: 20px;
+            font-weight: normal;
+            line-height: 1.2;
+            color: #000;
         }
-        .aac-map-popup-address .fa {
-            margin-right: 3px;
-            color: #999;
-        }
-        .aac-map-popup-availability {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #555;
-        }
-        .aac-map-popup-availability .fa {
-            margin-right: 4px;
+        .aac-map-popup-number {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #000;
+            color: #fff;
+            font-family: ginkamedium, sans-serif;
+            font-size: 13px;
         }
         .aac-map-popup-badges {
-            margin-top: 6px;
             display: flex;
             gap: 6px;
-            flex-wrap: wrap;
+            margin-top: 6px;
         }
         .aac-map-popup-badge {
-            display: inline-block;
-            padding: 2px 7px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #3730a3;
-            background: #e0e7ff;
+            padding: 1px 7px;
+            border: 1px solid #000;
             border-radius: 3px;
+            font-size: 11px;
+            letter-spacing: 0.03em;
+            color: #000;
+        }
+        .aac-map-popup-badge--suspended {
+            border-color: #b91c1c;
+            color: #b91c1c;
+        }
+        .aac-map-popup-body {
+            padding: 14px 16px 16px;
+        }
+        .aac-map-popup-line {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #000;
+        }
+        .aac-map-popup-line i {
+            width: 14px;
+            margin-top: 2px;
+            text-align: center;
         }
         .aac-map-popup-suspended-notice {
             margin-top: 8px;
-            padding: 6px 8px;
+            padding: 8px 10px;
             background: #fee2e2;
-            border-radius: 4px;
             font-size: 12px;
             color: #991b1b;
-            line-height: 1.4;
         }
-        .aac-map-popup-suspended-notice .fa {
-            margin-right: 4px;
-        }
-
-        /* Cartes de sites */
-        .pu-locations-list {
+        .aac-map-popup-actions {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 14px;
         }
-        .pu-location-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 16px 18px;
+        #aac-locations-map .aac-map-popup-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            background: #000;
+            color: #fff;
+            font-family: ginkamedium, sans-serif;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        #aac-locations-map .aac-map-popup-btn:hover {
             background: #fff;
+            color: #000;
         }
-        .pu-location-card--suspended {
-            border-color: #fca5a5;
-            background: #fff8f8;
+        #aac-locations-map .aac-map-popup-link {
+            font-family: ginkamedium, sans-serif;
+            font-size: 13px;
+            color: #000;
+            text-decoration: underline;
+            text-underline-offset: 3px;
         }
-        .pu-location-card-header {
+        #aac-locations-map .aac-map-popup-link i {
+            margin-left: 4px;
+            font-size: 11px;
+        }
+
+        /* Repères numérotés de la carte */
+        .aac-map-marker {
+            background: none;
+            border: 0;
+        }
+        .aac-map-marker span {
             display: flex;
             align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: 2px solid #fff;
+            border-radius: 50% 50% 50% 0;
+            background: #000;
+            color: #fff;
+            font-family: ginkamedium, sans-serif;
+            font-size: 15px;
+            line-height: 1;
+            transform: rotate(-45deg);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+        }
+        .aac-map-marker b {
+            font-weight: normal;
+            transform: rotate(45deg);
+        }
+        .aac-map-marker--suspended span {
+            background: #9ca3af;
+        }
+        /* Accordéon des sites */
+        .pu-sites-accordion {
+            margin-top: 50px;
+            color: #000;
+        }
+        .pu-site {
+        
+            background: #fff;
+            scroll-margin-top: 100px;
+        }
+        .pu-site + .pu-site {
+            margin-top: 24px;
+        }
+        .pu-site-summary {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 22px;
+            background: #f5f4f2;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+        }
+       
+        .pu-site-summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .pu-site-summary:focus-visible {
+            outline: 2px solid #000;
+            outline-offset: 2px;
+        }
+        .pu-site-summary-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .pu-site-name {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-family: ginkamedium, sans-serif;
+            font-size: 28px;
+            font-weight: normal;
+            line-height: 1.2;
+            text-transform: none;
+            color: #000;
+        }
+        .pu-site-summary-meta {
+            font-size: 14px;
+            color: #000;
+        }
+        .pu-site-chevron {
+            flex-shrink: 0;
+            font-size: 18px;
+            color: #000;
+            transition: transform 0.2s ease;
+        }
+        .pu-site[open] .pu-site-chevron {
+            transform: rotate(180deg);
+        }
+        .pu-site-body {
+            padding: 4px 22px 24px;
+        }
+        .pu-site-body h4 {
+            margin: 26px 0 10px;
+            font-size: 18px;
+        }
+        .pu-site-summary-address {
+            margin-top: 2px;
+            font-size: 15px;
+            color: #000;
+        }
+        .pu-site-summary-address .fas {
+            margin-right: 6px;
+        }
+        .pu-site-body > h4:first-child {
+            margin-top: 20px;
+        }
+        .pu-site-text {
+            font-size: 15px;
+            color: #000;
+            line-height: 1.6;
+        }
+        .pu-site-text p {
+            font-size: inherit;
+        }
+        .pu-site-text p:last-child {
+            margin-bottom: 0;
+        }
+        .pu-site-visits {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            font-size: 15px;
+            color: #000;
+        }
+        .pu-site-visits li {
+            padding: 2px 0;
+        }
+        .pu-site-visits .fas {
+            margin-right: 8px;
+        }
+        .pu-site-note {
+            margin: 6px 0 0;
+            font-size: 13px;
+            color: #000;
+        }
+        .pu-site-actions {
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 8px;
+            margin-top: 22px;
+        }
+        .pu-site-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            background: #fff;
+            color: #000;
+            font-family: ginkamedium, sans-serif;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 1.2;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .pu-site-action:hover,
+        .pu-site-action:focus {
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+        }
+        .pu-site-action--primary {
+            background: #000;
+            color: #fff;
+        }
+        .pu-site-action--primary:hover,
+        .pu-site-action--primary:focus {
+            background: #fff;
+            color: #000;
+        }
+        @media (max-width: 767px) {
+            .pu-site-summary {
+                flex-wrap: wrap;
+            }
+            .pu-site-name {
+                font-size: 24px;
+            }
+            .pu-site-summary {
+                padding: 14px 16px;
+            }
+            .pu-site-body {
+                padding: 4px 16px 20px;
+            }
         }
         .pu-location-index {
             flex-shrink: 0;
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background: #1C244B;
+            background: #000;
             color: #fff;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .pu-location-name {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 600;
-            color: #1C244B;
-            flex: 1;
         }
         .pu-location-badges {
             display: flex;
@@ -684,34 +1013,16 @@
             letter-spacing: 0.03em;
         }
         .pu-badge--erp {
-            background: #e0e7ff;
-            color: #3730a3;
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
         }
         .pu-badge--suspended {
             background: #fee2e2;
             color: #b91c1c;
         }
-        .pu-location-card-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-        .pu-location-meta-item {
-            font-size: 13px;
-            color: #6b7280;
-        }
-        .pu-location-meta-item .fa {
-            margin-right: 4px;
-            color: #9ca3af;
-        }
-        .pu-location-description {
-            font-size: 14px;
-            color: #374151;
-            line-height: 1.6;
-        }
         .pu-location-suspension-notice {
-            margin-top: 10px;
+            margin-top: 12px;
             padding: 10px 12px;
             background: #fee2e2;
             border: 1px solid #fca5a5;
@@ -743,17 +1054,6 @@
             width: 100%;
             border-radius: 4px;
         }
-        #aac-locations-map .leaflet-popup-content {
-            margin: 12px 16px;
-            line-height: 1.4;
-            min-width: 160px;
-        }
-        #aac-locations-map .aac-map-popup-name {
-            display: block;
-            font-size: 14px;
-            font-weight: 700;
-            color: #1C244B;
-        }
     </style>
     {% if space.isMultiLocation and space.locations|length > 0 %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -781,20 +1081,62 @@
             });
 
             {% if space.isMultiLocation and space.locations|length > 0 %}
+            initSitesAccordion();
             initAacLocationsMap();
             {% endif %}
         });
 
         {% if space.isMultiLocation and space.locations|length > 0 %}
+        var aacSitesMap = { map: null, markers: {} };
+
+        function openSite(id) {
+            var site = document.getElementById('site-' + id);
+            if (!site) {
+                return;
+            }
+            site.open = true;
+            site.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function initSitesAccordion() {
+            $(document).on('click', '.js-open-site', function (e) {
+                e.preventDefault();
+                if (aacSitesMap.map) {
+                    aacSitesMap.map.closePopup();
+                }
+                openSite($(this).data('site-id'));
+            });
+
+            $(document).on('click', '.js-show-site-on-map', function () {
+                var mapEl = document.getElementById('aac-locations-map');
+                var marker = aacSitesMap.markers[$(this).data('location-id')];
+                if (mapEl) {
+                    mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                if (marker && aacSitesMap.map) {
+                    aacSitesMap.map.setView(marker.getLatLng(), 15, { animate: false });
+                    marker.openPopup();
+                }
+            });
+
+            var match = /^#site-(\d+)$/.exec(window.location.hash);
+            if (match) {
+                openSite(match[1]);
+            }
+        }
+
         function initAacLocationsMap() {
             var mapEl = document.getElementById('aac-locations-map');
             if (typeof L === 'undefined' || !mapEl) {
+                $('.js-show-site-on-map').hide();
                 return;
             }
 
             var locations = [
                 {% for location in space.locations %}
                 {
+                    id: {{ location.id }},
+                    number: {{ loop.index }},
                     name: {{ location.name|json_encode|raw }},
                     lat: {{ location.latitude ?? 'null' }},
                     lng: {{ location.longitude ?? 'null' }},
@@ -805,12 +1147,14 @@
                     availability: {{ location.availability|default('')|json_encode|raw }},
                     isErp: {{ location.isErp ? 'true' : 'false' }},
                     suspended: {{ location.suspended ? 'true' : 'false' }},
-                    suspensionMessage: {{ location.suspensionMessage|default('')|json_encode|raw }}
+                    suspensionMessage: {{ location.suspensionMessage|default('')|json_encode|raw }},
+                    aacDocumentUrl: {{ location.aacDocumentName ? vich_uploader_asset(location, 'aacDocument')|json_encode|raw : 'null' }}
                 }{% if not loop.last %},{% endif %}
                 {% endfor %}
             ];
 
             var map = L.map(mapEl).setView([46.6, 2.4], 6);
+            aacSitesMap.map = map;
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; OpenStreetMap'
@@ -826,28 +1170,38 @@
             }
 
             function buildPopupContent(loc) {
-                var html = '<span class="aac-map-popup-name">' + escapeHtml(loc.name) + '</span>';
-
-                if (loc.fullAddress) {
-                    html += '<span class="aac-map-popup-address"><i class="fas fa-location-dot"></i> ' + escapeHtml(loc.fullAddress) + '</span>';
-                }
-
-                if (loc.availability) {
-                    html += '<div class="aac-map-popup-availability"><i class="far fa-clock"></i> Durée du projet\u00a0: ' + escapeHtml(loc.availability) + '</div>';
-                }
-
                 var badges = '';
                 if (loc.isErp) {
                     badges += '<span class="aac-map-popup-badge">ERP</span>';
                 }
-                if (badges) {
-                    html += '<div class="aac-map-popup-badges">' + badges + '</div>';
+                if (loc.suspended) {
+                    badges += '<span class="aac-map-popup-badge aac-map-popup-badge--suspended">Suspendu</span>';
                 }
 
+                var html = '<div class="aac-map-popup-head">'
+                    + '<span class="aac-map-popup-number">' + loc.number + '</span>'
+                    + '<div><span class="aac-map-popup-name">' + escapeHtml(loc.name) + '</span>'
+                    + (badges ? '<div class="aac-map-popup-badges">' + badges + '</div>' : '')
+                    + '</div></div>';
+
+                html += '<div class="aac-map-popup-body">';
+                if (loc.fullAddress) {
+                    html += '<div class="aac-map-popup-line"><i class="fas fa-location-dot"></i><span>' + escapeHtml(loc.fullAddress) + '</span></div>';
+                }
+                if (loc.availability) {
+                    html += '<div class="aac-map-popup-line"><i class="far fa-clock"></i><span>Durée du projet\u00a0: ' + escapeHtml(loc.availability) + '</span></div>';
+                }
                 if (loc.suspended) {
                     var msg = loc.suspensionMessage || 'Candidatures suspendues pour ce site.';
-                    html += '<div class="aac-map-popup-suspended-notice"><i class="fas fa-circle-pause"></i> ' + escapeHtml(msg) + '</div>';
+                    html += '<div class="aac-map-popup-suspended-notice">' + escapeHtml(msg) + '</div>';
                 }
+
+                html += '<div class="aac-map-popup-actions">';
+                if (loc.aacDocumentUrl) {
+                    html += '<a class="aac-map-popup-btn" href="' + escapeHtml(loc.aacDocumentUrl) + '" target="_blank" rel="noopener"><i class="far fa-file-pdf"></i> Appel à candidatures</a>';
+                }
+                html += '<a class="aac-map-popup-link js-open-site" href="#site-' + loc.id + '" data-site-id="' + loc.id + '">Voir le détail du site <i class="fas fa-arrow-right"></i></a>';
+                html += '</div></div>';
 
                 return html;
             }
@@ -868,13 +1222,25 @@
                 }
 
                 var marker = L.marker([lat, lng], {
-                    opacity: loc.suspended ? 0.5 : 1
+                    icon: L.divIcon({
+                        className: 'aac-map-marker' + (loc.suspended ? ' aac-map-marker--suspended' : ''),
+                        html: '<span><b>' + loc.number + '</b></span>',
+                        iconSize: [34, 34],
+                        iconAnchor: [17, 41],
+                        popupAnchor: [0, -44]
+                    }),
+                    title: loc.number + '. ' + (loc.name || 'Site'),
+                    riseOnHover: true
                 }).addTo(map);
-                marker.bindPopup(buildPopupContent(loc), { maxWidth: 280 });
+                marker.bindPopup(buildPopupContent(loc), { maxWidth: 320, minWidth: 260, className: 'aac-map-popup', autoPanPaddingTopLeft: [60, 20], autoPanPaddingBottomRight: [20, 20] });
+                aacSitesMap.markers[loc.id] = marker;
                 bounds.push([lat, lng]);
             }
 
             function finalizeMap() {
+                $('.js-show-site-on-map').each(function () {
+                    $(this).toggle(!!aacSitesMap.markers[$(this).data('location-id')]);
+                });
                 if (bounds.length === 1) {
                     map.setView(bounds[0], 14);
                 } else if (bounds.length > 1) {

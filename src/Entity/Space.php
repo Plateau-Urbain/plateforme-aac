@@ -62,14 +62,12 @@ class Space implements \Stringable
      * @var string
      */
     #[ORM\Column(name: 'description', type: 'text', nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
     private $description;
 
     /**
      * @var string
      */
     #[ORM\Column(name: 'activity_description', type: 'text', nullable: true)]
-    #[Assert\NotBlank(groups: ['save'])]
     private $activityDescription;
 
     /**
@@ -1471,6 +1469,12 @@ class Space implements \Stringable
     #[Assert\Callback(groups: ['save'])]
     public function validateDocs(ExecutionContextInterface $context)
     {
+        if ($this->isMultiLocation()) {
+            $this->validateLocationsPublicationContent($context);
+
+            return;
+        }
+
         if (count($this->getDocs(SpaceImage::FILETYPE_DOCUMENT_AAC)) < 1) {
             $context->buildViolation('Il manque le document de l\'appel à candidature')
                     ->atPath('doc_aac')
@@ -1485,6 +1489,43 @@ class Space implements \Stringable
         //             //->setParameter('{{ value }}', $invalidValue)
         //             ->addViolation();
         // }
+    }
+
+    /**
+     * Les sites ne sont pas validés en cascade : les chemins locations[clé].champ
+     * permettent d'afficher l'erreur dans le bloc du site concerné.
+     */
+    private function validateLocationsPublicationContent(ExecutionContextInterface $context): void
+    {
+        foreach ($this->locations as $key => $location) {
+            if (!$location instanceof SpaceLocation
+                || $location->isSuspended()
+                || trim((string) $location->getName()) === '') {
+                continue;
+            }
+
+            if (trim(strip_tags((string) $location->getActivityDescription())) === '') {
+                $context->buildViolation('Veuillez renseigner les activités recherchées sur ce site.')
+                    ->atPath(sprintf('locations[%s].activityDescription', $key))
+                    ->addViolation();
+            }
+        }
+    }
+
+    #[Assert\Callback(groups: ['save'])]
+    public function validateGlobalTexts(ExecutionContextInterface $context): void
+    {
+        if ($this->isMultiLocation()) {
+            return;
+        }
+
+        foreach (['description' => $this->description, 'activityDescription' => $this->activityDescription] as $path => $value) {
+            if (trim((string) $value) === '') {
+                $context->buildViolation('Cette valeur ne doit pas être vide.')
+                    ->atPath($path)
+                    ->addViolation();
+            }
+        }
     }
 
     #[Assert\Callback(groups: ['save'])]

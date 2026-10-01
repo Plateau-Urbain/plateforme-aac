@@ -1,0 +1,19 @@
+{% set field = field ?? 'aacDocument' %}
+{% set documentName = location ? attribute(location, field ~ 'Name') : null %}
+<div class="{{ col ?? 'col-sm-12' }} form-group js-location-doc{% if not documentForm.vars.valid %} has-error{% endif %}">
+    {{ form_label(documentForm) }}
+    {{ form_help(documentForm) }}
+    {% if documentName %}
+        <p class="location-doc-current">
+            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+            Document actuel :
+            <a href="{{ vich_uploader_asset(location, field) }}" target="_blank" rel="noopener">{{ attribute(location, field ~ 'DisplayName') }}</a>
+        </p>
+        <p class="help-block">Déposez un nouveau fichier pour le remplacer, ou cochez la suppression.</p>
+    {% endif %}
+    {{ form_widget(documentForm) }}
+    {{ form_errors(documentForm) }}
+    {% if documentForm.file is defined %}
+        {{ form_errors(documentForm.file) }}
+    {% endif %}
+</div>

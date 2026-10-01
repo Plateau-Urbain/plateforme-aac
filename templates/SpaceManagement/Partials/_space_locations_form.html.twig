@@ -39,7 +39,32 @@
                 <div class="col-sm-12 form-group">{{ form_row(form.locations.vars.prototype.description) }}</div>
             </div>
             <div class="row">
+                <div class="col-sm-12 form-group">
+                    {{ form_label(form.locations.vars.prototype.activityDescription) }}
+                    {{ form_help(form.locations.vars.prototype.activityDescription) }}
+                    {{ form_widget(form.locations.vars.prototype.activityDescription) }}
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-sm-12 form-group">{{ form_row(form.locations.vars.prototype.availability) }}</div>
+            </div>
+            <div class="row">
+                {% include 'SpaceManagement/Partials/_space_location_document.html.twig' with {
+                    documentForm: form.locations.vars.prototype.aacDocument,
+                    location: null
+                } %}
+            </div>
+            <div class="row">
+                {% include 'SpaceManagement/Partials/_space_location_document.html.twig' with {
+                    documentForm: form.locations.vars.prototype.planDocument,
+                    location: null,
+                    col: 'col-sm-6'
+                } %}
+                {% include 'SpaceManagement/Partials/_space_location_document.html.twig' with {
+                    documentForm: form.locations.vars.prototype.faqDocument,
+                    location: null,
+                    col: 'col-sm-6'
+                } %}
             </div>
             <div class="row">
                 <div class="col-sm-12 form-group">{{ form_row(form.locations.vars.prototype.isErp) }}</div>
