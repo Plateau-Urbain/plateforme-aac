@@ -2276,7 +2276,7 @@ class SpaceManagementController extends AbstractController
     private function getFormSectionAnchor(Space $space, string $section): string
     {
         $anchors = $space->isMultiLocation()
-            ? ['photos' => 'three', 'documents' => 'four', 'resources' => 'five', 'visits' => 'six', 'locations' => 'two']
+            ? ['photos' => 'three', 'documents' => 'four', 'visits' => 'five', 'locations' => 'two']
             : ['photos' => 'two', 'documents' => 'three', 'resources' => 'four', 'visits' => 'five'];
 
         return '#' . ($anchors[$section] ?? 'one');

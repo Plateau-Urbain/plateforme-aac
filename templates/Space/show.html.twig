@@ -405,8 +405,8 @@
   {% set filePlan = space.getDocs('document_plan') %}
   {% set fileFaq = space.getDocs('document_faq') %}
   {% set hasAac = not space.isMultiLocation and fileAac|length > 0 and fileAac[0].fileName is not empty %}
-  {% set hasPlan = filePlan|length > 0 and filePlan[0].fileName is not empty %}
-  {% set hasFaq = fileFaq|length > 0 and fileFaq[0].fileName is not empty %}
+  {% set hasPlan = not space.isMultiLocation and filePlan|length > 0 and filePlan[0].fileName is not empty %}
+  {% set hasFaq = not space.isMultiLocation and fileFaq|length > 0 and fileFaq[0].fileName is not empty %}
   {% set hasRessources = hasAac or hasPlan or hasFaq %}
 
   {% if hasRessources %}
@@ -916,6 +916,20 @@
         }
         .pu-site-text p:last-child {
             margin-bottom: 0;
+        }
+        .pu-site-text ul,
+        .pu-site-text ol {
+            margin: 0 0 10px;
+            padding-left: 22px;
+        }
+        .pu-site-text ul:last-child,
+        .pu-site-text ol:last-child {
+            margin-bottom: 0;
+        }
+        .pu-site-text li {
+            font-size: inherit;
+            line-height: 1.6;
+            color: #000;
         }
         .pu-site-visits {
             list-style: none;

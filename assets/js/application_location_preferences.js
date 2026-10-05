@@ -19,19 +19,18 @@
 
         if (excluded) {
             $item.find('.js-location-preference-rank').val('');
-            $rankLabel.text('—').css({ background: '#94a3b8' });
+            $rankLabel.text('—');
             $excludeBtn.hide();
             $restoreBtn.show();
             if (!$badge.length) {
-                $item.find('.location-preference-info > div').first().append(
-                    '<span class="label label-default js-excluded-badge" style="font-size: 11px;">Ne m\'intéresse pas</span>'
+                $item.find('.location-preference-badges').append(
+                    '<span class="pu-badge pu-badge--excluded js-excluded-badge">Ne m\'intéresse pas</span>'
                 );
             }
         } else {
             $excludeBtn.show();
             $restoreBtn.hide();
             $badge.remove();
-            $rankLabel.css({ background: '#0f172a' });
         }
     }
 
@@ -47,7 +46,7 @@
 
             rank += 1;
             $item.find('.js-location-preference-rank').val(rank);
-            $item.find('.js-preference-rank-label').text(rank).css({ background: '#0f172a' });
+            $item.find('.js-preference-rank-label').text(rank);
         });
     }
 

@@ -39,9 +39,10 @@ class ApplicationAdminController extends CRUDController
     public function selectExportFieldsAction(Request $request): Response
     {
         $filterParameters = $request->query->all();
+        $filteredSpace = $this->getFilteredSpaceFromParameters($filterParameters);
         $includeLocationPreferenceFields = $this->shouldIncludeLocationPreferenceFields($filterParameters);
-        $availableFields = $this->getAllAvailableFields($includeLocationPreferenceFields);
-        $presetExportFieldKeys = $this->getPresetExportFieldKeys();
+        $availableFields = $this->getAllAvailableFields($includeLocationPreferenceFields, $filteredSpace);
+        $presetExportFieldKeys = $this->getPresetExportFieldKeys($filteredSpace);
 
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('export_fields', $request->request->getString('_token'))) {
@@ -58,12 +59,15 @@ class ApplicationAdminController extends CRUDController
                 return $this->renderWithExtraParams('Admin/Application/select_export_fields.html.twig', [
                     'availableFields' => $availableFields,
                     'presetExportFieldKeys' => $presetExportFieldKeys,
+                    'locationPreferenceColumnCount' => $includeLocationPreferenceFields
+                        ? $this->getLocationPreferenceColumnCount($filteredSpace)
+                        : 0,
                     'action' => 'list',
                     'filterParameters' => $filterParameters,
                 ]);
             }
 
-            $selectedFields = $this->sortSelectedExportFieldKeys($selectedFields);
+            $selectedFields = $this->sortSelectedExportFieldKeys($selectedFields, $filteredSpace);
 
             // Préparer les paramètres pour l'export en conservant les filtres
             $exportParams = array_merge(
@@ -78,6 +82,9 @@ class ApplicationAdminController extends CRUDController
         return $this->renderWithExtraParams('Admin/Application/select_export_fields.html.twig', [
             'availableFields' => $availableFields,
             'presetExportFieldKeys' => $presetExportFieldKeys,
+            'locationPreferenceColumnCount' => $includeLocationPreferenceFields
+                ? $this->getLocationPreferenceColumnCount($filteredSpace)
+                : 0,
             'action' => 'list',
             'filterParameters' => $filterParameters,
         ]);
@@ -99,10 +106,12 @@ class ApplicationAdminController extends CRUDController
             return $this->redirectToList();
         }
 
-        $selectedFieldKeys = $this->sortSelectedExportFieldKeys($selectedFieldKeys);
+        $filterParameters = $request->query->all();
+        $filteredSpace = $this->getFilteredSpaceFromParameters($filterParameters);
+        $selectedFieldKeys = $this->sortSelectedExportFieldKeys($selectedFieldKeys, $filteredSpace);
 
-        $includeLocationPreferenceFields = $this->shouldIncludeLocationPreferenceFields($request->query->all());
-        $allFields = $this->getAllAvailableFields($includeLocationPreferenceFields);
+        $includeLocationPreferenceFields = $this->shouldIncludeLocationPreferenceFields($filterParameters);
+        $allFields = $this->getAllAvailableFields($includeLocationPreferenceFields, $filteredSpace);
 
         if (!$includeLocationPreferenceFields) {
             $selectedFieldKeys = array_values(array_filter(
@@ -373,7 +382,7 @@ class ApplicationAdminController extends CRUDController
      * Retourne tous les champs disponibles pour l'export
      */
     /** @return array<string, array{label: string, property: string, category: string}> */
-    private function getAllAvailableFields(bool $includeLocationPreferenceFields = true): array
+    private function getAllAvailableFields(bool $includeLocationPreferenceFields = true, ?Space $space = null): array
     {
         // Aligné sur `SpaceManagementController::getAllAvailableFieldsForExport()`
         $fields = [
@@ -666,7 +675,7 @@ class ApplicationAdminController extends CRUDController
                 'category' => 'Candidature - Mon projet',
             ];
 
-            $maxRank = $this->getMaxLocationPreferenceRank();
+            $maxRank = $this->getLocationPreferenceColumnCount($space);
             for ($rank = 1; $rank <= $maxRank; ++$rank) {
                 $fields[sprintf('locationPreference_rank_%d', $rank)] = [
                     'label' => sprintf('[Candidature] Choix %d', $rank),
@@ -686,17 +695,20 @@ class ApplicationAdminController extends CRUDController
     }
 
     /** @return string[] */
-    private function getPresetExportFieldKeys(): array
+    private function getPresetExportFieldKeys(?Space $space = null): array
     {
+        $columnCount = $this->getLocationPreferenceColumnCount($space);
+
         return array_values(array_filter(
-            $this->getExportFieldOrderPreset(),
+            $this->getExportFieldOrderPreset($space),
             static fn (string $key): bool => $key !== 'locationPreferences'
-                && !preg_match('/^locationPreference_rank_\d+$/', $key)
+                && $key !== 'locationPreferences_excluded'
+                && ($columnCount > 1 || !preg_match('/^locationPreference_rank_\d+$/', $key))
         ));
     }
 
     /** @return string[] */
-    private function getExportFieldOrderPreset(): array
+    private function getExportFieldOrderPreset(?Space $space = null): array
     {
         $orderPreset = [
             'space',
@@ -723,7 +735,7 @@ class ApplicationAdminController extends CRUDController
             'contribution',
         ];
 
-        $maxRank = $this->getMaxLocationPreferenceRank();
+        $maxRank = $this->getLocationPreferenceColumnCount($space);
         for ($rank = 1; $rank <= $maxRank; ++$rank) {
             $orderPreset[] = sprintf('locationPreference_rank_%d', $rank);
         }
@@ -739,9 +751,9 @@ class ApplicationAdminController extends CRUDController
      *
      * @return string[]
      */
-    private function sortSelectedExportFieldKeys(array $selectedFieldKeys): array
+    private function sortSelectedExportFieldKeys(array $selectedFieldKeys, ?Space $space = null): array
     {
-        $orderPreset = $this->getExportFieldOrderPreset();
+        $orderPreset = $this->getExportFieldOrderPreset($space);
 
         $resolveExportFieldSortIndex = static function (string $key) use ($orderPreset): int {
             $index = array_search($key, $orderPreset, true);
@@ -775,6 +787,35 @@ class ApplicationAdminController extends CRUDController
             ->getSingleScalarResult();
 
         return max($maxRank, 0);
+    }
+
+    /**
+     * Nombre de colonnes « Choix N » : sites actifs du plus grand AAC au fil de l'eau,
+     * ou rang max déjà enregistré (candidatures plus anciennes).
+     */
+    private function getLocationPreferenceColumnCount(?Space $space = null): int
+    {
+        if ($space instanceof Space) {
+            return $space->isMultiLocation() ? count($space->getOrderedActiveLocations()) : 0;
+        }
+
+        $siteCounts = $this->em->createQueryBuilder()
+            ->select('COUNT(location.id) AS siteCount')
+            ->from(Space::class, 'space')
+            ->join('space.locations', 'location')
+            ->where('space.workflowType = :workflowType')
+            ->andWhere('location.suspended = false')
+            ->setParameter('workflowType', Space::WORKFLOW_MULTI_LOCATION)
+            ->groupBy('space.id')
+            ->getQuery()
+            ->getScalarResult();
+
+        $maxSites = 0;
+        foreach ($siteCounts as $row) {
+            $maxSites = max($maxSites, (int) $row['siteCount']);
+        }
+
+        return max($maxSites, $this->getMaxLocationPreferenceRank());
     }
 
     /**

@@ -217,7 +217,6 @@
                     <li><a class="indicator" href="#three"></a></li>
                     <li><a class="indicator" href="#four"></a></li>
                     <li><a class="indicator" href="#five"></a></li>
-                    <li><a class="indicator" href="#six"></a></li>
                 </ul>
             </div>
 
@@ -351,18 +350,6 @@
                 <div id="five" class="section">
                     <span class="section-title form-five"></span>
                     <div class="form-contener bleu">
-                        <h3>Documents ressources</h3>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                {% include 'SpaceManagement/Partials/_space_required_form.html.twig' with { 'form': form, 'space': space, 'show_aac_doc': false } %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="six" class="section">
-                    <span class="section-title form-six"></span>
-                    <div class="form-contener bleu">
                         <h3>Visites organisées</h3>
                         <div class="row">
                             <div class="col-sm-12">
@@ -410,7 +397,7 @@
 
 <script>
 (function () {
-    var sections = ['one', 'two', 'three', 'four', 'five', 'six'];
+    var sections = ['one', 'two', 'three', 'four', 'five'];
     var targetSection = null;
     var targetIndex = -1;
 

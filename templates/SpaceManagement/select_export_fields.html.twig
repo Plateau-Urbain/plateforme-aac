@@ -720,7 +720,7 @@ $(document).ready(function() {
         'category',                       // Type d'usage
         'localUsageDescription',          // Quel sera l'usage du local ?
         'contribution'                    // Idées pour le projet collectif
-        {% if space.isMultiLocation %},
+        {% if space.isMultiLocation and space.orderedActiveLocations|length > 1 %},
         {% for rank in 1..space.orderedActiveLocations|length %},
         'locationPreference_rank_{{ rank }}' // Choix {{ rank }}
         {% endfor %}

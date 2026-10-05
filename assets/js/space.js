@@ -124,6 +124,10 @@ $(document).ready(function () {
             autogrow: true
         });
 
+        if (window.initSpaceLocations) {
+            window.initSpaceLocations();
+        }
+
         if (saving && $(data).find('.alert-success').length > 0 && $("#js-form-space .has-error").length < 1) {
             $.colorbox({ html: $('#saveBox').html().replace('%%savemsg%%', saving) });
         }

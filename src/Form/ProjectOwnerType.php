@@ -134,6 +134,9 @@ class ProjectOwnerType extends AbstractType
 
                     return $useType->getName();
                 },
+                'choice_attr' => static fn ($useType): array => $useType instanceof UseType && !$useType->getIsActive()
+                    ? ['data-archived' => '1']
+                    : [],
                 'query_builder' => function (EntityRepository $repo) use ($currentUseTypeId) {
                     $qb = $repo->createQueryBuilder('u')
                         ->where('u.isActive = :active')

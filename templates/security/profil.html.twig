@@ -68,13 +68,6 @@
             </div>
         {% endfor %}
 
-        {% if form.vars.value.useType is not null and not form.vars.value.useType.isActive %}
-            <div class="alert alert-warning" role="alert">
-                <strong>Type de projet :</strong>
-                la valeur enregistrée n’est plus proposée sur la plateforme. Vous devez en sélectionner une nouvelle dans la section « Mes souhaits » (en bas du formulaire), puis enregistrer.
-            </div>
-        {% endif %}
-
         {% if form.vars.submitted is defined and form.vars.submitted and form.vars.valid is defined and not form.vars.valid and form.useType.vars.errors|length %}
             <div id="js-profile-usetype-validation-alert" class="alert alert-danger" role="alert">
                 <strong>Enregistrement impossible.</strong>
@@ -916,61 +909,20 @@
                     id:       'warn-useType',
                     selector: null, // traité séparément via $useTypeField
                     label:    'Type de projet',
-                    message:  'Nouveau champ obligatoire : veuillez sélectionner un type de projet.',
+                    message:  'Ce champ a évolué : sélectionnez votre secteur d\'activité.',
                     anchor:   '#five'
                 },
                 {
                     id:       'warn-useType-archived',
                     selector: null,
                     label:    'Type de projet (archivé)',
-                    message:  'Le type enregistré n\'est plus proposé : choisissez-en un autre dans la liste.',
+                    message:  'Ce champ a évolué : sélectionnez votre secteur d\'activité.',
                     anchor:   '#five'
                 }
             ];
 
             // Bandeau récapitulatif en haut de page
             const $banner = $('#js-profile-incomplete-banner');
-
-            function buildBanner(missingIds) {
-                if (!missingIds.length) {
-                    $banner.hide().empty();
-                    return;
-                }
-                $banner.html(
-                    '<div style="padding:14px 18px;margin-bottom:16px;">' +
-                    '<strong style="color:#bc1b38;">⚠ Votre profil doit être complété pour pouvoir candidater</strong>' +
-                    '<p style="margin:8px 0 0 0;color:#000;">Merci de <strong>compléter l\'ensemble des sections de votre profil</strong> (coordonnées, présentation, projet, réseaux sociaux…) ' +
-                    'avant de déposer une candidature. Si vous reprenez une candidature plus ancienne, il est normal que votre profil ne soit plus entièrement à jour.</p>' +
-                    '</div>'
-                ).show();
-            }
-
-            // Calcul initial des champs manquants
-            function getMissingIds() {
-                const missing = [];
-                newFieldWarnings.forEach(function(cfg) {
-                    if (!cfg.selector) return; // preferredDepartments traité en dehors
-                    const $field = $(cfg.selector);
-                    if (!$field.length) return;
-                    const val = $field.val();
-                    if (!val || val.trim() === '') missing.push(cfg.id);
-                });
-                // preferredDepartments
-                const $pd = $('#project_owner_preferredDepartments');
-                if ($pd.length) {
-                    const v = $pd.val();
-                    const empty = !v || (Array.isArray(v) ? v.length === 0 : String(v).trim() === '');
-                    if (empty) missing.push('warn-preferredDepartments');
-                }
-                // useType vide (pas archivé — l'alerte Twig statique couvre déjà ce cas)
-                const $ut = $('#project_owner_useType');
-                if ($ut.length && $('#js-form-space').attr('data-use-type-archived') !== '1') {
-                    const utVal = $ut.val();
-                    const utEmpty = !utVal || String(utVal).trim() === '';
-                    if (utEmpty) missing.push('warn-useType');
-                }
-                return missing;
-            }
 
             function removeMissingId(id) {
                 const items = $banner.find('li');
@@ -1048,7 +1000,7 @@
                     if (!utGroup.find('.help-block-new').length) {
                         utGroup.addClass('has-warning-new');
                         const $utChosen = $useTypeField.next('.chzn-container');
-                        ($utChosen.length ? $utChosen : $useTypeField).after('<span class="help-block-new" role="note">Nouveau champ obligatoire : veuillez sélectionner un type de projet.</span>');
+                        ($utChosen.length ? $utChosen : $useTypeField).after('<span class="help-block-new" role="note">Ce champ a évolué : sélectionnez votre secteur d\'activité.</span>');
                     }
                     $useTypeField.one('change', function() {
                         const v = $(this).val();
@@ -1056,7 +1008,6 @@
                             utGroup.removeClass('has-warning-new');
                             utGroup.find('.help-block-new').remove();
                             removeMissingId('warn-useType');
-                            buildBanner(getMissingIds());
                         }
                     });
                 }
@@ -1068,15 +1019,17 @@
                 if (!utGroup.find('.help-block-new').length) {
                     utGroup.addClass('has-warning-new');
                     const $utChosen2 = $useTypeField.next('.chzn-container');
-                    ($utChosen2.length ? $utChosen2 : $useTypeField).after('<span class="help-block-new" role="note">Ce type de projet n\'est plus proposé : sélectionnez une autre ligne dans la liste (sans la mention « archivé »), puis enregistrez.</span>');
+                    ($utChosen2.length ? $utChosen2 : $useTypeField).after('<span class="help-block-new" role="note">Ce champ a évolué : sélectionnez votre secteur d\'activité.</span>');
                 }
                 $useTypeField.on('change', function() {
+                    if ($(this).find('option:selected').attr('data-archived') === '1') {
+                        return;
+                    }
                     utGroup.removeClass('has-warning-new');
                     utGroup.find('.help-block-new').remove();
                     removeMissingId('warn-useType-archived');
                     removeMissingId('warn-useType');
                     $('#js-form-space').attr('data-use-type-archived', '0');
-                    buildBanner(getMissingIds());
                 });
             }
 
@@ -1381,6 +1334,14 @@
                 
                 // Supprimer les anciens messages d'erreur
                 formGroup.find('.js-help-block').remove();
+
+                if ($field.attr('id') === 'project_owner_useType' && $field.find('option:selected').attr('data-archived') === '1') {
+                    formGroup.addClass('has-error');
+                    if (!formGroup.find('.help-block').length) {
+                        formGroup.append('<span class="help-block js-help-block" role="alert" aria-live="polite">Ce secteur d\'activité n\'est plus proposé : sélectionnez-en un autre dans la liste.</span>');
+                    }
+                    return;
+                }
                 
                 if (isRequired && isValueEmpty(value)) {
                     // Champ requis mais vide - afficher l'erreur

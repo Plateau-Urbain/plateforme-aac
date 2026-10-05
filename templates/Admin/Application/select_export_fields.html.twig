@@ -188,6 +188,14 @@
                             </h4>
                         </div>
                         <div class="panel-body">
+                            {% if category == 'Candidature - Mon projet' and locationPreferenceColumnCount|default(0) > 0 %}
+                            <p class="help-block" style="margin-top: 0;">
+                                Les colonnes «&nbsp;Choix 1&nbsp;» à «&nbsp;Choix {{ locationPreferenceColumnCount }}&nbsp;» correspondent au classement des sites des AAC au fil de l'eau
+                                (autant de colonnes que le plus grand nombre de sites parmi ces AAC).
+                                Elles restent vides pour les AAC classiques.
+                                «&nbsp;Sites non retenus&nbsp;» liste les sites explicitement écartés par le candidat.
+                            </p>
+                            {% endif %}
                             <div class="row">
                                 {% for item in fields %}
                                 <div class="col-md-4 col-sm-6">
