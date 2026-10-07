@@ -843,10 +843,6 @@ class Space implements \Stringable
 
     public function getListingCardClass(): string
     {
-        if ($this->isMultiLocation()) {
-            return 'space-card--multi-location';
-        }
-
         return $this->isProposedByAdmin() ? 'space-card--by-admin' : 'space-card--by-proprio';
     }
 

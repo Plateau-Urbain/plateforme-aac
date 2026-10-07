@@ -9364,6 +9364,7 @@ form .main .section-title {
   background: rgba(45, 116, 186, 0.95);
   color: #fff;
   padding: 9px 9px;
+  border-top-right-radius: 12px;
   border-bottom-left-radius: 12px;
   font-size: 11px;
   text-transform: uppercase;
@@ -9385,6 +9386,7 @@ form .main .section-title {
   background: rgba(105, 189, 147, 0.95);
   color: #fff;
   padding: 9px 9px;
+  border-top-right-radius: 12px;
   border-bottom-left-radius: 12px;
   font-size: 11px;
   text-transform: uppercase;
@@ -10259,7 +10261,7 @@ a.btn-line-19:hover span {
   padding-top: 110px;
   padding-bottom: 7px;
   border-bottom: 1px solid #707070;
-  /*margin-bottom: 60px;*/
+  margin-bottom: 32px;
 }
 
 @media (max-width: 992px) {
@@ -12461,6 +12463,7 @@ form .main .section-title.form-sixth:after {
   background: #e7b15a;
   color: #fff;
   padding: 9px 9px;
+  border-top-right-radius: 12px;
   border-bottom-left-radius: 12px;
   font-size: 11px;
   text-transform: uppercase;
@@ -12634,6 +12637,7 @@ body.theme-v2 .space_item_unavailable,
 body.theme-v2 .space_item_suspended {
     color: #1e293b !important;
     border-radius: var(--v2-radius-md) !important;
+    overflow: hidden;
     box-shadow: var(--v2-shadow-sm) !important;
     transform: translateY(0);
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease !important;

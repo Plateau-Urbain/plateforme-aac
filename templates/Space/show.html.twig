@@ -484,36 +484,6 @@
       </div>
     {% endif %}
 
-    {% if space.parcels | length > 0 %}
-      <h4 id="parcels">
-        {{ 'Répartition des espaces' }}
-      </h4>
-      <div class="pu-col-container content-block">
-        <div class="pu-table-wrapper">
-          <table class="pu-parcels-table">
-            <thead>
-              <tr>
-                <th>{{ 'Étage' | upper }}</th>
-                <th>{{ 'Type de locaux' | upper }}</th>
-                <th>{{ 'Surface' | upper }}</th>
-                <th>{{ 'Disponibilité' | upper }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for p in space.parcels %}
-                <tr {% if loop.index is even %}class="even"{% endif %}>
-                  <td>{{ p.floor }}</td>
-                  <td>{{ p.type }}</td>
-                  <td>{{ p.surface }} m<sup>2</sup></td>
-                  <td>{% if p.disponibility is not null %}{{ p.disponibility | date('d/m/Y') }}{% else %}Immédiat{% endif %}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    {% endif %}
-
     {% if space.usageRestriction %}
       <h4>
         {{ 'Mentions / restrictions d\'usage' }}

@@ -58,7 +58,7 @@ class SpaceType extends AbstractType
                     'placeholder' => 'Ex : Géré par Plateau Urbain, Proposé par Base Commune…',
                 ],
                 'required'     => false,
-                'help'         => 'Laissez vide pour utiliser le texte automatique ("Géré par Plateau Urbain" ou "Géré par [société du propriétaire]"). Saisissez un texte libre pour le remplacer complètement.',
+                'help'         => 'Laissez vide pour utiliser le texte automatique ("Géré par Plateau Urbain" ou "Proposé par [société du propriétaire]"). Saisissez un texte libre pour le remplacer complètement.',
                 'error_bubbling' => false,
             ])
             ->add('zipCode', null, ['label' => 'Code postal', 'attr' => ['class' => 'form-control'], 'required' => false, 'error_bubbling' => false])
