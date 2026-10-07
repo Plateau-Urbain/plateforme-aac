@@ -333,7 +333,7 @@
             {% if application.localUsageDescription %}
               <tr><th>Quel sera l'usage du local ?</th><td>{{ application.localUsageDescription|nl2br }}</td></tr>
             {% endif %}
-            {% include 'Application/Partials/_location_preferences.html.twig' with { application: application } %}
+            {% include 'Application/partials/_location_preferences.html.twig' with { application: application } %}
             <tr><th>Ouvert(e) à un projet collectif</th><td>{{ application.openToGlobalProject ? 'Oui' : 'Non' }}</td></tr>
             {% if application.contribution %}
               <tr><th>Quelles idées avez-vous pour participer au projet collectif ?</th><td>{{ application.contribution|nl2br }}</td></tr>
