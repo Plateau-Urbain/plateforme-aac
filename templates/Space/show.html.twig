@@ -288,7 +288,7 @@
         <div class="pu-sites-accordion">
             {% for location in space.locations %}
             {% set siteVisits = space.visits|filter(v => v.location and v.location.id == location.id) %}
-            <details class="pu-site{% if location.suspended %} pu-site--suspended{% endif %}" id="site-{{ location.id }}"{% if loop.first %} open{% endif %}>
+            <details class="pu-site{% if location.suspended %} pu-site--suspended{% endif %}" id="site-{{ location.id }}">
                 <summary class="pu-site-summary">
                     <span class="pu-location-index">{{ loop.index }}</span>
                     <span class="pu-site-summary-main">
@@ -346,6 +346,9 @@
                         <p class="pu-site-note">Si votre candidature est sélectionnée, vous recevrez un mail pour vous inscrire à l’une de ces visites (la visite du site est obligatoire).</p>
                     {% endif %}
 
+                    {% if location.aacDocumentName or location.planDocumentName or location.faqDocumentName %}
+                        <h4>Documents ressources</h4>
+                    {% endif %}
                     <div class="pu-site-actions">
                         {% if location.aacDocumentName %}
                             <a class="pu-site-action pu-site-action--primary" href="{{ vich_uploader_asset(location, 'aacDocument') }}" target="_blank" rel="noopener">
@@ -413,44 +416,28 @@
   <h4>
       {{ 'Documents ressources' }}
     </h4>
-    <div class="pu-col-container content-block ressources">
-          {% if hasAac %}
-          <div class="ressources-item grey">
-            <div class="fd ressources-fd"><div class="pdf-appel"></div></div>
-            <div class="lien-pdf red">
-                <p>
-                    <a class="red" href="{{ vich_uploader_asset(fileAac[0], 'file') }}" target="_blank">
-                        Télécharger l'appel à candidatures
-                    </a>
-                </p>
-            </div>
-          </div>
-          {% endif %}
-          {% if hasPlan %}
-          <div class="ressources-item grey">
-           <div class="fd ressources-fd"><img src="{{ asset('bundles/app/images/groupe-repartion-espace.png') }}" alt="Répartition des espaces" /></div>
-           <div class="lien-pdf red">
-               <p>
-                   <a class="red" href="{{ vich_uploader_asset(filePlan[0], 'file') }}" target="_blank">
-                       Répartition des espaces
-                   </a>
-               </p>
-           </div>
+    <div class="pu-col-container content-block">
+        <div class="pu-site-actions">
+            {% if hasAac %}
+                <a class="pu-site-action pu-site-action--primary" href="{{ vich_uploader_asset(fileAac[0], 'file') }}" target="_blank" rel="noopener">
+                    <i class="far fa-file-pdf" aria-hidden="true"></i>
+                    Télécharger l'appel à candidatures
+                </a>
+            {% endif %}
+            {% if hasPlan %}
+                <a class="pu-site-action" href="{{ vich_uploader_asset(filePlan[0], 'file') }}" target="_blank" rel="noopener">
+                    <i class="far fa-file-pdf" aria-hidden="true"></i>
+                    Répartition des espaces
+                </a>
+            {% endif %}
+            {% if hasFaq %}
+                <a class="pu-site-action" href="{{ vich_uploader_asset(fileFaq[0], 'file') }}" target="_blank" rel="noopener">
+                    <i class="far fa-circle-question" aria-hidden="true"></i>
+                    F.A.Q
+                </a>
+            {% endif %}
         </div>
-          {% endif %}
-          {% if hasFaq %}
-          <div class="ressources-item grey">
-           <div class="fd ressources-fd"><img src="{{ asset('bundles/app/images/groupe-faq.png') }}" alt="F.A.Q" /></div>
-           <div class="lien-pdf red">
-               <p>
-                   <a class="red" href="{{ vich_uploader_asset(fileFaq[0], 'file') }}" target="_blank">
-                       F.A.Q
-                   </a>
-               </p>
-           </div>
-        </div>
-          {% endif %}
-     </div>
+    </div>
   {% endif %}
 
 
