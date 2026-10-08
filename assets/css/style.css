@@ -12525,7 +12525,8 @@ form .main .section-title.form-sixth:after {
   padding: 4px 10px;
   border-radius: 20px;
   line-height: 1.4;
-  white-space: nowrap;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   transition: background-color 0.15s ease;
 }
 
