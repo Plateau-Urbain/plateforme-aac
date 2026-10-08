@@ -12721,6 +12721,12 @@ body.theme-v2 .space_item.space-card--multi-location:hover {
     transform: translateY(-2px);
 }
 
+.space_item h3.h3-21,
+.space_item_unavailable h3.h3-21 {
+    font-size: 21px;
+    line-height: 27px;
+}
+
 /* Lisibilité de la surface de lecture (Invariante au survol) */
 body.theme-v2 .space_item .foot,
 body.theme-v2 .space_item_unavailable .foot,
