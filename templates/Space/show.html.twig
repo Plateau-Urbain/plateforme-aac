@@ -1060,6 +1060,25 @@
         {% if space.isMultiLocation and space.locations|length > 0 %}
         var aacSitesMap = { map: null, markers: {} };
 
+        function addOsmTiles(map) {
+            var layer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            });
+            layer.createTile = function (coords, done) {
+                var tile = document.createElement('img');
+                L.DomEvent.on(tile, 'load', L.Util.bind(this._tileOnLoad, this, done, tile));
+                L.DomEvent.on(tile, 'error', L.Util.bind(this._tileOnError, this, done, tile));
+                tile.referrerPolicy = 'origin';
+                tile.alt = '';
+                tile.setAttribute('role', 'presentation');
+                tile.src = this.getTileUrl(coords);
+                return tile;
+            };
+            layer.addTo(map);
+            return layer;
+        }
+
         function openSite(id) {
             var site = document.getElementById('site-' + id);
             if (!site) {
@@ -1126,10 +1145,7 @@
 
             var map = L.map(mapEl).setView([46.6, 2.4], 6);
             aacSitesMap.map = map;
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
+            addOsmTiles(map);
 
             var bounds = [];
             var pending = 0;

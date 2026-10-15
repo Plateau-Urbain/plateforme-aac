@@ -8,6 +8,25 @@
     var leafletLoaded = false;
     var leafletLoading = false;
 
+    function addOsmTiles(map) {
+        var layer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        });
+        layer.createTile = function (coords, done) {
+            var tile = document.createElement('img');
+            L.DomEvent.on(tile, 'load', L.Util.bind(this._tileOnLoad, this, done, tile));
+            L.DomEvent.on(tile, 'error', L.Util.bind(this._tileOnError, this, done, tile));
+            tile.referrerPolicy = 'origin';
+            tile.alt = '';
+            tile.setAttribute('role', 'presentation');
+            tile.src = this.getTileUrl(coords);
+            return tile;
+        };
+        layer.addTo(map);
+        return layer;
+    }
+
     function loadLeaflet(callback) {
         if (typeof L !== 'undefined') {
             callback();
@@ -47,10 +66,7 @@
             var zoom = $item.find('.js-location-lat').val() ? 15 : 6;
 
             var map = L.map($mapEl[0]).setView([lat, lng], zoom);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
+            addOsmTiles(map);
 
             var marker = L.marker([lat, lng], { draggable: true }).addTo(map);
 

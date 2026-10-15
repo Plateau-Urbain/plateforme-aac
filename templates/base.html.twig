@@ -5,6 +5,8 @@
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 <head>
     <meta charset="utf-8" />
+    {# Le proxy frontal envoie Referrer-Policy: no-referrer, ce qui fait refuser les tuiles OSM. #}
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- Page Title -->
     <title>{% block title %}Trouver un local | Plateau Urbain{% endblock %}</title>
