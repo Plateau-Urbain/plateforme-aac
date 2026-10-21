@@ -40,6 +40,13 @@
 
         {% form_theme form 'Form/bootstrap_3_layout.html.twig' %}
         <style>
+            #js-form-space .field-required-star {
+                color: #E9473C;
+                font-weight: 700;
+            }
+            #js-form-space label.no-auto-star.required:after {
+                content: none;
+            }
             #js-form-space .has-error .help-block {
                 display: block;
                 color: #FFF;

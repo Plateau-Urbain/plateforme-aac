@@ -57,6 +57,7 @@ class Builder
         $Menu->addChild("Définition", ['uri' => 'https://www.plateau-urbain.com/tiers-lieux/', 'linkAttributes' => ['target' => '_top']]);
         $Menu->addChild("Nos projets", ['uri' => 'https://www.plateau-urbain.com/tiers-lieux/nos-projets/', 'linkAttributes' => ['target' => '_top']]);
         $Menu->addChild("Actualités des lieux", ['uri' => 'https://www.plateau-urbain.com/tiers-lieux/actualites-des-lieux/', 'linkAttributes' => ['target' => '_top']]);
+        $Menu->addChild("Agenda", ['uri' => 'https://www.plateau-urbain.com/tiers-lieux/agenda/', 'linkAttributes' => ['target' => '_top']]);
         $Menu->addChild("Occupant·es", ['uri' => 'https://www.plateau-urbain.com/tiers-lieux/occupant-es/', 'linkAttributes' => ['target' => '_top']]);
         $menu->addChild('Trouver un local', ['route' => 'search_index','attributes' => [
             'class' => 'local',

@@ -51,21 +51,25 @@ class SpaceLocationType extends AbstractType
                 'empty_data' => null,
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Descriptif du projet',
+                'label' => 'Descriptif du projet <span class="field-required-star" aria-hidden="true">*</span>',
+                'label_html' => true,
+                'label_attr' => ['class' => 'no-auto-star'],
                 'attr' => ['class' => 'form-control', 'rows' => 3, 'required' => 'required'],
                 'required' => true,
                 'error_bubbling' => false,
             ])
             ->add('activityDescription', TextareaType::class, [
-                'label' => 'Activités recherchées',
-                'attr' => ['class' => 'form-control', 'rows' => 3],
-                'required' => false,
-                'help' => 'Obligatoire pour publier.',
-                'help_attr' => ['class' => 'help-block'],
+                'label' => 'Activités recherchées <span class="field-required-star" aria-hidden="true">*</span>',
+                'label_html' => true,
+                'label_attr' => ['class' => 'no-auto-star'],
+                'attr' => ['class' => 'form-control', 'rows' => 3, 'required' => 'required'],
+                'required' => true,
                 'error_bubbling' => false,
             ])
             ->add('availability', null, [
-                'label' => 'Durée du projet',
+                'label' => 'Durée du projet <span class="field-required-star" aria-hidden="true">*</span>',
+                'label_html' => true,
+                'label_attr' => ['class' => 'no-auto-star'],
                 'attr' => ['class' => 'form-control', 'placeholder' => '1 an, 6 mois…', 'required' => 'required'],
                 'required' => true,
                 'error_bubbling' => false,
