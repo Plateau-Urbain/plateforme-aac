@@ -44,6 +44,7 @@ class SpaceApiPresenter
             'createdAt' => $this->toIso($space->getCreated()),
             'updatedAt' => $this->toIso($space->getUpdated()),
             'applicationDeadline' => $this->toIso($space->getLimitAvailability()),
+            'availability' => $space->getAvailability(),
             'description' => $space->getDescription(),
             'activityDescription' => $space->getActivityDescription(),
             'locationDescription' => $space->getLocationDescription(),
