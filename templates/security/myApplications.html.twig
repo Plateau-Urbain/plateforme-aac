@@ -221,7 +221,7 @@
                         </li>
                         {% if not space.isMultiLocation and (space.nbSpaces or space.minSpace or space.maxSpace) %}
                         <li>
-                          <strong>{{ space.nbSpaces }}</strong> espace(s) de {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup>
+                          <strong>{{ space.nbSpaces }}</strong> espace(s) {% include 'Space/Partials/_surface_range.html.twig' with { space: space } %}
                         </li>
                         {% endif %}
                         <li> Bailleur: {{ space.owner.company }}

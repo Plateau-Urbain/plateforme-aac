@@ -104,11 +104,9 @@
             {% endif %}
             {% if space.nbSpaces or space.minSpace or space.maxSpace %}
             <p class="pu-label">
-              Surfaces&nbsp;:
+              Surface(s)&nbsp;:
               {% if space.nbSpaces %}{{ space.nbSpaces }} espace(s){% endif %}
-              {% if space.minSpace or space.maxSpace %}
-                de {{ space.minSpace|default('?') }} m<sup>2</sup> à {{ space.maxSpace|default('?') }} m<sup>2</sup>
-              {% endif %}
+              {% include 'Space/Partials/_surface_range.html.twig' with { space: space } %}
             </p>
             {% endif %}
      

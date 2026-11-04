@@ -62,7 +62,7 @@
               </li>
               {% if not space.isMultiLocation and (space.nbSpaces or space.minSpace or space.maxSpace) %}
               <li>{{ space.nbSpaces }} espace(s)
-              de {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup></li>
+              {% include 'Space/Partials/_surface_range.html.twig' with { space: space } %}</li>
               {% endif %}
               </ul>
              </div>

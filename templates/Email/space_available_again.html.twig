@@ -17,7 +17,17 @@
             <ul style="margin: 10px 0;">
                 <li><strong>Type :</strong> {{ space.type }}</li>
                 <li><strong>Prix :</strong> À partir de {{ space.price }}€/m²/mois</li>
-                <li><strong>Surface :</strong> De {{ space.minSpace }} à {{ space.maxSpace }} m²</li>
+                {% if space.minSpace or space.maxSpace %}
+                <li><strong>Surface :</strong>
+                    {% if space.minSpace and space.maxSpace and space.minSpace != space.maxSpace %}
+                        De {{ space.minSpace }} à {{ space.maxSpace }} m²
+                    {% elseif space.minSpace %}
+                        {{ space.minSpace }} m²
+                    {% else %}
+                        Jusqu'à {{ space.maxSpace }} m²
+                    {% endif %}
+                </li>
+                {% endif %}
                 <li><strong>Date limite :</strong> {{ space.limitAvailability|date('d/m/Y') }}</li>
             </ul>
         </div>

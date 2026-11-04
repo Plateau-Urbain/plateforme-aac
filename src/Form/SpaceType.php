@@ -86,7 +86,13 @@ class SpaceType extends AbstractType
             ->add('availability', null, ['label' => 'Durée du projet', 'attr' => ['class' => 'form-control', 'placeholder' => "1 an, 6 mois…"], 'required' => true, 'error_bubbling' => false])
             ->add('nbSpaces', IntegerType::class, ['label' => 'Nombre d\'espaces', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
             ->add('minSpace', IntegerType::class, ['label' => 'Surface minimale (m²)', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
-            ->add('maxSpace', IntegerType::class, ['label' => 'Surface maximale (m²)', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
+            ->add('maxSpace', IntegerType::class, [
+                'label' => 'Surface maximale (m²)',
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Facultatif'],
+                'required' => false,
+                'empty_data' => null,
+                'error_bubbling' => false,
+            ])
             ->add('description', null, ['label' => 'Description', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
             ->add('activityDescription', null, ['label' => 'Activités recherchées', 'attr' => ['class' => 'form-control'], 'required' => true, 'error_bubbling' => false])
             ->add('isErp', CheckboxType::class, [

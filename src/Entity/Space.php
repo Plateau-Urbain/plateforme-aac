@@ -224,7 +224,6 @@ class Space implements \Stringable
      * @var int
      */
     #[ORM\Column(name: 'max_space', type: 'integer', nullable: true)]
-    #[Assert\NotBlank(groups: ['standard'])]
     private $maxSpace;
 
     /**

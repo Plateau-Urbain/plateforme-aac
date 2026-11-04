@@ -1,0 +1,7 @@
+{% if space.minSpace and space.maxSpace and space.minSpace != space.maxSpace %}
+de {{ space.minSpace }} m<sup>2</sup> à {{ space.maxSpace }} m<sup>2</sup>
+{% elseif space.minSpace %}
+de {{ space.minSpace }} m<sup>2</sup>
+{% elseif space.maxSpace %}
+jusqu'à {{ space.maxSpace }} m<sup>2</sup>
+{% endif %}
