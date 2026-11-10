@@ -166,6 +166,7 @@ class ApplicationAdmin extends AbstractAdmin
             ->add('wishedSize', null, ['label'=> 'Surface souhaitée (candidature) (m²)'])
             ->add('startOccupation', DateType::class, ['label'=>"Date d'entrée souhaitée"])
             ->add('description', null, ['label'=>"Description du projet"])
+            ->add('localUsageDescription', null, ['label'=>"Quel sera l'usage du local ?", 'required' => false])
             ->add('openToGlobalProject', ChoiceType::class, ['label'=> "Ouvert à faire partie d'un projet collectif", 'choices' => ['Oui' => true, 'Non' => false]])
             ->add('contribution', null, ['label'=> "Quelles idées avez-vous pour participer au projet collectif ?"])
             ->end()
@@ -358,6 +359,7 @@ class ApplicationAdmin extends AbstractAdmin
             ->end()
             ->with('Description du projet', ['class' => 'col-md-12'])
                 ->add('description', TextType::class, ['label' => 'Description'])
+                ->add('localUsageDescription', TextType::class, ['label' => 'Quel sera l\'usage du local ?'])
                 ->add('contribution', TextType::class, ['label' => 'Quelles idées avez-vous pour participer au projet collectif ?'])
                 ->add('openToGlobalProject', null, ['label' => 'Ouvert au projet collectif'])
             ->end()
@@ -469,6 +471,7 @@ class ApplicationAdmin extends AbstractAdmin
           'Bluesky' => 'projectHolder.googleUrl',
           'Autre' => 'projectHolder.otherUrl',
           'Description' => 'description',
+          'Quel sera l\'usage du local ?' => 'localUsageDescription',
           'Date de dépôt de la candidature' => 'created',
           'Type d\'usage' => 'category',
           'Statut juridique (profil)' => 'projectHolder.companyStatus',

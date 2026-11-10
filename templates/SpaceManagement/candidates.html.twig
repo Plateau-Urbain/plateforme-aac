@@ -1062,9 +1062,8 @@
               <li>Type d'usage : <strong>{{ application.category }}</strong></li>
               <li>Statut juridique : <strong>{% if application.companyStatus %}{{ application.companyStatus }}{% else %}—{% endif %}</strong></li>
               <li>Surface souhaitée : <strong>{% if application.wishedSize %}{{ application.wishedSize }}{% else %}—{% endif %} m²</strong></li>
-              {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
-              {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
-              <li>Durée d'occupation : <strong>{% if _lengthValue %}{{ _lengthValue }}{% if _lengthType %} {{ _lengthType }}{% endif %}{% else %}—{% endif %}</strong></li>
+              {% set _length = application.fullLengthOccupation %}
+              <li>Durée d'occupation : <strong>{% if _length %}{{ _length }}{% else %}—{% endif %}</strong></li>
               <li>Date d'entrée souhaitée : <strong>{{ application.startOccupation|localizeddate('long', 'none', 'fr') }}</strong></li>
               {% if space.isMultiLocation and application.locationPreferences|length %}
               <li style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed #ddd;">

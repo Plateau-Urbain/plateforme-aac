@@ -297,13 +297,12 @@
             <tr><th>Départements souhaités</th><td>{% if application.projectHolder.preferredDepartmentsLabels|length %}{{ application.projectHolder.preferredDepartmentsLabels|join(', ') }}{% else %}—{% endif %}</td></tr>
             <tr><th>Statut juridique</th><td>{% if application.companyStatus %}{{ application.companyStatus }}{% else %}—{% endif %}</td></tr>
             <tr><th>Surface souhaitée</th><td>{% if application.wishedSize %}{{ application.wishedSize }}{% else %}—{% endif %} m<sup>2</sup></td></tr>
-            {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
-            {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
+            {% set _length = application.fullLengthOccupation %}
             <tr>
               <th>Durée d'occupation</th>
               <td>
-                {% if _lengthValue %}
-                  {{ _lengthValue }}{% if _lengthType %} {{ _lengthType }}{% endif %}
+                {% if _length %}
+                  {{ _length }}
                 {% else %}
                   —
                 {% endif %}

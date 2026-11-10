@@ -309,13 +309,12 @@
             {% if application.wishedSize %}
               <tr><th>Surface souhaitée</th><td>{{ application.wishedSize }} m<sup>2</sup></td></tr>
             {% endif %}
-            {% set _lengthValue = application.lengthOccupation ?: application.projectHolder.usageDuration %}
-            {% set _lengthType = application.lengthTypeOccupation ?: application.projectHolder.lengthTypeOccupation %}
+            {% set _length = application.fullLengthOccupation %}
             <tr>
               <th>Durée d'occupation</th>
               <td>
-                {% if _lengthValue %}
-                  {{ _lengthValue }}{% if _lengthType %} {{ _lengthType }}{% endif %}
+                {% if _length %}
+                  {{ _length }}
                 {% else %}
                   —
                 {% endif %}

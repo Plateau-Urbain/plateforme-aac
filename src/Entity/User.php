@@ -874,7 +874,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
         $this->documents = new ArrayCollection();
         $this->typeUser = self::PORTEUR;
         $this->preferredDepartments = [];
-        $this->lengthTypeOccupation = 'mois';
+        $this->lengthTypeOccupation = 'an(s)';
         $this->isPuShareholder = null;
         $this->isSubjectToVat = null;
     }
@@ -1191,7 +1191,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyP
      */
     public function getLengthTypeOccupation()
     {
-        return $this->lengthTypeOccupation ?: 'mois';
+        return $this->lengthTypeOccupation ?: 'an(s)';
     }
 
     /**
