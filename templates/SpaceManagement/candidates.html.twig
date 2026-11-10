@@ -1235,14 +1235,6 @@
                 $form.get(0).submit();
             }
 
-            // Ajouter l'ancre de tri/filtres aux liens de la pagination
-            $('.pagination a, .navigation a').each(function() {
-                var href = $(this).attr('href');
-                if (href && href.indexOf('#') === -1) {
-                    $(this).attr('href', href + '#management-toolbar');
-                }
-            });
-
             // Manage sort field (visuel uniquement)
             $(function () {
                 $('.sort').on('click', 'label', function () {

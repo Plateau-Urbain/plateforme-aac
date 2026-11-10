@@ -1157,6 +1157,9 @@ $(document).ready(function() {
         if (!hash || hash === '#') {
             return;
         }
+        if (this.pathname !== window.location.pathname || this.search !== window.location.search) {
+            return;
+        }
         var $target = $(hash);
         var offset = $target.offset();
         if (!offset) {
